@@ -1,71 +1,77 @@
-import { app, shell, BrowserWindow } from 'electron'
-import { join } from 'path'
+import { app, BrowserWindow } from 'electron'
+import { join } from 'node:path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { APP_ORIGIN, mainWindowOptions } from './policy'
+import { hardenWebContents, registerAppScheme, serveRenderer } from './security'
 
-function createWindow(): void {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
-    show: false,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
-    webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
+const devServerUrl = is.dev ? process.env['ELECTRON_RENDERER_URL'] : undefined
+const rendererOrigin = devServerUrl ?? APP_ORIGIN
+
+let mainWindow: BrowserWindow | null = null
+
+function createWindow(): BrowserWindow {
+  const window = new BrowserWindow({
+    ...mainWindowOptions(join(__dirname, '../preload/index.js')),
+    ...(process.platform === 'linux' ? { icon } : {})
   })
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+  window.on('ready-to-show', () => window.show())
+  if (is.dev) {
+    // Surface renderer warnings and errors (including CSP violations) in the dev terminal.
+    window.webContents.on('console-message', ({ level, message, sourceId, lineNumber }) => {
+      if (level === 'warning' || level === 'error') {
+        console.log(`[renderer:${level}] ${message} (${sourceId}:${lineNumber})`)
+      }
+    })
   }
+  window.on('closed', () => {
+    if (mainWindow === window) mainWindow = null
+  })
+
+  void window.loadURL(devServerUrl ?? `${APP_ORIGIN}/index.html`)
+  return window
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.github.twitchdropcollector')
-
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
-
-  createWindow()
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-})
-
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
+function focusMainWindow(): void {
+  if (!mainWindow) {
+    mainWindow = createWindow()
+    return
   }
-})
+  if (mainWindow.isMinimized()) mainWindow.restore()
+  mainWindow.show()
+  mainWindow.focus()
+}
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+registerAppScheme()
+
+// Lets end-to-end tests run against an isolated profile. Ignored in packaged builds.
+const userDataOverride = process.env['TDC_USER_DATA_DIR']
+if (userDataOverride && !app.isPackaged) app.setPath('userData', userDataOverride)
+
+if (!app.requestSingleInstanceLock()) {
+  // Another instance owns the lock; it receives 'second-instance' and focuses its window.
+  app.quit()
+} else {
+  app.on('second-instance', focusMainWindow)
+
+  void app.whenReady().then(() => {
+    electronApp.setAppUserModelId('com.github.twitchdropcollector')
+
+    // F12 toggles DevTools in development; reload shortcuts are ignored in production.
+    app.on('browser-window-created', (_, window) => optimizer.watchWindowShortcuts(window))
+
+    serveRenderer(join(__dirname, '../renderer'))
+    hardenWebContents(rendererOrigin)
+    mainWindow = createWindow()
+
+    // macOS: re-create the window when the dock icon is clicked and none are open.
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) mainWindow = createWindow()
+    })
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit()
+  })
+}

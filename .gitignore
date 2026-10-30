@@ -23,3 +23,7 @@ dist
 .eslintcache
 *.log*
 .DS_Store
+
+# Playwright
+e2e/test-results
+e2e/playwright-report

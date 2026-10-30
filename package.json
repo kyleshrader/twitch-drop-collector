@@ -5,7 +5,8 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "tooling"
+    "tooling",
+    "e2e"
   ],
   "scripts": {
     "dev": "yarn workspace @tdc/desktop dev",
@@ -15,7 +16,8 @@
     "lint": "eslint --cache .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "yarn constraints && yarn typecheck && yarn lint && yarn test"
+    "check": "yarn constraints && yarn typecheck && yarn lint && yarn test",
+    "test:e2e": "turbo run test:e2e"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

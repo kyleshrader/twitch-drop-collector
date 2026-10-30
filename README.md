@@ -14,7 +14,8 @@ yarn dev
 ## Checks
 
 ```bash
-yarn check   # constraints, typecheck, lint, test
+yarn check      # constraints, typecheck, lint, test
+yarn test:e2e   # builds the app and runs Playwright against it
 ```
 
 ## Layout
@@ -22,4 +23,5 @@ yarn check   # constraints, typecheck, lint, test
 - `apps/desktop`: Electron app (`src/main`, `src/preload`, `src/renderer`)
 - `packages/*`: `core`, `api`, `storage`, `config`, `ipc-contract`, `ui`
 - `tooling`: shared tsconfig bases, ESLint boundary rules and their tests
+- `e2e`: Playwright tests that launch the built app
 - `docs`: [spec](docs/spec.md) and [decision log](docs/decisions.md)

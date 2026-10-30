@@ -84,7 +84,7 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 - **Decision:** removed `snap` from the scaffold's electron-builder targets.
 - **Reason:** spec fallback; revisit at M10.
 
-## Carried into M2
+## Carried into M2 (done in M2)
 
 - `apps/desktop/src/main/index.ts` still has the scaffold's `sandbox: false`; there's no single-instance lock yet, and CSP and navigation rules aren't finalised. All of these are M2 scope.
 
@@ -92,3 +92,31 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 
 - **Decision:** `* text=auto eol=lf` in `.gitattributes`.
 - **Reason:** `.editorconfig` and Prettier use LF; with `core.autocrlf=true` on Windows, checkouts would otherwise be CRLF and `prettier --check` would fail.
+
+## 2026-10-29 · M2: renderer served over `app://`, not `file://`
+
+- **Decision:** production loads `app://renderer/index.html`, served by `protocol.handle` from `out/renderer`, with a path check that refuses anything outside that folder. Dev loads the Vite server URL.
+- **Alternatives:** `loadFile` (scaffold default).
+- **Reason:** Electron security checklist item 18; `file://` pages get extra privileges. A single known origin also makes the navigation check exact. `isSameOrigin` compares scheme and host because Node's `URL.origin` is `"null"` for custom schemes, which would make every custom scheme look same-origin.
+
+## 2026-10-29 · M2: CSP as a meta tag written by a Vite plugin
+
+- **Decision:** `index.html` has a placeholder that a small plugin in `electron.vite.config.ts` fills in: `default-src 'none'`, `script-src 'self'`, `style-src 'self'`, `connect-src 'self'` and so on in builds. Dev adds `'unsafe-inline'` to script and style only.
+- **Alternatives:** a response header from the `app://` handler; nonces via Vite's `html.cspNonce`.
+- **Reason:** one source for both modes. Vite's dev server injects the React Refresh preamble and CSS as inline tags. Packaged builds never get the dev policy; the e2e test checks that the built page has no `unsafe-*`.
+
+## 2026-10-29 · M2: navigation, windows, permissions
+
+- **Decision:** applied to every `webContents`: `setWindowOpenHandler` always denies; `will-navigate` blocks other origins; https URLs from either go to `shell.openExternal`, anything else is dropped. `will-attach-webview` is blocked, and the default session denies all permission requests and checks.
+- **Reason:** spec, plus checklist items 5, 12–15. Permissions can be allowed one by one later if a feature needs them (for example notifications).
+
+## 2026-10-29 · M2: security tests at two levels
+
+- **Decision:** `apps/desktop/src/main/policy.test.ts` (Vitest) covers the window options and URL and path helpers. `e2e/` (Playwright `_electron`) launches the built app and checks the live `getLastWebPreferences()`, no Node globals in the renderer, the CSP (including a blocked inline script), denied popups and navigation, and the single-instance lock (a second launch exits 0 and restores the minimised window). Run with `yarn test:e2e`, which builds the app first.
+- **Reason:** M2 acceptance. Both suites were checked by flipping `sandbox` to `false`; each failed.
+- Playwright's Electron support is still marked experimental. It works on Electron 45 so far; WebdriverIO is the spec's fallback.
+
+## 2026-10-29 · M2: `TDC_USER_DATA_DIR` for test isolation
+
+- **Decision:** when the app is not packaged, `TDC_USER_DATA_DIR` overrides `userData` before the single-instance lock is taken.
+- **Reason:** e2e runs (and later settings-restart tests) must not share a lock or settings with a real install. Ignored in packaged builds, so it isn't an attack surface for shipped apps.
