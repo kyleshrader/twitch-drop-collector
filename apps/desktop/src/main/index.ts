@@ -1,12 +1,17 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'node:path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { APP_ORIGIN, mainWindowOptions } from './policy'
+import { createInvokeHandlers } from './ipc/handlers'
+import { registerInvokeRoute } from './ipc/register'
+import { createInvokeRouter } from './ipc/router'
+import { createConsoleLogger } from './logger'
+import { APP_ORIGIN, isSameOrigin, mainWindowOptions } from './policy'
 import { hardenWebContents, registerAppScheme, serveRenderer } from './security'
 
 const devServerUrl = is.dev ? process.env['ELECTRON_RENDERER_URL'] : undefined
 const rendererOrigin = devServerUrl ?? APP_ORIGIN
+const logger = createConsoleLogger({ level: is.dev ? 'debug' : 'info' })
 
 let mainWindow: BrowserWindow | null = null
 
@@ -63,6 +68,14 @@ if (!app.requestSingleInstanceLock()) {
 
     serveRenderer(join(__dirname, '../renderer'))
     hardenWebContents(rendererOrigin)
+    registerInvokeRoute(
+      ipcMain,
+      createInvokeRouter({
+        handlers: createInvokeHandlers({ app, shell, platform: process.platform }),
+        isTrustedSender: (url) => isSameOrigin(url, rendererOrigin),
+        logger: logger.child('ipc')
+      })
+    )
     mainWindow = createWindow()
 
     // macOS: re-create the window when the dock icon is clicked and none are open.

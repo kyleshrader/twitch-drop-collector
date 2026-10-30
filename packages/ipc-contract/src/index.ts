@@ -1,5 +1,18 @@
-// IPC channel definitions and schemas, shared by main, preload and renderer. Filled in at M3.
-import { z } from 'zod'
-
-export const AppInfo = z.object({ name: z.string(), version: z.string() })
-export type AppInfo = z.infer<typeof AppInfo>
+// IPC contract shared by main, preload and renderer. Depends only on zod (dependency rule 7).
+export {
+  AppInfo,
+  OpenExternalInput,
+  invokeChannels,
+  isInvokeChannel,
+  type InvokeArgs,
+  type InvokeChannel,
+  type InvokeInput,
+  type InvokeOutput
+} from './channels'
+export {
+  IpcError,
+  type IpcErrorCode,
+  type IpcFailure,
+  type IpcResult,
+  type PreloadApi
+} from './result'

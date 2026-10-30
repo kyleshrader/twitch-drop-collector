@@ -1,5 +1,6 @@
 {
   "name": "@tdc/desktop",
+  "productName": "Twitch Drop Collector",
   "version": "0.0.0",
   "private": true,
   "description": "Twitch Drop Collector desktop app",
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@electron-toolkit/utils": "^4.0.0",
+    "@tanstack/react-query": "^5.105.0",
     "@tdc/api": "workspace:^",
     "@tdc/config": "workspace:^",
     "@tdc/core": "workspace:^",
@@ -36,6 +38,7 @@
     "react-dom": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "zod": "catalog:"
   }
 }
