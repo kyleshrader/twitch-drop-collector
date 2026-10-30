@@ -74,9 +74,10 @@ export function AccountPanel(): ReactNode {
           <p role="status" data-testid="auth-status">
             {state.message ?? t.signedOut}
           </p>
-          {/* Code sign-in only for now; the login-window strategy stays in main for later. */}
+          {/* Login window only, as upstream: only the Android app client can see campaigns. The
+              device-code strategy stays in main for later (docs/decisions.md). */}
           <p>
-            <button type="button" onClick={() => signIn.mutate('deviceCode')}>
+            <button type="button" onClick={() => signIn.mutate('loginWindow')}>
               {t.signIn}
             </button>{' '}
             {t.signInNote}

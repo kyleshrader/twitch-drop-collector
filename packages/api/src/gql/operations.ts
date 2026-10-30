@@ -97,13 +97,16 @@ export const Campaigns = defineOperation({
   })
 })
 
-/** Full detail for one campaign. Twitch keys this by the user's login (or ID). */
+/**
+ * Full detail for one campaign. Despite the variable's name, channelLogin must be the user's ID:
+ * with the login Twitch returns user: null (checked live, matches upstream).
+ */
 export const CampaignDetailsQuery = defineOperation({
   name: 'DropCampaignDetails',
   sha256: '039277bf98f3130929262cc7c6efd9c141ca3749cb6dca442fc8ead9a53f77c1',
-  variables: (input: { campaignId: string; userLogin: string }) => ({
+  variables: (input: { campaignId: string; userId: string }) => ({
     dropID: input.campaignId,
-    channelLogin: input.userLogin
+    channelLogin: input.userId
   }),
   data: z.looseObject({
     user: z.looseObject({ dropCampaign: CampaignDetails.nullable() }).nullable()

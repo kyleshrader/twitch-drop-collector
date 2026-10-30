@@ -33,6 +33,7 @@ import { createLoginItem } from './adapters/login-item'
 import { browserUserAgent, createLoginWindow, LOGIN_PARTITION } from './adapters/login-window'
 import { applyProxy, createNetFetch, requestTimeoutMs } from './adapters/network'
 import { createSafeStorageSessionStore } from './adapters/session-store'
+import { runGqlProbe } from './dev/gql-probe'
 import { createInvokeHandlers } from './ipc/handlers'
 import { registerInvokeRoute } from './ipc/register'
 import { createInvokeRouter } from './ipc/router'
@@ -240,6 +241,29 @@ if (!app.requestSingleInstanceLock()) {
     })
     // Restoring validates the saved token over the network; don't hold up the window for it.
     void auth.start()
+
+    // Dev-only: TDC_DEV_GQL_PROBE=1 runs read-only GQL queries on the saved session, saves the
+    // raw responses under userData/gql-probe, then quits. Ignored in packaged builds.
+    // TDC_DEV_GQL_PROBE=loginWindow first signs in through the login window (Android app client).
+    const probe = process.env['TDC_DEV_GQL_PROBE']
+    if ((probe === '1' || probe === 'loginWindow') && !app.isPackaged) {
+      const signInFirst =
+        probe === 'loginWindow'
+          ? auth.start().then(() => auth.signIn('loginWindow'))
+          : Promise.resolve()
+      void signInFirst
+        .then(() =>
+          runGqlProbe({
+            auth,
+            http,
+            gqlUrl: endpoints.gql,
+            outDir: join(app.getPath('userData'), 'gql-probe'),
+            logger: logger.child('probe')
+          })
+        )
+        .catch((error: unknown) => logger.error('GQL probe failed', { error }))
+        .finally(() => app.quit())
+    }
 
     // macOS: re-create the window when the dock icon is clicked and none are open.
     app.on('activate', () => {

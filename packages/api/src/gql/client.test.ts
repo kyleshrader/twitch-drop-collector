@@ -140,7 +140,7 @@ describe('gql client', () => {
     }))
     const result = await client().gql.request(CampaignDetailsQuery, {
       campaignId: 'c1',
-      userLogin: 'me'
+      userId: '123'
     })
     expect(result).toEqual({ user: { dropCampaign: null } })
   })

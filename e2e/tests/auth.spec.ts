@@ -23,17 +23,22 @@ test.afterEach(async () => {
 const launch = (userDataDir = newUserDataDir()): ReturnType<typeof launchApp> =>
   launchApp(userDataDir, { TDC_TWITCH_ENDPOINTS: JSON.stringify(twitchEndpoints(twitch.url)) })
 
-/**
- * The login-window method has no button for now (code sign-in is the visible one), so these
- * tests start it the way the button would, through the renderer's IPC API.
- */
+/** The visible sign-in: Twitch's login window (Android app client), as upstream. */
 async function startWindowSignIn(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Sign in with Twitch' }).click()
+}
+
+/**
+ * Device-code sign-in has no button for now (Android TV sessions can't see campaigns), so the
+ * test starts it the way a button would, through the renderer's IPC API.
+ */
+async function startCodeSignIn(page: Page): Promise<void> {
   await page.evaluate(() =>
     (
       window as unknown as { api: { invoke: (c: string, i: unknown) => Promise<unknown> } }
-    ).api.invoke('auth:signIn', { method: 'loginWindow' })
+    ).api.invoke('auth:signIn', { method: 'deviceCode' })
   )
-  // The button would refresh the panel's auth state; without one, reload so it polls again.
+  // A button would refresh the panel's auth state; without one, reload so it polls again.
   // (Main pushes auth changes to the renderer from M8.)
   await page.reload()
 }
@@ -117,9 +122,9 @@ test('restores the session after a restart, then signs out completely', async ()
 test('signs in with a device code', async () => {
   const { app, window: page } = await launch()
   try {
-    // Code sign-in is the only visible method for now.
+    // The login window is the only visible method; code sign-in is reachable only through IPC.
     await expect(page.getByRole('button', { name: /^Sign in/ })).toHaveCount(1)
-    await page.getByRole('button', { name: 'Sign in with Twitch' }).click()
+    await startCodeSignIn(page)
     await expect(page.getByTestId('device-code')).toHaveText('E2ECODE1')
     await expect(status(page)).toHaveText('Signed in as e2euser', { timeout: 10_000 })
     expect(await everythingTheRendererCanReach(app, page)).not.toContain(DEVICE_TOKEN)

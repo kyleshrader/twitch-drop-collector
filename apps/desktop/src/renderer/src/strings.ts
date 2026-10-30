@@ -15,7 +15,8 @@ export const strings = {
     unverified: '(offline, not yet re-checked)',
     signOut: 'Sign out',
     signIn: 'Sign in with Twitch',
-    signInNote: 'You’ll get a short code to confirm at twitch.tv/activate in your usual browser.',
+    signInNote:
+      'Opens Twitch’s own sign-in page in a window. Check that its address bar shows 🔒 www.twitch.tv. Your password goes only to Twitch; this app only receives the sign-in.',
     waitingForWindow: 'Finish signing in in the Twitch window…',
     waitingForCode: 'Waiting for you to enter the code on Twitch…',
     enterCode: 'Your code:',
