@@ -313,3 +313,18 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
   - Directory slugs are built from the game name when Twitch gave none.
 - **Watch (`createWatchService`):** one watch every 20s on the target channel. A progress-check event fires about 15s after each watch, if the target hasn't changed. A new target or `restart()` (after a claim) cuts the wait short. Failed watches are reported and the loop continues. Tested on the manual clock.
 - **Test support:** `fakeGql` answers operations by name and validates every answer with the operation's schema, so fakes can't drift from the real response shapes. The services are tested on the live fixtures.
+
+## 2026-10-30 · M7b: the miner
+
+- **`createMiner` (`packages/core/src/miner/miner.ts`)** ports upstream's main loop. It's event-driven: its own actions (reload, games update, channel switch, claim, stream re-check, progress check) run one at a time through a queue, which replaces upstream's state-flag loop. Every decision uses the tested pure rules.
+- **Reload:** inventory refresh, `claimAll` (each claim announced through `onClaim`), wanted games, channel refresh, PubSub topic sync for tracked channels, channel pick, and maintenance timers (campaign and drop windows within the hour, plus an hourly full reload).
+- **Live events:**
+  - `drop-progress` updates a drop that can be earned on the watched channel.
+  - `drop-claim` records the claim ID and claims. After 4s it polls `CurrentDrop` up to 8 times, 2s apart, until Twitch moves on, then restarts watching, or reloads if the campaign is done on this channel.
+  - `stream-down` takes effect at once. `stream-up` and `broadcast-settings-update` re-fetch after 120s.
+  - `viewcount` updates viewers.
+  - Reward notifications trigger a reload, and the notification is dismissed.
+  - A failed watch re-checks the channel.
+- **Progress:** when Twitch has reported nothing for 60s, the miner asks `CurrentDrop`. If that has nothing, it adds one estimated minute to the active campaign, and at the 15-minute cap it switches channel.
+- **Other:** a manual channel choice wins while it's watchable. A failed task sets status `error` and retries a reload after 5 minutes. `stop()` unsubscribes everything and stops watching. The UI reads `snapshot()`: status, message, watched channel, active campaign and drop, and wanted games.
+- **Tests:** 15 scenarios with in-memory service fakes, a fake PubSub and the manual clock.
