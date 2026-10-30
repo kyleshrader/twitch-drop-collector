@@ -1,0 +1,72 @@
+[
+  {
+    "data": {
+      "user": {
+        "id": "97160118",
+        "profileURL": "https://www.twitch.tv/vincentsmg",
+        "displayName": "VincentSMG",
+        "login": "vincentsmg",
+        "profileImageURL": "https://static-cdn.jtvnw.net/jtv_user_pictures/7c71fa7c-3582-4a22-b8e5-e10ef00d498f-profile_image-150x150.png",
+        "broadcastSettings": {
+          "id": "97160118",
+          "title": "!Drops (FAST DROPS) 12 Year Rust veteran !discord (Multistreaming)",
+          "game": {
+            "id": "263490",
+            "displayName": "Rust",
+            "name": "Rust",
+            "slug": "rust",
+            "__typename": "Game"
+          },
+          "__typename": "BroadcastSettings"
+        },
+        "stream": {
+          "id": "320872063070",
+          "viewersCount": 653,
+          "tags": [],
+          "__typename": "Stream"
+        },
+        "__typename": "User"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 47,
+      "requestID": "REQUEST",
+      "operationName": "VideoPlayerStreamInfoOverlayChannel"
+    }
+  },
+  {
+    "data": {
+      "user": {
+        "id": "742044363",
+        "profileURL": "https://www.twitch.tv/vinni_tv_",
+        "displayName": "Vinni_TV_",
+        "login": "vinni_tv_",
+        "profileImageURL": "https://static-cdn.jtvnw.net/jtv_user_pictures/f79815aa-2638-448e-91e9-6bfd473702e9-profile_image-150x150.png",
+        "broadcastSettings": {
+          "id": "742044363",
+          "title": "[GER][PC][24/7 Drops] Base Invaders | Entspannt genießen | !Drops !Dc !SNK !HBF #Aldigönnt",
+          "game": {
+            "id": "263490",
+            "displayName": "Rust",
+            "name": "Rust",
+            "slug": "rust",
+            "__typename": "Game"
+          },
+          "__typename": "BroadcastSettings"
+        },
+        "stream": {
+          "id": "318995962599",
+          "viewersCount": 30,
+          "tags": [],
+          "__typename": "Stream"
+        },
+        "__typename": "User"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 47,
+      "requestID": "REQUEST",
+      "operationName": "VideoPlayerStreamInfoOverlayChannel"
+    }
+  }
+]

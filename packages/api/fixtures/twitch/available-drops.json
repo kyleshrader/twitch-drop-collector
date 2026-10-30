@@ -1,0 +1,152 @@
+[
+  {
+    "data": {
+      "channel": {
+        "id": "97160118",
+        "viewerDropCampaigns": [
+          {
+            "id": "df28c49a-1a1f-45d5-b3e5-603cb4a7b208",
+            "name": "1 Month of Apple TV",
+            "game": {
+              "id": "509663",
+              "name": "Special Events",
+              "__typename": "Game"
+            },
+            "detailsURL": "https://blog.twitch.tv/2026/10/20/sub-for-apple-tv-and-ted-lasso-chat-badges/ ",
+            "endAt": "2026-11-03T19:59:59.999Z",
+            "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/CAMPAIGN/2629997a-5629-49a7-86e1-da08aaaccfa2.png",
+            "eventBasedDrops": [],
+            "timeBasedDrops": [
+              {
+                "id": "4c02faf6-c8bf-11f1-8ea4-0a58a9feac02",
+                "name": "1 Month of Apple TV",
+                "startAt": "2026-10-20T19:00:00Z",
+                "endAt": "2026-11-03T19:59:59.999Z",
+                "benefitEdges": [
+                  {
+                    "benefit": {
+                      "id": "1e20a97c-c84e-11f1-b89b-0a58a9feac02",
+                      "name": "1 Month of Apple TV",
+                      "game": {
+                        "name": "Just Chatting",
+                        "id": "509658",
+                        "__typename": "Game"
+                      },
+                      "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/d0537f4f-b701-4c77-bb26-de26ba23dd3a.png",
+                      "__typename": "DropBenefit"
+                    },
+                    "entitlementLimit": 1,
+                    "__typename": "DropBenefitEdge"
+                  }
+                ],
+                "requiredMinutesWatched": 0,
+                "requiredSubs": 1,
+                "__typename": "TimeBasedDrop"
+              }
+            ],
+            "summary": {
+              "includesMWRequirement": false,
+              "includesSubRequirement": true,
+              "isSitewide": true,
+              "isRewardCampaign": true,
+              "isPermanentlyDismissible": true,
+              "__typename": "DropCampaignSummary"
+            },
+            "localizedContent": {
+              "title": "Subscribe to earn Drops!",
+              "earnInstructions": "Get rewards by purchasing or gifting subscriptions to {Channel} while they're live in any category",
+              "actionItems": null,
+              "endDateText": "Ends on {EndDate}.",
+              "permanentDismissText": "Don't show again",
+              "ctaText": "View Details",
+              "dismissText": "Dismiss",
+              "__typename": "DropCommunityHighlightCampaignLocalizedContent"
+            },
+            "__typename": "DropCampaign"
+          }
+        ],
+        "__typename": "Channel"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 36,
+      "requestID": "REQUEST",
+      "operationName": "DropsHighlightService_AvailableDrops"
+    }
+  },
+  {
+    "data": {
+      "channel": {
+        "id": "742044363",
+        "viewerDropCampaigns": [
+          {
+            "id": "df28c49a-1a1f-45d5-b3e5-603cb4a7b208",
+            "name": "1 Month of Apple TV",
+            "game": {
+              "id": "509663",
+              "name": "Special Events",
+              "__typename": "Game"
+            },
+            "detailsURL": "https://blog.twitch.tv/2026/10/20/sub-for-apple-tv-and-ted-lasso-chat-badges/ ",
+            "endAt": "2026-11-03T19:59:59.999Z",
+            "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/CAMPAIGN/2629997a-5629-49a7-86e1-da08aaaccfa2.png",
+            "eventBasedDrops": [],
+            "timeBasedDrops": [
+              {
+                "id": "4c02faf6-c8bf-11f1-8ea4-0a58a9feac02",
+                "name": "1 Month of Apple TV",
+                "startAt": "2026-10-20T19:00:00Z",
+                "endAt": "2026-11-03T19:59:59.999Z",
+                "benefitEdges": [
+                  {
+                    "benefit": {
+                      "id": "1e20a97c-c84e-11f1-b89b-0a58a9feac02",
+                      "name": "1 Month of Apple TV",
+                      "game": {
+                        "name": "Just Chatting",
+                        "id": "509658",
+                        "__typename": "Game"
+                      },
+                      "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/d0537f4f-b701-4c77-bb26-de26ba23dd3a.png",
+                      "__typename": "DropBenefit"
+                    },
+                    "entitlementLimit": 1,
+                    "__typename": "DropBenefitEdge"
+                  }
+                ],
+                "requiredMinutesWatched": 0,
+                "requiredSubs": 1,
+                "__typename": "TimeBasedDrop"
+              }
+            ],
+            "summary": {
+              "includesMWRequirement": false,
+              "includesSubRequirement": true,
+              "isSitewide": true,
+              "isRewardCampaign": true,
+              "isPermanentlyDismissible": true,
+              "__typename": "DropCampaignSummary"
+            },
+            "localizedContent": {
+              "title": "Subscribe to earn Drops!",
+              "earnInstructions": "Get rewards by purchasing or gifting subscriptions to {Channel} while they're live in any category",
+              "actionItems": null,
+              "endDateText": "Ends on {EndDate}.",
+              "permanentDismissText": "Don't show again",
+              "ctaText": "View Details",
+              "dismissText": "Dismiss",
+              "__typename": "DropCommunityHighlightCampaignLocalizedContent"
+            },
+            "__typename": "DropCampaign"
+          }
+        ],
+        "__typename": "Channel"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 36,
+      "requestID": "REQUEST",
+      "operationName": "DropsHighlightService_AvailableDrops"
+    }
+  }
+]

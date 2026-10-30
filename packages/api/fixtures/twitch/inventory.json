@@ -1,0 +1,1128 @@
+[
+  {
+    "data": {
+      "currentUser": {
+        "id": "10000001",
+        "inventory": {
+          "dropCampaignsInProgress": [
+            {
+              "id": "a40fa4aa-bdca-4b6f-8858-6a3f5aaf3484",
+              "detailsURL": "https://event.pearlabyss.com/CrimsonDesert/Drops?_dropsType=twitch",
+              "accountLinkURL": "https://event.pearlabyss.com/CrimsonDesert/Drops?_dropsType=twitch",
+              "startAt": "2026-10-29T22:00:00Z",
+              "endAt": "2026-11-04T23:59:59.999Z",
+              "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/CAMPAIGN/c30c938a-e0b7-42d0-ae27-0ba759f980c0.jpeg",
+              "name": "Crimson Desert DLC Week 1",
+              "status": "ACTIVE",
+              "self": {
+                "isAccountConnected": true,
+                "__typename": "DropCampaignSelfEdge"
+              },
+              "game": {
+                "id": "515186",
+                "slug": "crimson-desert",
+                "name": "Crimson Desert",
+                "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/515186_IGDB-285x380.jpg",
+                "__typename": "Game"
+              },
+              "allow": {
+                "channels": null,
+                "__typename": "DropCampaignACL"
+              },
+              "eventBasedDrops": [],
+              "timeBasedDrops": [
+                {
+                  "id": "9b0407f9-b275-11f1-a20c-0a58a9feac02",
+                  "name": "60 min.",
+                  "startAt": "2026-10-29T22:00:00Z",
+                  "endAt": "2026-11-04T23:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 60,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "3346bf0d-5179-4a89-b760-13e1581dfd12_CUSTOM_ID_DLC60MINWEEK1",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/6fb510c8-189a-4232-8552-0f662f1b2ad2.png",
+                        "name": "Lantern & Meat Dish",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 60,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": "10000001#a40fa4aa-bdca-4b6f-8858-6a3f5aaf3484#9b0407f9-b275-11f1-a20c-0a58a9feac02",
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "a40fa4aa-bdca-4b6f-8858-6a3f5aaf3484",
+                    "detailsURL": "https://event.pearlabyss.com/CrimsonDesert/Drops?_dropsType=twitch",
+                    "accountLinkURL": "https://event.pearlabyss.com/CrimsonDesert/Drops?_dropsType=twitch",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "300% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "a044b8df-b275-11f1-a3ec-0a58a9feac02",
+                  "name": "120 min.",
+                  "startAt": "2026-10-29T22:00:00Z",
+                  "endAt": "2026-11-04T23:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 120,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "3346bf0d-5179-4a89-b760-13e1581dfd12_CUSTOM_ID_DLC120MINWEEK1",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a018ac8f-47c3-45d3-b4e7-d5442f9742a1.png",
+                        "name": "Pirate Eyepatch & Sword",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 120,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": "10000001#a40fa4aa-bdca-4b6f-8858-6a3f5aaf3484#a044b8df-b275-11f1-a3ec-0a58a9feac02",
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "a40fa4aa-bdca-4b6f-8858-6a3f5aaf3484",
+                    "detailsURL": "https://event.pearlabyss.com/CrimsonDesert/Drops?_dropsType=twitch",
+                    "accountLinkURL": "https://event.pearlabyss.com/CrimsonDesert/Drops?_dropsType=twitch",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "150% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "a622abb2-b275-11f1-bf97-0a58a9feac02",
+                  "name": "180 min.",
+                  "startAt": "2026-10-29T22:00:00Z",
+                  "endAt": "2026-11-04T23:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 180,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "3346bf0d-5179-4a89-b760-13e1581dfd12_CUSTOM_ID_DLC180MINWEEK1",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/8923aee2-68a7-489e-aee0-e153381878af.png",
+                        "name": "Pet Parrot in Pirate Hat",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 180,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": "10000001#a40fa4aa-bdca-4b6f-8858-6a3f5aaf3484#a622abb2-b275-11f1-bf97-0a58a9feac02",
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "a40fa4aa-bdca-4b6f-8858-6a3f5aaf3484",
+                    "detailsURL": "https://event.pearlabyss.com/CrimsonDesert/Drops?_dropsType=twitch",
+                    "accountLinkURL": "https://event.pearlabyss.com/CrimsonDesert/Drops?_dropsType=twitch",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "100% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                }
+              ],
+              "__typename": "DropCampaign"
+            },
+            {
+              "id": "ef80b803-00ee-41e0-9223-18eee2499e41",
+              "detailsURL": "https://www.ubisoft.com/en-us/help/connectivity-and-performance/article/information-about-twitch-drops-for-ubisoft-games/000065532#:~:text=You%20can%20earn%20in%2Dgame,stream%20from%20a%20participating%20channel.",
+              "accountLinkURL": "https://drops-register.ubi.com/#/en-US",
+              "startAt": "2026-10-17T05:00:00Z",
+              "endAt": "2026-10-26T04:58:59.999Z",
+              "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/CAMPAIGN/42267ad4-b20d-4757-aeb4-ec9c2a034c31.png",
+              "name": "R6S S2 2026 19",
+              "status": "EXPIRED",
+              "self": {
+                "isAccountConnected": true,
+                "__typename": "DropCampaignSelfEdge"
+              },
+              "game": {
+                "id": "460630",
+                "slug": "tom-clancys-rainbow-six-siege",
+                "name": "Rainbow Six Siege",
+                "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/460630-285x380.jpg",
+                "__typename": "Game"
+              },
+              "allow": {
+                "channels": [
+                  {
+                    "id": "208760543",
+                    "name": "rainbow6jp",
+                    "url": "https://www.twitch.tv/rainbow6jp",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "259664444",
+                    "name": "rainbow6tur",
+                    "url": "https://www.twitch.tv/rainbow6tur",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "132106826",
+                    "name": "rainbow6br",
+                    "url": "https://www.twitch.tv/rainbow6br",
+                    "__typename": "Channel"
+                  }
+                ],
+                "__typename": "DropCampaignACL"
+              },
+              "eventBasedDrops": [],
+              "timeBasedDrops": [
+                {
+                  "id": "6144841c-8ce2-11f1-95f1-0a58a9feac02",
+                  "name": "Esports Pack",
+                  "startAt": "2026-10-17T05:00:00Z",
+                  "endAt": "2026-10-26T04:58:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 60,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "59d4f6c2-36bc-4c3f-83c8-f8d9936dc75b_CUSTOM_ID_esportspack_2026_stage2.1",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a0bcc4dc-161b-4d49-bf1f-4cb523b18d73.jpeg",
+                        "name": "Esports Pack 26 Stage 2.1",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 1,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 60,
+                    "currentSubs": 0,
+                    "isClaimed": true,
+                    "dropInstanceID": "10000001#ef80b803-00ee-41e0-9223-18eee2499e41#6144841c-8ce2-11f1-95f1-0a58a9feac02",
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "ef80b803-00ee-41e0-9223-18eee2499e41",
+                    "detailsURL": "https://www.ubisoft.com/en-us/help/connectivity-and-performance/article/information-about-twitch-drops-for-ubisoft-games/000065532#:~:text=You%20can%20earn%20in%2Dgame,stream%20from%20a%20participating%20channel.",
+                    "accountLinkURL": "https://drops-register.ubi.com/#/en-US",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "301% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "69b9ec1f-8ce2-11f1-99a7-0a58a9feac02",
+                  "name": "Esports Pack",
+                  "startAt": "2026-10-17T05:00:00Z",
+                  "endAt": "2026-10-26T04:58:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 180,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "59d4f6c2-36bc-4c3f-83c8-f8d9936dc75b_CUSTOM_ID_esportspack_2026_stage2.1",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a0bcc4dc-161b-4d49-bf1f-4cb523b18d73.jpeg",
+                        "name": "Esports Pack 26 Stage 2.1",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 1,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 180,
+                    "currentSubs": 0,
+                    "isClaimed": true,
+                    "dropInstanceID": "10000001#ef80b803-00ee-41e0-9223-18eee2499e41#69b9ec1f-8ce2-11f1-99a7-0a58a9feac02",
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "ef80b803-00ee-41e0-9223-18eee2499e41",
+                    "detailsURL": "https://www.ubisoft.com/en-us/help/connectivity-and-performance/article/information-about-twitch-drops-for-ubisoft-games/000065532#:~:text=You%20can%20earn%20in%2Dgame,stream%20from%20a%20participating%20channel.",
+                    "accountLinkURL": "https://drops-register.ubi.com/#/en-US",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "100% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "870d17fe-8ce2-11f1-88b8-0a58a9feac02",
+                  "name": "Esports Pack",
+                  "startAt": "2026-10-17T05:00:00Z",
+                  "endAt": "2026-10-26T04:58:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 360,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "59d4f6c2-36bc-4c3f-83c8-f8d9936dc75b_CUSTOM_ID_esportspack_2026_stage2.1",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a0bcc4dc-161b-4d49-bf1f-4cb523b18d73.jpeg",
+                        "name": "Esports Pack 26 Stage 2.1",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 181,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "ef80b803-00ee-41e0-9223-18eee2499e41",
+                    "detailsURL": "https://www.ubisoft.com/en-us/help/connectivity-and-performance/article/information-about-twitch-drops-for-ubisoft-games/000065532#:~:text=You%20can%20earn%20in%2Dgame,stream%20from%20a%20participating%20channel.",
+                    "accountLinkURL": "https://drops-register.ubi.com/#/en-US",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "50% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "8aecc342-8ce2-11f1-ae2b-0a58a9feac02",
+                  "name": "Esports Pack",
+                  "startAt": "2026-10-17T05:00:00Z",
+                  "endAt": "2026-10-26T04:58:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 540,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "59d4f6c2-36bc-4c3f-83c8-f8d9936dc75b_CUSTOM_ID_esportspack_2026_stage2.1",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a0bcc4dc-161b-4d49-bf1f-4cb523b18d73.jpeg",
+                        "name": "Esports Pack 26 Stage 2.1",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 181,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "ef80b803-00ee-41e0-9223-18eee2499e41",
+                    "detailsURL": "https://www.ubisoft.com/en-us/help/connectivity-and-performance/article/information-about-twitch-drops-for-ubisoft-games/000065532#:~:text=You%20can%20earn%20in%2Dgame,stream%20from%20a%20participating%20channel.",
+                    "accountLinkURL": "https://drops-register.ubi.com/#/en-US",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "33% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                }
+              ],
+              "__typename": "DropCampaign"
+            },
+            {
+              "id": "5f277031-448e-4eb2-8817-45f56779633c",
+              "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+              "accountLinkURL": "https://account.battle.net/connections",
+              "startAt": "2026-10-30T07:00:00Z",
+              "endAt": "2026-11-23T07:59:59.999Z",
+              "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/CAMPAIGN/167cbaa3-f803-456b-a90e-64d78da9fbe0.png",
+              "name": "OWCS Stage 3 Playoffs",
+              "status": "ACTIVE",
+              "self": {
+                "isAccountConnected": true,
+                "__typename": "DropCampaignSelfEdge"
+              },
+              "game": {
+                "id": "515025",
+                "slug": "overwatch-2",
+                "name": "Overwatch",
+                "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/515025-285x380.jpg",
+                "__typename": "Game"
+              },
+              "allow": {
+                "channels": [
+                  {
+                    "id": "137512364",
+                    "name": "ow_esports",
+                    "url": "https://www.twitch.tv/ow_esports",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "882546504",
+                    "name": "ow_esports_jp",
+                    "url": "https://www.twitch.tv/ow_esports_jp",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "42450967",
+                    "name": "unter",
+                    "url": "https://www.twitch.tv/unter",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "23220337",
+                    "name": "emongg",
+                    "url": "https://www.twitch.tv/emongg",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "53648099",
+                    "name": "warn",
+                    "url": "https://www.twitch.tv/warn",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "27689704",
+                    "name": "commanderx",
+                    "url": "https://www.twitch.tv/commanderx",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "124994203",
+                    "name": "rakattack",
+                    "url": "https://www.twitch.tv/rakattack",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "53265819",
+                    "name": "poko",
+                    "url": "https://www.twitch.tv/poko",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "194331558",
+                    "name": "august",
+                    "url": "https://www.twitch.tv/august",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "51929371",
+                    "name": "ml7support",
+                    "url": "https://www.twitch.tv/ml7support",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "44158279",
+                    "name": "karq",
+                    "url": "https://www.twitch.tv/karq",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "29470837",
+                    "name": "angrodtralari",
+                    "url": "https://www.twitch.tv/angrodtralari",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "136539915",
+                    "name": "teetawatv3",
+                    "url": "https://www.twitch.tv/teetawatv3",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "142720133",
+                    "name": "ta1yo_tv",
+                    "url": "https://www.twitch.tv/ta1yo_tv",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "806179236",
+                    "name": "meltonff",
+                    "url": "https://www.twitch.tv/meltonff",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "139064318",
+                    "name": "nitrao",
+                    "url": "https://www.twitch.tv/nitrao",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "170760368",
+                    "name": "6cyx",
+                    "url": "https://www.twitch.tv/6cyx",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "125129801",
+                    "name": "avrl",
+                    "url": "https://www.twitch.tv/avrl",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "123484627",
+                    "name": "iddqd",
+                    "url": "https://www.twitch.tv/iddqd",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "121202124",
+                    "name": "hadi_ow",
+                    "url": "https://www.twitch.tv/hadi_ow",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "477111082",
+                    "name": "owbrain",
+                    "url": "https://www.twitch.tv/owbrain",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "147487993",
+                    "name": "tommathan",
+                    "url": "https://www.twitch.tv/tommathan",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "30182559",
+                    "name": "hammerkick",
+                    "url": "https://www.twitch.tv/hammerkick",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "136255354",
+                    "name": "franciscoow",
+                    "url": "https://www.twitch.tv/franciscoow",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "174667965",
+                    "name": "profoundrice",
+                    "url": "https://www.twitch.tv/profoundrice",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "146593616",
+                    "name": "zbra",
+                    "url": "https://www.twitch.tv/zbra",
+                    "__typename": "Channel"
+                  },
+                  {
+                    "id": "162257460",
+                    "name": "chosen_ow",
+                    "url": "https://www.twitch.tv/chosen_ow",
+                    "__typename": "Channel"
+                  }
+                ],
+                "__typename": "DropCampaignACL"
+              },
+              "eventBasedDrops": [],
+              "timeBasedDrops": [
+                {
+                  "id": "07fe0213-d263-11f1-b6af-0a58a9feac02",
+                  "name": "OWCS Away Sombra Skin",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 720,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_1707777",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/21451e8a-1ab1-4f88-a13c-07e00f2a75f2.png",
+                        "name": "OWCS Away Sombra Skin",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "16% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "10ee8610-d263-11f1-b721-0a58a9feac02",
+                  "name": "Esports Loot Box",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 840,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_2152950",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/58277681-1b97-42b6-8e0d-2ef7ba5ac536.png",
+                        "name": "Esports Loot Box",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "13% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "1730cbcb-d263-11f1-88b8-0a58a9feac02",
+                  "name": "Esports Loot Box",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 900,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_2152951",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/08d53625-9560-4d9f-9a2b-41f4741676f0.png",
+                        "name": "Esports Loot Box",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "12% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "8d48a014-d25e-11f1-abf2-0a58a9feac02",
+                  "name": "Sophisticated Sparklers Spray",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 180,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_2136817",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/c18179a6-d751-4ee7-aea5-6263ead48cdf.png",
+                        "name": "Sophisticated Sparklers",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "64% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "929b2b14-d25a-11f1-a394-0a58a9feac02",
+                  "name": "Candlelit Satya Spray",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 60,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_2136819",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/ac407c56-e9c2-463d-bd45-40d79ca505cd.png",
+                        "name": "Candlelit Satya Spray",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 1,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 60,
+                    "currentSubs": 0,
+                    "isClaimed": true,
+                    "dropInstanceID": "10000001#5f277031-448e-4eb2-8817-45f56779633c#929b2b14-d25a-11f1-a394-0a58a9feac02",
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "193% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "9e791855-d25a-11f1-ab5e-0a58a9feac02",
+                  "name": "Purrfect Evening Spray",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 120,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_1853599",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a514e2e0-e7ed-48c8-bc42-91d40ec87a78.png",
+                        "name": "Purrfect Evening Spray",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "96% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "9f770a1c-d25e-11f1-b842-0a58a9feac02",
+                  "name": "Esports Loot Box",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 240,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_2152948",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/0b3013fe-b163-451a-908c-172f68b12dad.png",
+                        "name": "Esports Loot Box",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "48% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "d4c0c807-d25e-11f1-9ef6-0a58a9feac02",
+                  "name": "Bua and Palak's Lanterns Spray",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 360,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_2136821",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/708214c4-841c-4950-82dd-dc83e0d83d31.png",
+                        "name": "Bua and Palak's Lanterns",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "32% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "dd6958d9-d25e-11f1-ab5e-0a58a9feac02",
+                  "name": "Lantern-Lit Night Name Card",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 480,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_2130951",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/29b08930-31a7-4bf1-9dc4-b9ca39d4556d.png",
+                        "name": "Lantern-Lit Night NC",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "24% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                },
+                {
+                  "id": "ff62a5f3-d262-11f1-a001-0a58a9feac02",
+                  "name": "OWCS Home Sombra Skin",
+                  "startAt": "2026-10-30T07:00:00Z",
+                  "endAt": "2026-11-23T07:59:59.999Z",
+                  "preconditionDrops": null,
+                  "requiredMinutesWatched": 600,
+                  "requiredSubs": 0,
+                  "benefitEdges": [
+                    {
+                      "benefit": {
+                        "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_1707776",
+                        "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/5bf9fb37-eb3f-49b2-a855-cb1e08c687a4.png",
+                        "name": "OWCS Home Sombra Skin",
+                        "distributionType": "DIRECT_ENTITLEMENT",
+                        "__typename": "DropBenefit"
+                      },
+                      "entitlementLimit": 1,
+                      "claimCount": 0,
+                      "__typename": "DropBenefitEdge"
+                    }
+                  ],
+                  "self": {
+                    "hasPreconditionsMet": true,
+                    "currentMinutesWatched": 116,
+                    "currentSubs": 0,
+                    "isClaimed": false,
+                    "dropInstanceID": null,
+                    "__typename": "TimeBasedDropSelfEdge"
+                  },
+                  "campaign": {
+                    "id": "5f277031-448e-4eb2-8817-45f56779633c",
+                    "detailsURL": "https://esports.overwatch.com/en-us/rewards",
+                    "accountLinkURL": "https://account.battle.net/connections",
+                    "self": {
+                      "isAccountConnected": true,
+                      "__typename": "DropCampaignSelfEdge"
+                    },
+                    "__typename": "DropCampaign"
+                  },
+                  "localizedContent": {
+                    "progress": "19% of {MinutesWatchedRequirement}",
+                    "__typename": "DropTypeInventoryLocalizedContent"
+                  },
+                  "__typename": "TimeBasedDrop"
+                }
+              ],
+              "__typename": "DropCampaign"
+            }
+          ],
+          "gameEventDrops": [
+            {
+              "game": null,
+              "id": "59d4f6c2-36bc-4c3f-83c8-f8d9936dc75b_CUSTOM_ID_esportspack_2026_stage2.1",
+              "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a0bcc4dc-161b-4d49-bf1f-4cb523b18d73.jpeg",
+              "isConnected": true,
+              "lastAwardedAt": "2026-10-18T19:48:50.183Z",
+              "name": "Esports Pack 26 Stage 2.1",
+              "requiredAccountLink": "https://drops-register.ubi.com/#/en-US",
+              "totalCount": 6,
+              "__typename": "UserDropReward"
+            },
+            {
+              "game": null,
+              "id": "9620a89d-b07c-4160-a851-ae832fa6985e_CUSTOM_ID_2136819",
+              "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/ac407c56-e9c2-463d-bd45-40d79ca505cd.png",
+              "isConnected": true,
+              "lastAwardedAt": "2026-10-30T08:45:23.315Z",
+              "name": "Candlelit Satya Spray",
+              "requiredAccountLink": "https://account.battle.net/connections",
+              "totalCount": 1,
+              "__typename": "UserDropReward"
+            },
+            {
+              "game": null,
+              "id": "e2a2aacb-acce-4761-8960-3c7f814a3f55_CUSTOM_ID_BackpackCharmCannedTomatoes",
+              "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/0326b61e-b431-48cf-93bb-231f457332c1.png",
+              "isConnected": true,
+              "lastAwardedAt": "2026-05-21T13:11:21Z",
+              "name": "Canned Tomatoes",
+              "requiredAccountLink": "https://id.embark.games/",
+              "totalCount": 1,
+              "__typename": "UserDropReward"
+            },
+            {
+              "game": null,
+              "id": "a3c13f82-ce43-4f29-88c0-47962f47809d_CUSTOM_ID_b172d38c-5911-4288-a6bb-b91ea0329358",
+              "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/e2767d91-c6fe-4a75-9acb-cb2d2f65eed7.png",
+              "isConnected": true,
+              "lastAwardedAt": "2026-09-12T06:25:46.361Z",
+              "name": "10x Copper Bars",
+              "requiredAccountLink": "https://accounts.palia.com",
+              "totalCount": 1,
+              "__typename": "UserDropReward"
+            },
+            {
+              "game": null,
+              "id": "5f41544e-1cde-4002-97dc-497d59f71dda_CUSTOM_ID_tranquility-VEEN-8881-1",
+              "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/cce115a7-0d47-4b90-bcf4-36a402fd50db.jpeg",
+              "isConnected": true,
+              "lastAwardedAt": "2026-09-28T15:33:57.9Z",
+              "name": "Vigil MET SKIN",
+              "requiredAccountLink": "https://www.eveonline.com/twitch",
+              "totalCount": 1,
+              "__typename": "UserDropReward"
+            }
+          ],
+          "__typename": "Inventory"
+        },
+        "__typename": "User"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 685,
+      "requestID": "REQUEST",
+      "operationName": "Inventory"
+    }
+  }
+]

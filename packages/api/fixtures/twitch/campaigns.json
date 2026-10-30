@@ -1,0 +1,193 @@
+[
+  {
+    "data": {
+      "currentUser": {
+        "id": "10000001",
+        "login": "test_user",
+        "dropCampaigns": [
+          {
+            "id": "41fd0f1e-aee2-495f-910c-6c6ebd056087",
+            "name": "EA Season 11 Drops 3",
+            "owner": {
+              "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+              "name": "IRONMACE",
+              "__typename": "Organization"
+            },
+            "game": {
+              "id": "2009321156",
+              "displayName": "Dark and Darker",
+              "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/2009321156_IGDB-120x160.jpg",
+              "__typename": "Game"
+            },
+            "status": "ACTIVE",
+            "startAt": "2026-10-23T12:00:00Z",
+            "endAt": "2026-10-30T11:58:59.999Z",
+            "detailsURL": "https://darkanddarker.com/twitch-drops/EAS11drops3",
+            "accountLinkURL": "https://darkanddarker.com/twitch-drops",
+            "self": {
+              "isAccountConnected": false,
+              "__typename": "DropCampaignSelfEdge"
+            },
+            "__typename": "DropCampaign"
+          },
+          {
+            "id": "45fb9af0-8fdf-461a-8c5f-026aa0df336a",
+            "name": "AOS Drops Day 9",
+            "owner": {
+              "id": "3346bf0d-5179-4a89-b760-13e1581dfd12",
+              "name": "Pearl Abyss",
+              "__typename": "Organization"
+            },
+            "game": {
+              "id": "386821",
+              "displayName": "Black Desert",
+              "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/386821_IGDB-120x160.jpg",
+              "__typename": "Game"
+            },
+            "status": "ACTIVE",
+            "startAt": "2026-10-29T12:00:00Z",
+            "endAt": "2026-10-30T11:59:59.999Z",
+            "detailsURL": "https://www.naeu.playblackdesert.com/News/Detail?groupContentNo=10665",
+            "accountLinkURL": "https://blackdesert.pearlabyss.com/Console/Intro/twitchDrops",
+            "self": {
+              "isAccountConnected": true,
+              "__typename": "DropCampaignSelfEdge"
+            },
+            "__typename": "DropCampaign"
+          },
+          {
+            "id": "2bd2dd54-33e6-455b-8a5c-457ed12ead41",
+            "name": "Affiliate10/29/26",
+            "owner": {
+              "id": "a1a51d5a-233d-41c3-9acd-a03bdab35159",
+              "name": "Out of the Park Developments",
+              "__typename": "Organization"
+            },
+            "game": {
+              "id": "2099590881",
+              "displayName": "Out of the Park Baseball 27",
+              "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/2099590881_IGDB-120x160.jpg",
+              "__typename": "Game"
+            },
+            "status": "ACTIVE",
+            "startAt": "2026-10-29T13:00:00Z",
+            "endAt": "2026-10-30T12:59:59.999Z",
+            "detailsURL": "https://forums.ootpdevelopments.com/showpost.php?p=5246508&postcount=1",
+            "accountLinkURL": "https://pt27.ootpdevelopments.com/twitch",
+            "self": {
+              "isAccountConnected": false,
+              "__typename": "DropCampaignSelfEdge"
+            },
+            "__typename": "DropCampaign"
+          },
+          {
+            "id": "47a6829c-eb3b-4b57-9548-67d85bff3a1c",
+            "name": "Обновление 26.10: Часть 4",
+            "owner": {
+              "id": "ef3a94ee-c2ef-487d-bb43-991701f78b25",
+              "name": "Lesta Games",
+              "__typename": "Organization"
+            },
+            "game": {
+              "id": "2133072147",
+              "displayName": "Mir Korabley",
+              "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/2133072147_IGDB-120x160.jpg",
+              "__typename": "Game"
+            },
+            "status": "ACTIVE",
+            "startAt": "2026-10-23T15:00:00Z",
+            "endAt": "2026-10-30T14:59:59.999Z",
+            "detailsURL": "https://krbli.ru/4dDrG8N",
+            "accountLinkURL": "https://lesta.ru/personal/?bind-external=twitch",
+            "self": {
+              "isAccountConnected": false,
+              "__typename": "DropCampaignSelfEdge"
+            },
+            "__typename": "DropCampaign"
+          },
+          {
+            "id": "e8b15816-901d-44fb-8ac4-58bf2ebf06c4",
+            "name": "Lestakorabli - 26.10 #4",
+            "owner": {
+              "id": "ef3a94ee-c2ef-487d-bb43-991701f78b25",
+              "name": "Lesta Games",
+              "__typename": "Organization"
+            },
+            "game": {
+              "id": "2133072147",
+              "displayName": "Mir Korabley",
+              "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/2133072147_IGDB-120x160.jpg",
+              "__typename": "Game"
+            },
+            "status": "ACTIVE",
+            "startAt": "2026-10-23T15:00:00Z",
+            "endAt": "2026-10-30T14:59:59.999Z",
+            "detailsURL": "https://krbli.ru/3RW8D27",
+            "accountLinkURL": "https://lesta.ru/personal/?bind-external=twitch",
+            "self": {
+              "isAccountConnected": false,
+              "__typename": "DropCampaignSelfEdge"
+            },
+            "__typename": "DropCampaign"
+          },
+          {
+            "id": "b3d9b711-f3b6-40b6-897a-1519852d0312",
+            "name": "AOS Drops Day 8",
+            "owner": {
+              "id": "3346bf0d-5179-4a89-b760-13e1581dfd12",
+              "name": "Pearl Abyss",
+              "__typename": "Organization"
+            },
+            "game": {
+              "id": "386821",
+              "displayName": "Black Desert",
+              "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/386821_IGDB-120x160.jpg",
+              "__typename": "Game"
+            },
+            "status": "EXPIRED",
+            "startAt": "2026-10-28T12:00:00Z",
+            "endAt": "2026-10-29T11:59:59.999Z",
+            "detailsURL": "https://www.naeu.playblackdesert.com/News/Detail?groupContentNo=10665",
+            "accountLinkURL": "https://blackdesert.pearlabyss.com/Console/Intro/twitchDrops",
+            "self": {
+              "isAccountConnected": true,
+              "__typename": "DropCampaignSelfEdge"
+            },
+            "__typename": "DropCampaign"
+          },
+          {
+            "id": "c0cdf686-c261-4dc0-9108-81e3d9137a8f",
+            "name": "Affiliate10/28/26",
+            "owner": {
+              "id": "a1a51d5a-233d-41c3-9acd-a03bdab35159",
+              "name": "Out of the Park Developments",
+              "__typename": "Organization"
+            },
+            "game": {
+              "id": "2099590881",
+              "displayName": "Out of the Park Baseball 27",
+              "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/2099590881_IGDB-120x160.jpg",
+              "__typename": "Game"
+            },
+            "status": "EXPIRED",
+            "startAt": "2026-10-28T13:00:00Z",
+            "endAt": "2026-10-29T12:59:59.999Z",
+            "detailsURL": "https://forums.ootpdevelopments.com/showpost.php?p=5246508&postcount=1",
+            "accountLinkURL": "https://pt27.ootpdevelopments.com/twitch",
+            "self": {
+              "isAccountConnected": false,
+              "__typename": "DropCampaignSelfEdge"
+            },
+            "__typename": "DropCampaign"
+          }
+        ],
+        "__typename": "User"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 180,
+      "requestID": "REQUEST",
+      "operationName": "ViewerDropsDashboard"
+    }
+  }
+]

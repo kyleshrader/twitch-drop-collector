@@ -278,3 +278,22 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
   - **Fix:** `CampaignDetailsQuery` now takes `{ campaignId, userId }` and sends the ID as `channelLogin`.
   - **Clean-up:** the copied `session.bin` files in the scratch probe profiles were deleted afterwards. The raw responses stay in the scratchpad, to be scrubbed into fixtures.
 - **Sign-in follows upstream (Kyle: "do whatever the other miner does"), 2026-10-30:** the login window (Android app client) is the only visible method, under "Sign in with Twitch". The device-code strategy (Android TV client) stays in core and main, reachable through `auth:signIn { method: 'deviceCode' }`, with its e2e test starting it through IPC. This supersedes the earlier "code sign-in is the only visible method" entry.
+
+## 2026-10-30 · M7b: live fixtures and the GQL → domain mapping
+
+- **Fixtures:** `packages/api/fixtures/twitch/*.json`, exported as `@tdc/api/fixtures/*`. They're real Android app session responses from the probe, anonymised by a scrub script kept outside the repo. User ID → `10000001` (also inside `dropInstanceID`s), login → `test_user`, request IDs → `REQUEST`, long lists trimmed. The scrub refuses to write anything still containing the user ID, login or an IP-like value. The playback token response is excluded (signed credential with an IP). `live-fixtures.test.ts` parses every fixture with our schemas and asserts the facts we rely on.
+- **What the live data showed:**
+  - Detail responses have no box art and no per-drop progress (`self`).
+  - Campaign-list entries carry box art and `self.isAccountConnected`.
+  - Inventory entries carry progress and `dropInstanceID`.
+  - Some allow-list channels have no display name.
+- **Mapping (`packages/core/src/inventory/mapping.ts`):** as upstream, campaign data is merged in layers (`mergeRaw`): inventory over campaign-list entry over details. A nested object merges; a list is taken whole from the higher layer.
+  - The merged object is validated with `gql.CampaignDetails`, then converted.
+  - The campaigns built are those in progress plus those with details. Campaigns without a game are skipped; ones that don't validate are skipped and reported.
+  - Without progress data, a drop counts as claimed when all its awarded rewards (`gameEventDrops.lastAwardedAt`) fall inside the drop's window.
+  - Claimed drops count as complete.
+  - Box art URLs lose their `-WxH` size suffix.
+  - Unknown benefit types map to `UNKNOWN`, unknown statuses to `ACTIVE`.
+- **Domain rules:**
+  - A precondition drop that isn't in the campaign doesn't block (upstream would crash on it).
+  - Progress updates apply the same change to every drop in the campaign, clamped to each drop's required minutes.

@@ -1,0 +1,23 @@
+[
+  {
+    "data": {
+      "currentUser": {
+        "id": "10000001",
+        "dropCurrentSession": {
+          "channel": null,
+          "game": null,
+          "currentMinutesWatched": 0,
+          "requiredMinutesWatched": 0,
+          "dropID": "",
+          "__typename": "DropCurrentSession"
+        },
+        "__typename": "User"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 17,
+      "requestID": "REQUEST",
+      "operationName": "DropCurrentSessionContext"
+    }
+  }
+]

@@ -14,7 +14,8 @@
     "@tdc/api": "workspace:^",
     "@tdc/config": "workspace:^",
     "@tdc/kernel": "workspace:^",
-    "@tdc/storage": "workspace:^"
+    "@tdc/storage": "workspace:^",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

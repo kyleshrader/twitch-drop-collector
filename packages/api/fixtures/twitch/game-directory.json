@@ -1,0 +1,264 @@
+[
+  {
+    "data": {
+      "game": {
+        "id": "263490",
+        "name": "Rust",
+        "displayName": "Rust",
+        "streams": {
+          "banners": null,
+          "edges": [
+            {
+              "cursor": "eyJvZmYiOjEsImJsayI6MjEsInN1YiI6eyIxIjp7Im9mZiI6MSwidG90Ijo4NH0sIjIiOnsib2ZmIjowLCJ0b3QiOjE0OX0sIjMiOnsib2ZmIjowLCJ0b3QiOjB9fX0=",
+              "node": {
+                "id": "320872063070",
+                "title": "!Drops (FAST DROPS) 12 Year Rust veteran !discord (Multistreaming)",
+                "viewersCount": 653,
+                "previewImageURL": "https://static-cdn.jtvnw.net/previews-ttv/live_user_vincentsmg-640x360.jpg",
+                "verticalPreviewImageURL": "https://static-cdn.jtvnw.net/previews-ttv/live_user_vincentsmg-360x640.jpg",
+                "height": 1080,
+                "width": 1920,
+                "isDualFormat": false,
+                "broadcaster": {
+                  "id": "97160118",
+                  "login": "vincentsmg",
+                  "displayName": "VincentSMG",
+                  "roles": {
+                    "isPartner": true,
+                    "isParticipatingDJ": false,
+                    "__typename": "UserRoles"
+                  },
+                  "profileImageURL": "https://static-cdn.jtvnw.net/jtv_user_pictures/7c71fa7c-3582-4a22-b8e5-e10ef00d498f-profile_image-50x50.png",
+                  "primaryColorHex": "8547FF",
+                  "__typename": "User"
+                },
+                "freeformTags": [
+                  {
+                    "id": "fft:CHANNEL:97160118:0",
+                    "name": "English",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:1",
+                    "name": "Rust",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:2",
+                    "name": "Vincent",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:3",
+                    "name": "gaming",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:4",
+                    "name": "rustdrops",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:5",
+                    "name": "Rustdrop",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:6",
+                    "name": "ruststreamer",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:7",
+                    "name": "facepunch",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:8",
+                    "name": "Rustupdate",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:97160118:9",
+                    "name": "DropsEnabled",
+                    "__typename": "FreeformTag"
+                  }
+                ],
+                "curatedTags": null,
+                "type": "live",
+                "game": {
+                  "id": "263490",
+                  "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/263490_IGDB-40x56.jpg",
+                  "name": "Rust",
+                  "displayName": "Rust",
+                  "slug": "rust",
+                  "__typename": "Game"
+                },
+                "previewThumbnailProperties": {
+                  "blurReason": "BLUR_NOT_REQUIRED",
+                  "__typename": "PreviewThumbnailProperties"
+                },
+                "contentClassificationLabels": [
+                  {
+                    "id": "MatureGame",
+                    "__typename": "ContentClassificationLabel"
+                  }
+                ],
+                "__typename": "Stream"
+              },
+              "trackingID": "50824f61-ef69-40b3-ab5d-8247711ecc24:4e5de483-1e86-49d3-954f-08384c55a782:MF|category:RF|RANKER_DR_MMOE_50_BF_BASECG:CG|UNK:CR|UNK:BL|UNK:FC|UNK:RK|0:CRK|0",
+              "__typename": "StreamEdge"
+            },
+            {
+              "cursor": "eyJvZmYiOjIsImJsayI6MjEsInN1YiI6eyIxIjp7Im9mZiI6MiwidG90Ijo4NH0sIjIiOnsib2ZmIjowLCJ0b3QiOjE0OX0sIjMiOnsib2ZmIjowLCJ0b3QiOjB9fX0=",
+              "node": {
+                "id": "318995962599",
+                "title": "[GER][PC][24/7 Drops] Base Invaders | Entspannt genießen | !Drops !Dc !SNK !HBF #Aldigönnt",
+                "viewersCount": 30,
+                "previewImageURL": "https://static-cdn.jtvnw.net/previews-ttv/live_user_vinni_tv_-640x360.jpg",
+                "verticalPreviewImageURL": "https://static-cdn.jtvnw.net/previews-ttv/live_user_vinni_tv_-360x640.jpg",
+                "height": 720,
+                "width": 1280,
+                "isDualFormat": false,
+                "broadcaster": {
+                  "id": "742044363",
+                  "login": "vinni_tv_",
+                  "displayName": "Vinni_TV_",
+                  "roles": {
+                    "isPartner": false,
+                    "isParticipatingDJ": false,
+                    "__typename": "UserRoles"
+                  },
+                  "profileImageURL": "https://static-cdn.jtvnw.net/jtv_user_pictures/f79815aa-2638-448e-91e9-6bfd473702e9-profile_image-50x50.png",
+                  "primaryColorHex": "0013A3",
+                  "__typename": "User"
+                },
+                "freeformTags": [
+                  {
+                    "id": "fft:CHANNEL:742044363:0",
+                    "name": "Deutsch",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:742044363:1",
+                    "name": "English",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:742044363:2",
+                    "name": "AllLanguages",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:742044363:3",
+                    "name": "DropsAktiviert",
+                    "__typename": "FreeformTag"
+                  }
+                ],
+                "curatedTags": null,
+                "type": "live",
+                "game": {
+                  "id": "263490",
+                  "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/263490_IGDB-40x56.jpg",
+                  "name": "Rust",
+                  "displayName": "Rust",
+                  "slug": "rust",
+                  "__typename": "Game"
+                },
+                "previewThumbnailProperties": {
+                  "blurReason": "BLUR_NOT_REQUIRED",
+                  "__typename": "PreviewThumbnailProperties"
+                },
+                "contentClassificationLabels": [
+                  {
+                    "id": "MatureGame",
+                    "__typename": "ContentClassificationLabel"
+                  },
+                  {
+                    "id": "ViolentGraphic",
+                    "__typename": "ContentClassificationLabel"
+                  }
+                ],
+                "__typename": "Stream"
+              },
+              "trackingID": "50824f61-ef69-40b3-ab5d-8247711ecc24:d14ac39c-3918-4506-94a0-c431e9875df4:MF|category:RF|RANKER_DR_MMOE_50_BF_BASECG:CG|UNK:CR|UNK:BL|UNK:FC|UNK:RK|1:CRK|14",
+              "__typename": "StreamEdge"
+            },
+            {
+              "cursor": "eyJvZmYiOjMsImJsayI6MjEsInN1YiI6eyIxIjp7Im9mZiI6MywidG90Ijo4NH0sIjIiOnsib2ZmIjowLCJ0b3QiOjE0OX0sIjMiOnsib2ZmIjowLCJ0b3QiOjB9fX0=",
+              "node": {
+                "id": "318489122776",
+                "title": "24/7 @Enardo | Rust",
+                "viewersCount": 41,
+                "previewImageURL": "https://static-cdn.jtvnw.net/previews-ttv/live_user_enardo247-640x360.jpg",
+                "verticalPreviewImageURL": "https://static-cdn.jtvnw.net/previews-ttv/live_user_enardo247-360x640.jpg",
+                "height": 720,
+                "width": 1280,
+                "isDualFormat": false,
+                "broadcaster": {
+                  "id": "1509166070",
+                  "login": "enardo247",
+                  "displayName": "Enardo247",
+                  "roles": {
+                    "isPartner": false,
+                    "isParticipatingDJ": false,
+                    "__typename": "UserRoles"
+                  },
+                  "profileImageURL": "https://static-cdn.jtvnw.net/jtv_user_pictures/eae35e27-96db-4a7b-b6be-f391d3905350-profile_image-50x50.png",
+                  "primaryColorHex": null,
+                  "__typename": "User"
+                },
+                "freeformTags": [
+                  {
+                    "id": "fft:CHANNEL:1509166070:0",
+                    "name": "English",
+                    "__typename": "FreeformTag"
+                  },
+                  {
+                    "id": "fft:CHANNEL:1509166070:1",
+                    "name": "DropsEnabled",
+                    "__typename": "FreeformTag"
+                  }
+                ],
+                "curatedTags": null,
+                "type": "live",
+                "game": {
+                  "id": "263490",
+                  "boxArtURL": "https://static-cdn.jtvnw.net/ttv-boxart/263490_IGDB-40x56.jpg",
+                  "name": "Rust",
+                  "displayName": "Rust",
+                  "slug": "rust",
+                  "__typename": "Game"
+                },
+                "previewThumbnailProperties": {
+                  "blurReason": "BLUR_NOT_REQUIRED",
+                  "__typename": "PreviewThumbnailProperties"
+                },
+                "contentClassificationLabels": [
+                  {
+                    "id": "MatureGame",
+                    "__typename": "ContentClassificationLabel"
+                  }
+                ],
+                "__typename": "Stream"
+              },
+              "trackingID": "50824f61-ef69-40b3-ab5d-8247711ecc24:1a93841f-6709-48b6-8ca5-f4c6936e3a49:MF|category:RF|RANKER_DR_MMOE_50_BF_BASECG:CG|UNK:CR|UNK:BL|UNK:FC|UNK:RK|2:CRK|5",
+              "__typename": "StreamEdge"
+            }
+          ],
+          "pageInfo": {
+            "hasNextPage": true,
+            "__typename": "PageInfo"
+          },
+          "__typename": "StreamConnection"
+        },
+        "__typename": "Game"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 203,
+      "requestID": "REQUEST",
+      "operationName": "DirectoryPage_Game"
+    }
+  }
+]

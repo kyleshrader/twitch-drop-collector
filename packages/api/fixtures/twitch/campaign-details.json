@@ -1,0 +1,813 @@
+[
+  {
+    "data": {
+      "user": {
+        "id": "10000001",
+        "dropCampaign": {
+          "id": "41fd0f1e-aee2-495f-910c-6c6ebd056087",
+          "self": {
+            "isAccountConnected": false,
+            "__typename": "DropCampaignSelfEdge"
+          },
+          "allow": {
+            "channels": null,
+            "isEnabled": false,
+            "__typename": "DropCampaignACL"
+          },
+          "accountLinkURL": "https://darkanddarker.com/twitch-drops",
+          "description": "EA Season 11 Drops 3",
+          "detailsURL": "https://darkanddarker.com/twitch-drops/EAS11drops3",
+          "endAt": "2026-10-30T11:58:59.999Z",
+          "eventBasedDrops": [],
+          "game": {
+            "id": "2009321156",
+            "slug": "dark-and-darker",
+            "displayName": "Dark and Darker",
+            "__typename": "Game"
+          },
+          "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/CAMPAIGN/f4070aa0-c65a-4810-b92b-7e26c8d39b4c.png",
+          "name": "EA Season 11 Drops 3",
+          "owner": {
+            "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+            "name": "IRONMACE",
+            "__typename": "Organization"
+          },
+          "startAt": "2026-10-23T12:00:00Z",
+          "status": "ACTIVE",
+          "timeBasedDrops": [
+            {
+              "id": "635058a8-b57a-11f1-8271-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "91144253-b575-11f1-946d-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:33:17.502Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/3468140d-7acb-4bdb-9fc7-ae458c9806de.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 Witness Emblem10",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "10x Huntress' Witness Emblem",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 60,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "68661ff7-b57a-11f1-b8a1-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "9ba84289-b575-11f1-9d4e-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:33:35.249Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a61c5dc9-2d09-4618-be43-f0714fc0599e.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 Healing Supplies",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "3x Healing Supplies (Bandage, Surgical Kit) Rare",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 120,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "6d47690f-b57a-11f1-b677-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "a19d081f-b575-11f1-8300-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:33:45.242Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a1e1bd8d-d393-4fca-b8f0-a64085d21447.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 Witness Emblem20",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "20x Huntress' Witness Emblem",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 240,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "7154c5bf-b57a-11f1-89f0-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "a685a334-b575-11f1-90fe-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:33:53.477Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/3302e262-7804-4002-a7fa-dc103f781a7e.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 Lockpick Set",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "6x Lockpick",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 300,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "76c57b75-b57a-11f1-8aca-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "ac03dcd9-b575-11f1-a91c-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:34:02.693Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/cfc1b697-bce1-42b1-90a3-56fa3d53cf06.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 15x Reward Tokens",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "15x Reward Tokens",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 420,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "7b1b4f82-b57a-11f1-b35e-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "b1aaab91-b575-11f1-956f-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:34:12.174Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/64ba3db8-58a1-4c5d-8c8c-50e311d19ca9.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 Rare PotionBundle",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "3x Potion Set (Healing, Protection, Anti-Magic) Rare",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 480,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "7fd055b9-b57a-11f1-9c34-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "b757302e-b575-11f1-956f-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:34:21.694Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/dca8a9b4-ee80-4909-b27e-44fdb4591ced.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 Witness Emblem30",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "30x Huntress' Witness Emblem",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 600,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "84925c9e-b57a-11f1-876f-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "be1b8d9b-b575-11f1-ae94-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:34:33.047Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/058ce17b-6e87-43eb-8fbc-8df840e41964.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 4x Gold CoinPouch",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "4x Untradeable Gold Coin Pouches",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 720,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "8957354a-b57a-11f1-9ee6-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "c403b3c9-b575-11f1-bdf2-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:34:42.957Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/c07991f9-53d7-4a45-9d45-550e3bc4fc74.png",
+                    "isIosAvailable": false,
+                    "name": "EAS11#3 Witness Emblem50",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "50x Huntress' Witness Emblem",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 840,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "9483bc93-b57a-11f1-9f17-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "c958f15a-b575-11f1-9a14-0a58a9feac02",
+                    "createdAt": "2026-09-21T04:34:51.904Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2009321156",
+                      "name": "Dark and Darker",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/648a8319-00f0-485c-ae4e-98b812accfb0.png",
+                    "isIosAvailable": false,
+                    "name": "Harvest Festival Dance",
+                    "ownerOrganization": {
+                      "id": "765bce30-7a4e-4b03-8210-d93067f171ec",
+                      "name": "IRONMACE",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:58:59.999Z",
+              "name": "Harvest Festival Dance",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 900,
+              "startAt": "2026-10-23T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            }
+          ],
+          "__typename": "DropCampaign"
+        },
+        "__typename": "User"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 43,
+      "requestID": "REQUEST",
+      "operationName": "DropCampaignDetails"
+    }
+  },
+  {
+    "data": {
+      "user": {
+        "id": "10000001",
+        "dropCampaign": {
+          "id": "45fb9af0-8fdf-461a-8c5f-026aa0df336a",
+          "self": {
+            "isAccountConnected": true,
+            "__typename": "DropCampaignSelfEdge"
+          },
+          "allow": {
+            "channels": null,
+            "isEnabled": false,
+            "__typename": "DropCampaignACL"
+          },
+          "accountLinkURL": "https://blackdesert.pearlabyss.com/Console/Intro/twitchDrops",
+          "description": "https://www.naeu.playblackdesert.com/News/Detail?groupContentNo=10665",
+          "detailsURL": "https://www.naeu.playblackdesert.com/News/Detail?groupContentNo=10665",
+          "endAt": "2026-10-30T11:59:59.999Z",
+          "eventBasedDrops": [],
+          "game": {
+            "id": "386821",
+            "slug": "black-desert",
+            "displayName": "Black Desert",
+            "__typename": "Game"
+          },
+          "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/CAMPAIGN/9088bd62-01d8-49f2-931d-838ab22da6ac.png",
+          "name": "AOS Drops Day 9",
+          "owner": {
+            "id": "3346bf0d-5179-4a89-b760-13e1581dfd12",
+            "name": "Pearl Abyss",
+            "__typename": "Organization"
+          },
+          "startAt": "2026-10-29T12:00:00Z",
+          "status": "ACTIVE",
+          "timeBasedDrops": [
+            {
+              "id": "27228107-c688-11f1-96cc-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "3346bf0d-5179-4a89-b760-13e1581dfd12_CUSTOM_ID_AOSSEASON261001",
+                    "createdAt": "2026-10-12T22:06:50.736Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "386821",
+                      "name": "Black Desert",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/5b6281fc-1d67-4c29-b22e-1beeb6a79d1e.png",
+                    "isIosAvailable": false,
+                    "name": "AOS Drops 1 Hour",
+                    "ownerOrganization": {
+                      "id": "3346bf0d-5179-4a89-b760-13e1581dfd12",
+                      "name": "Pearl Abyss",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:59:59.999Z",
+              "name": "AOS Day 9 (1 Hour)",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 60,
+              "startAt": "2026-10-29T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "ae76f030-c688-11f1-bdd3-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "3346bf0d-5179-4a89-b760-13e1581dfd12_CUSTOM_ID_AOSSEASON261002",
+                    "createdAt": "2026-10-12T22:07:07.284Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "386821",
+                      "name": "Black Desert",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/1d1db70f-aab9-4086-93e8-5945946e1928.png",
+                    "isIosAvailable": false,
+                    "name": "AOS Drops 2 Hours",
+                    "ownerOrganization": {
+                      "id": "3346bf0d-5179-4a89-b760-13e1581dfd12",
+                      "name": "Pearl Abyss",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:59:59.999Z",
+              "name": "AOS Day 9 (2 Hours)",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 120,
+              "startAt": "2026-10-29T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "eb0271ec-c688-11f1-95ee-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "3346bf0d-5179-4a89-b760-13e1581dfd12_CUSTOM_ID_AOSSEASON261003",
+                    "createdAt": "2026-10-12T22:07:24.452Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "386821",
+                      "name": "Black Desert",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/4b47b6a1-3281-4d0a-ad82-bd0cba5d41eb.png",
+                    "isIosAvailable": false,
+                    "name": "AOS Drops 3 Hours",
+                    "ownerOrganization": {
+                      "id": "3346bf0d-5179-4a89-b760-13e1581dfd12",
+                      "name": "Pearl Abyss",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T11:59:59.999Z",
+              "name": "AOS Day 9 (3 Hours)",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 180,
+              "startAt": "2026-10-29T12:00:00Z",
+              "__typename": "TimeBasedDrop"
+            }
+          ],
+          "__typename": "DropCampaign"
+        },
+        "__typename": "User"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 43,
+      "requestID": "REQUEST",
+      "operationName": "DropCampaignDetails"
+    }
+  },
+  {
+    "data": {
+      "user": {
+        "id": "10000001",
+        "dropCampaign": {
+          "id": "2bd2dd54-33e6-455b-8a5c-457ed12ead41",
+          "self": {
+            "isAccountConnected": false,
+            "__typename": "DropCampaignSelfEdge"
+          },
+          "allow": {
+            "channels": [
+              {
+                "id": "15850551",
+                "displayName": "Sporer",
+                "name": "sporer",
+                "__typename": "Channel"
+              },
+              {
+                "id": "24670980",
+                "displayName": "dishnet34",
+                "name": "dishnet34",
+                "__typename": "Channel"
+              },
+              {
+                "id": "188788173",
+                "displayName": "DrDynastic",
+                "name": "drdynastic",
+                "__typename": "Channel"
+              }
+            ],
+            "isEnabled": true,
+            "__typename": "DropCampaignACL"
+          },
+          "accountLinkURL": "https://pt27.ootpdevelopments.com/twitch",
+          "description": "Win a free Perfect Team Card Pack while you watch us stream Out of the Park Baseball 27! Get up to five (5) packs per day!",
+          "detailsURL": "https://forums.ootpdevelopments.com/showpost.php?p=5246508&postcount=1",
+          "endAt": "2026-10-30T12:59:59.999Z",
+          "eventBasedDrops": [],
+          "game": {
+            "id": "2099590881",
+            "slug": "out-of-the-park-baseball-27",
+            "displayName": "Out of the Park Baseball 27",
+            "__typename": "Game"
+          },
+          "imageURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/CAMPAIGN/default.png",
+          "name": "Affiliate10/29/26",
+          "owner": {
+            "id": "a1a51d5a-233d-41c3-9acd-a03bdab35159",
+            "name": "Out of the Park Developments",
+            "__typename": "Organization"
+          },
+          "startAt": "2026-10-29T13:00:00Z",
+          "status": "ACTIVE",
+          "timeBasedDrops": [
+            {
+              "id": "1b98798c-d143-11f1-a0c0-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "3b6728d8-1bd0-11f1-8cab-0a58a9feac02",
+                    "createdAt": "2026-03-09T15:54:18.895Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2099590881",
+                      "name": "Out of the Park Baseball 27",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/43746f49-2066-4c4b-a847-1c8d749b39dc.png",
+                    "isIosAvailable": false,
+                    "name": "PT27 Standard Pack",
+                    "ownerOrganization": {
+                      "id": "a1a51d5a-233d-41c3-9acd-a03bdab35159",
+                      "name": "Out of the Park Developments",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T12:59:59.999Z",
+              "name": "1",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 15,
+              "startAt": "2026-10-29T13:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "23c5a264-d143-11f1-9673-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "3b6728d8-1bd0-11f1-8cab-0a58a9feac02",
+                    "createdAt": "2026-03-09T15:54:18.895Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2099590881",
+                      "name": "Out of the Park Baseball 27",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/43746f49-2066-4c4b-a847-1c8d749b39dc.png",
+                    "isIosAvailable": false,
+                    "name": "PT27 Standard Pack",
+                    "ownerOrganization": {
+                      "id": "a1a51d5a-233d-41c3-9acd-a03bdab35159",
+                      "name": "Out of the Park Developments",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T12:59:59.999Z",
+              "name": "2",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 30,
+              "startAt": "2026-10-29T13:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "2b2f60d5-d143-11f1-8212-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "3b6728d8-1bd0-11f1-8cab-0a58a9feac02",
+                    "createdAt": "2026-03-09T15:54:18.895Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2099590881",
+                      "name": "Out of the Park Baseball 27",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/43746f49-2066-4c4b-a847-1c8d749b39dc.png",
+                    "isIosAvailable": false,
+                    "name": "PT27 Standard Pack",
+                    "ownerOrganization": {
+                      "id": "a1a51d5a-233d-41c3-9acd-a03bdab35159",
+                      "name": "Out of the Park Developments",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T12:59:59.999Z",
+              "name": "3",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 45,
+              "startAt": "2026-10-29T13:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "31259567-d143-11f1-a14d-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "3b6728d8-1bd0-11f1-8cab-0a58a9feac02",
+                    "createdAt": "2026-03-09T15:54:18.895Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2099590881",
+                      "name": "Out of the Park Baseball 27",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/43746f49-2066-4c4b-a847-1c8d749b39dc.png",
+                    "isIosAvailable": false,
+                    "name": "PT27 Standard Pack",
+                    "ownerOrganization": {
+                      "id": "a1a51d5a-233d-41c3-9acd-a03bdab35159",
+                      "name": "Out of the Park Developments",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T12:59:59.999Z",
+              "name": "4",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 60,
+              "startAt": "2026-10-29T13:00:00Z",
+              "__typename": "TimeBasedDrop"
+            },
+            {
+              "id": "37771697-d143-11f1-8bc5-0a58a9feac02",
+              "requiredSubs": 0,
+              "benefitEdges": [
+                {
+                  "benefit": {
+                    "id": "497cb87c-1bd0-11f1-9b5d-0a58a9feac02",
+                    "createdAt": "2026-03-09T15:54:42.525Z",
+                    "entitlementLimit": 1,
+                    "game": {
+                      "id": "2099590881",
+                      "name": "Out of the Park Baseball 27",
+                      "__typename": "Game"
+                    },
+                    "imageAssetURL": "https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/ff039d2e-c867-4180-9949-41a1e7eb64ff.png",
+                    "isIosAvailable": false,
+                    "name": "PT27 Silver Pack",
+                    "ownerOrganization": {
+                      "id": "a1a51d5a-233d-41c3-9acd-a03bdab35159",
+                      "name": "Out of the Park Developments",
+                      "__typename": "Organization"
+                    },
+                    "distributionType": "DIRECT_ENTITLEMENT",
+                    "__typename": "DropBenefit"
+                  },
+                  "entitlementLimit": 1,
+                  "__typename": "DropBenefitEdge"
+                }
+              ],
+              "endAt": "2026-10-30T12:59:59.999Z",
+              "name": "5",
+              "preconditionDrops": null,
+              "requiredMinutesWatched": 90,
+              "startAt": "2026-10-29T13:00:00Z",
+              "__typename": "TimeBasedDrop"
+            }
+          ],
+          "__typename": "DropCampaign"
+        },
+        "__typename": "User"
+      }
+    },
+    "extensions": {
+      "durationMilliseconds": 53,
+      "requestID": "REQUEST",
+      "operationName": "DropCampaignDetails"
+    }
+  }
+]
