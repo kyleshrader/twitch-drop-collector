@@ -22,6 +22,7 @@
     "@tdc/config": "workspace:^",
     "@tdc/core": "workspace:^",
     "@tdc/ipc-contract": "workspace:^",
+    "@tdc/kernel": "workspace:^",
     "@tdc/storage": "workspace:^",
     "@tdc/ui": "workspace:^",
     "@types/node": "catalog:",

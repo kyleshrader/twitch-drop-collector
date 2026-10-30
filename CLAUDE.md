@@ -16,7 +16,8 @@ Full spec: docs/spec.md. Decision log: docs/decisions.md.
 - Network, secrets, storage and OS integration run in the main process only.
 - Renderer talks to main only through the typed preload API; main validates every IPC input.
 - Windows keep contextIsolation, sandbox, and nodeIntegration: false.
-- packages/core, api, storage, config never import electron or react.
+- packages/kernel, core, api, storage, config never import electron or react.
+- packages/kernel imports nothing from the workspace and no Node/DOM/Electron APIs.
 - Renderer imports only packages/ui and packages/ipc-contract.
 - Look up current versions and config syntax in docs; don't rely on memory.
 - Log library and design choices in docs/decisions.md.

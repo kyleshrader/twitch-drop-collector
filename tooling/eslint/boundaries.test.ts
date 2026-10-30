@@ -14,6 +14,7 @@ async function boundaryErrors(file: string, specifier: string): Promise<string[]
     .map((m) => m.message)
 }
 
+const KERNEL = 'packages/kernel/src/probe.ts'
 const CORE = 'packages/core/src/probe.ts'
 const API = 'packages/api/src/probe.ts'
 const CONFIG = 'packages/config/src/probe.ts'
@@ -38,7 +39,15 @@ describe('forbidden imports fail lint', () => {
     ['rule 5: preload imports core', PRELOAD, '@tdc/core'],
     ['rule 6: main imports ui', MAIN, '@tdc/ui'],
     ['rule 7: ipc-contract imports react', IPC, 'react'],
-    ['rule 7: ipc-contract imports core', IPC, '@tdc/core']
+    ['rule 7: ipc-contract imports core', IPC, '@tdc/core'],
+    ['rule 7: ipc-contract imports kernel', IPC, '@tdc/kernel'],
+    ['rule 8: kernel imports core', KERNEL, '@tdc/core'],
+    ['rule 8: kernel imports api', KERNEL, '@tdc/api'],
+    ['rule 8: kernel imports electron', KERNEL, 'electron'],
+    ['rule 8: kernel imports a Node built-in', KERNEL, 'node:fs'],
+    ['rule 8: ui imports kernel', UI, '@tdc/kernel'],
+    ['rule 8: renderer imports kernel', RENDERER, '@tdc/kernel'],
+    ['rule 8: preload imports kernel', PRELOAD, '@tdc/kernel']
   ])('%s', async (_name, file, specifier) => {
     expect(await boundaryErrors(file, specifier)).not.toEqual([])
   })
@@ -55,7 +64,12 @@ describe('allowed imports pass lint', () => {
     ['preload imports ipc-contract', PRELOAD, '@tdc/ipc-contract'],
     ['main imports core', MAIN, '@tdc/core'],
     ['main imports electron', MAIN, 'electron'],
-    ['ipc-contract imports zod', IPC, 'zod']
+    ['ipc-contract imports zod', IPC, 'zod'],
+    ['core imports kernel', CORE, '@tdc/kernel'],
+    ['api imports kernel', API, '@tdc/kernel'],
+    ['config imports kernel', CONFIG, '@tdc/kernel'],
+    ['main imports kernel', MAIN, '@tdc/kernel'],
+    ['kernel imports zod', KERNEL, 'zod']
   ])('%s', async (_name, file, specifier) => {
     expect(await boundaryErrors(file, specifier)).toEqual([])
   })

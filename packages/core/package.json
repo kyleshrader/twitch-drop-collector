@@ -13,6 +13,7 @@
   "dependencies": {
     "@tdc/api": "workspace:^",
     "@tdc/config": "workspace:^",
+    "@tdc/kernel": "workspace:^",
     "@tdc/storage": "workspace:^"
   },
   "devDependencies": {

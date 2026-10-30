@@ -11,18 +11,29 @@ const CATALOG = (() => {
   return new Set([...block.matchAll(/^ {2}"?([^":\s]+)"?:/gm)].map((m) => m[1]))
 })()
 
-// Mirrors dependency rules 1, 2 and 7 in docs/spec.md at the manifest level.
-const DOMAIN = ['@tdc/core', '@tdc/api', '@tdc/storage', '@tdc/config', '@tdc/ipc-contract']
+// Mirrors dependency rules 1, 2, 7 and 8 (docs/spec.md, docs/decisions.md) at the manifest level.
+const DOMAIN = [
+  '@tdc/kernel',
+  '@tdc/core',
+  '@tdc/api',
+  '@tdc/storage',
+  '@tdc/config',
+  '@tdc/ipc-contract'
+]
 const FORBIDDEN_IN_DOMAIN = ['electron', 'react', 'react-dom']
 const ALLOWED_WORKSPACE_DEPS = {
-  '@tdc/core': ['@tdc/api', '@tdc/storage', '@tdc/config'],
-  '@tdc/api': [],
-  '@tdc/storage': [],
-  '@tdc/config': [],
+  '@tdc/kernel': [],
+  '@tdc/core': ['@tdc/kernel', '@tdc/api', '@tdc/storage', '@tdc/config'],
+  '@tdc/api': ['@tdc/kernel'],
+  '@tdc/storage': ['@tdc/kernel'],
+  '@tdc/config': ['@tdc/kernel'],
   '@tdc/ipc-contract': [],
   '@tdc/ui': []
 }
-const IPC_CONTRACT_RUNTIME_DEPS = ['zod']
+const RUNTIME_DEPS_ALLOWLIST = {
+  '@tdc/ipc-contract': ['zod'],
+  '@tdc/kernel': ['zod']
+}
 
 /** @param {Context} ctx */
 function enforcePrivateWorkspaces({ Yarn }) {
@@ -63,12 +74,13 @@ function enforceDependencyRules({ Yarn }) {
       dependency.error(`${owner} must not depend on ${dependency.ident} (spec dependency rules)`)
     }
 
+    const runtimeAllowlist = RUNTIME_DEPS_ALLOWLIST[owner]
     if (
-      owner === '@tdc/ipc-contract' &&
+      runtimeAllowlist &&
       dependency.type === 'dependencies' &&
-      !IPC_CONTRACT_RUNTIME_DEPS.includes(dependency.ident)
+      !runtimeAllowlist.includes(dependency.ident)
     ) {
-      dependency.error(`ipc-contract may depend only on ${IPC_CONTRACT_RUNTIME_DEPS} (rule 7)`)
+      dependency.error(`${owner} may depend only on ${runtimeAllowlist} (rules 7 and 8)`)
     }
   }
 }

@@ -4,6 +4,7 @@
 import boundaries from 'eslint-plugin-boundaries'
 
 const ELEMENTS = [
+  { type: 'kernel', pattern: 'packages/kernel' },
   { type: 'core', pattern: 'packages/core' },
   { type: 'api', pattern: 'packages/api' },
   { type: 'storage', pattern: 'packages/storage' },
@@ -59,6 +60,10 @@ const policies = [
   },
   // 7. ipc-contract depends only on the validation library.
   { from: from('ipc-contract'), allow: [toExternal(['zod', 'zod/**'])] },
+  // 8. kernel imports nothing from the workspace and no runtime APIs (at most the validation
+  //    library); every non-UI package and main may import it. See docs/decisions.md.
+  { from: from('kernel'), allow: [toExternal(['zod', 'zod/**'])] },
+  { from: from(...DOMAIN, 'main'), allow: [toElements('kernel')] },
   // Tests may use the test runner wherever they live.
   { from: { file: { categories: 'test' } }, allow: [toExternal(['vitest', 'vitest/**'])] }
 ]

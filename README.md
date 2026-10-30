@@ -21,7 +21,7 @@ yarn test:e2e   # builds the app and runs Playwright against it
 ## Layout
 
 - `apps/desktop`: Electron app (`src/main`, `src/preload`, `src/renderer`)
-- `packages/*`: `core`, `api`, `storage`, `config`, `ipc-contract`, `ui`
+- `packages/*`: `kernel`, `core`, `api`, `storage`, `config`, `ipc-contract`, `ui`
 - `tooling`: shared tsconfig bases, ESLint boundary rules and their tests
 - `e2e`: Playwright tests that launch the built app
 - `docs`: [spec](docs/spec.md) and [decision log](docs/decisions.md)

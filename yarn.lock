@@ -821,6 +821,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tdc/api@workspace:packages/api"
   dependencies:
+    "@tdc/kernel": "workspace:^"
     "@types/node": "catalog:"
     typescript: "catalog:"
     vite: "catalog:"
@@ -832,6 +833,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tdc/config@workspace:packages/config"
   dependencies:
+    "@tdc/kernel": "workspace:^"
     "@types/node": "catalog:"
     typescript: "catalog:"
     vite: "catalog:"
@@ -845,6 +847,7 @@ __metadata:
   dependencies:
     "@tdc/api": "workspace:^"
     "@tdc/config": "workspace:^"
+    "@tdc/kernel": "workspace:^"
     "@tdc/storage": "workspace:^"
     "@types/node": "catalog:"
     typescript: "catalog:"
@@ -862,6 +865,7 @@ __metadata:
     "@tdc/config": "workspace:^"
     "@tdc/core": "workspace:^"
     "@tdc/ipc-contract": "workspace:^"
+    "@tdc/kernel": "workspace:^"
     "@tdc/storage": "workspace:^"
     "@tdc/ui": "workspace:^"
     "@types/node": "catalog:"
@@ -902,10 +906,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@tdc/kernel@workspace:^, @tdc/kernel@workspace:packages/kernel":
+  version: 0.0.0-use.local
+  resolution: "@tdc/kernel@workspace:packages/kernel"
+  dependencies:
+    typescript: "catalog:"
+    vite: "catalog:"
+    vitest: "catalog:"
+  languageName: unknown
+  linkType: soft
+
 "@tdc/storage@workspace:^, @tdc/storage@workspace:packages/storage":
   version: 0.0.0-use.local
   resolution: "@tdc/storage@workspace:packages/storage"
   dependencies:
+    "@tdc/kernel": "workspace:^"
     "@types/node": "catalog:"
     typescript: "catalog:"
     vite: "catalog:"

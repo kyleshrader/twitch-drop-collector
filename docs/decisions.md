@@ -120,3 +120,26 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 
 - **Decision:** when the app is not packaged, `TDC_USER_DATA_DIR` overrides `userData` before the single-instance lock is taken.
 - **Reason:** e2e runs (and later settings-restart tests) must not share a lock or settings with a real install. Ignored in packaged builds, so it isn't an attack surface for shipped apps.
+
+## 2026-10-30 · Add `@tdc/kernel` and dependency rule 8 (changes the spec's layout)
+
+- **Decision:** a new `packages/kernel` holds cross-cutting types every non-UI package needs: `Logger`, `Clock`, and later the typed emitter, `Service` lifecycle, backoff, rate limiter and error base types. **Rule 8:** kernel imports nothing from the workspace, no runtime APIs (Node, DOM, Electron) and at most the validation library. `core`, `api`, `storage`, `config` and main may import it; `ui`, the renderer, preload and `ipc-contract` may not.
+- **Alternatives:** define `Logger`/`Clock` in `core` (but `api`, `storage` and `config` can't import `core` under rule 2); duplicate the interfaces in each package.
+- **Reason:** the service and factory architecture in `docs/port-plan.md` injects a logger and clock into every service. Enforced by `tooling/eslint/boundaries.mjs`, `yarn.config.cjs` and new cases in `tooling/eslint/boundaries.test.ts`. `docs/spec.md` is left as written; this entry supersedes its layout and dependency rules where they differ.
+
+## 2026-10-30 · Port approach: rewrite TwitchDropsMiner in our architecture
+
+- **Decision:** a TypeScript rewrite in our service architecture, using their behaviour and protocol details as-is wherever that's simply how Twitch has to be called.
+- **Reason:** it's a different language and structure, so there's no code to carry over and no notice to maintain.
+
+## 2026-10-30 · Port plan decisions 2–5
+
+- **Login:** `AuthStrategy` with a login-window and a device-code implementation; both get tested live in M7, and whichever works becomes the default.
+- **Realtime:** PubSub sits behind a `RealtimeSource` interface so polling can replace it.
+- **Offline:** a `Connectivity` service pauses the miner; on resume it re-validates auth and reloads the full inventory.
+- **Scope of v1:** full feature parity, including the image cache, in a temporary React UI (`docs/port-plan.md` §5). English only, with strings kept in one module. The UX redesign and our own translations come later.
+
+## 2026-10-30 · Milestone order with the port
+
+- **Decision:** M3 IPC (contract built around a `MinerSnapshot` view model plus commands), M4 config (their settings), M5 storage (campaign cache, claim history, image cache), M6 network (`api`: HTTP, GQL, PubSub, watch, tested against scrubbed fixtures), M7 auth (both strategies, tested live). Then a **new M7b "Miner"**: `core` domain rules written tests-first from `docs/port-plan.md` §3, then the services, then the miner state machine, wired into the temporary UI. M8–M12 continue as in the spec, with M8 also covering connectivity pause/resume.
+- **Reason:** the spec's infrastructure milestones become the pieces the miner needs, so the port lands on finished foundations.

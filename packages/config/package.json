@@ -15,5 +15,8 @@
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
+  },
+  "dependencies": {
+    "@tdc/kernel": "workspace:^"
   }
 }
