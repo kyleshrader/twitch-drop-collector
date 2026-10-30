@@ -8,7 +8,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:electron": "node ../../tooling/scripts/vitest-in-electron.mjs"
   },
   "devDependencies": {
     "@types/node": "catalog:",
@@ -17,6 +18,7 @@
     "vitest": "catalog:"
   },
   "dependencies": {
-    "@tdc/kernel": "workspace:^"
+    "@tdc/kernel": "workspace:^",
+    "zod": "catalog:"
   }
 }

@@ -14,7 +14,7 @@ yarn dev
 ## Checks
 
 ```bash
-yarn check      # constraints, typecheck, lint, test
+yarn check      # constraints, typecheck, lint, test, test:electron
 yarn test:e2e   # builds the app and runs Playwright against it (TDC_E2E_SHOW_WINDOWS=1 to watch)
 ```
 

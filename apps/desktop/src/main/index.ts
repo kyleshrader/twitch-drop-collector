@@ -4,6 +4,8 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { createSettingsService } from '@tdc/config'
+import { systemClock } from '@tdc/kernel'
+import { openStorage } from '@tdc/storage'
 import icon from '../../resources/icon.png?asset'
 import { createJsonFileStore } from './adapters/json-file-store'
 import { createLoginItem } from './adapters/login-item'
@@ -127,6 +129,24 @@ if (!app.requestSingleInstanceLock()) {
       if (next.general.launchAtLogin !== previous.general.launchAtLogin) {
         syncLoginItem(next.general.launchAtLogin)
       }
+    })
+
+    // Local database: migrated before anything reads it; a database that can't be used is moved
+    // aside and recreated (it only holds cache and history).
+    const storage = openStorage({
+      file: join(app.getPath('userData'), 'tdc.db'),
+      clock: systemClock,
+      logger: logger.child('storage')
+    })
+    const purgeCache = (): void => {
+      const purged = storage.cache.purgeExpired()
+      if (purged > 0) logger.child('storage').debug('Purged expired cache entries', { purged })
+    }
+    purgeCache()
+    const purgeTimer = setInterval(purgeCache, 60 * 60 * 1000)
+    app.on('will-quit', () => {
+      clearInterval(purgeTimer)
+      storage.close()
     })
 
     registerInvokeRoute(

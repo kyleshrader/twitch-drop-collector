@@ -16,8 +16,9 @@
     "lint": "eslint --cache .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "yarn constraints && yarn typecheck && yarn lint && yarn test",
-    "test:e2e": "turbo run test:e2e"
+    "check": "yarn constraints && yarn typecheck && yarn lint && yarn test && yarn test:electron",
+    "test:e2e": "turbo run test:e2e",
+    "test:electron": "turbo run test:electron"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -8,7 +8,7 @@ Full spec: docs/spec.md. Decision log: docs/decisions.md.
 - Node: `fnm use` (reads .node-version). Corepack must be installed on Node 25+.
 - Install: yarn install --immutable
 - Dev: yarn dev
-- Checks: yarn constraints && yarn typecheck && yarn lint && yarn test (or `yarn check`)
+- Checks: yarn check (constraints, typecheck, lint, test, and test:electron for code that runs on Electron's Node)
 - End-to-end: yarn test:e2e (builds the app, then runs Playwright against it; windows stay invisible, set TDC_E2E_SHOW_WINDOWS=1 to watch)
 
 ## Always
