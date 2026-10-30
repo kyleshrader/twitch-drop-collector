@@ -32,8 +32,13 @@ function client(): { gql: GqlClient; scheduler: ReturnType<typeof recordingSched
   })
   const gql = createGqlClient({
     http,
-    auth: { headers: async () => ({ Authorization: 'OAuth test-token' }) },
-    profile: CLIENT_PROFILES.androidApp,
+    auth: {
+      headers: async () => ({
+        Authorization: 'OAuth test-token',
+        'Client-Id': CLIENT_PROFILES.androidApp.clientId,
+        Origin: CLIENT_PROFILES.androidApp.clientUrl
+      })
+    },
     url: `${server.url}/gql`,
     limiter: createRateLimiter({
       capacity: 5,

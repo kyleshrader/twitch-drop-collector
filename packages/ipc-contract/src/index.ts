@@ -9,6 +9,7 @@ export {
   type InvokeInput,
   type InvokeOutput
 } from './channels'
+export { AuthStateView, SignInMethod } from './auth'
 export { SettingsPatchInput, SettingsView } from './settings'
 export {
   IpcError,

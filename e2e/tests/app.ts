@@ -22,13 +22,35 @@ export function appEnv(userDataDir: string): Record<string, string> {
   // Set TDC_E2E_SHOW_WINDOWS=1 to watch the tests; otherwise windows stay invisible.
   const invisible: Record<string, string> =
     process.env['TDC_E2E_SHOW_WINDOWS'] === '1' ? {} : { TDC_E2E_INVISIBLE: '1' }
-  return { ...env, ...invisible, TDC_USER_DATA_DIR: userDataDir }
+  return {
+    ...env,
+    ...invisible,
+    // Tests never talk to the real Twitch: unless a test supplies a mock, every endpoint points
+    // at a closed local port.
+    TDC_TWITCH_ENDPOINTS: JSON.stringify(twitchEndpoints('http://127.0.0.1:9')),
+    TDC_USER_DATA_DIR: userDataDir
+  }
+}
+
+/** All Twitch endpoints served from one (mock) origin. */
+export function twitchEndpoints(base: string): Record<string, string> {
+  return {
+    web: base,
+    id: base,
+    gql: `${base}/gql`,
+    usher: base,
+    pubsub: base.replace(/^http/, 'ws')
+  }
 }
 
 export async function launchApp(
-  userDataDir = newUserDataDir()
+  userDataDir = newUserDataDir(),
+  extraEnv: Record<string, string> = {}
 ): Promise<{ app: ElectronApplication; window: Page; userDataDir: string }> {
-  const app = await electron.launch({ args: [MAIN_ENTRY], env: appEnv(userDataDir) })
+  const app = await electron.launch({
+    args: [MAIN_ENTRY],
+    env: { ...appEnv(userDataDir), ...extraEnv }
+  })
   const window = await app.firstWindow()
   await window.waitForLoadState('domcontentloaded')
   return { app, window, userDataDir }

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { AppShell } from '@tdc/ui'
+import { AccountPanel } from './AccountPanel'
 import { invoke } from './ipc'
 import { SettingsScreen } from './SettingsScreen'
 import { strings } from './strings'
@@ -16,6 +17,7 @@ function MainScreen(): ReactNode {
   })
   return (
     <>
+      <AccountPanel />
       <p data-testid="app-version">
         {info.data
           ? strings.main.version(info.data.version, info.data.platform)

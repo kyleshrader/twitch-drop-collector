@@ -1,10 +1,12 @@
 import { createBackoff, type Logger, type RateLimiter, type Scheduler } from '@tdc/kernel'
 import { GqlError, ResponseShapeError } from '../errors'
 import type { HttpClient } from '../http'
-import type { ClientProfile } from '../profiles'
 import { toPayload, type GqlOperation } from './operation'
 
-/** Supplies auth headers (Authorization, device and session IDs). Implemented by auth in M7. */
+/**
+ * Who the request is from: the session's client identity (Client-Id, Origin, Referer,
+ * User-Agent) plus Authorization and the device and session IDs. Implemented by auth.
+ */
 export interface GqlAuth {
   headers(): Promise<Record<string, string>>
 }
@@ -65,7 +67,6 @@ function inspect(operation: string, item: GqlItem): Verdict {
 export function createGqlClient(deps: {
   http: HttpClient
   auth: GqlAuth
-  profile: ClientProfile
   url: string
   limiter: RateLimiter
   scheduler: Scheduler
@@ -73,7 +74,7 @@ export function createGqlClient(deps: {
   maxAttempts?: number
   random?: () => number
 }): GqlClient {
-  const { http, auth, profile, url, limiter, scheduler, logger, maxAttempts = 8 } = deps
+  const { http, auth, url, limiter, scheduler, logger, maxAttempts = 8 } = deps
 
   const send = async <V, D>(
     operation: GqlOperation<V, D>,
@@ -92,13 +93,7 @@ export function createGqlClient(deps: {
           url,
           signal,
           json: batched ? payload : payload[0],
-          headers: {
-            Accept: '*/*',
-            'Client-Id': profile.clientId,
-            Origin: profile.clientUrl,
-            Referer: profile.clientUrl,
-            ...(await auth.headers())
-          }
+          headers: { Accept: '*/*', ...(await auth.headers()) }
         })
       )
       if (response.status !== 200) {

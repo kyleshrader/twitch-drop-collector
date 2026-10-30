@@ -12,6 +12,13 @@ export {
   type HttpRequest,
   type HttpResponse
 } from './http'
+export {
+  createIdentityClient,
+  DeviceCode,
+  TokenInfo,
+  type DevicePoll,
+  type IdentityClient
+} from './identity'
 export { CLIENT_PROFILES, pickUserAgent, type ClientProfile } from './profiles'
 export {
   createPubSub,

@@ -2,7 +2,6 @@ import { createRateLimiter, systemClock } from '@tdc/kernel'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createGqlClient } from './gql/client'
 import { createHttpClient } from './http'
-import { CLIENT_PROFILES } from './profiles'
 import { systemScheduler } from './runtime'
 import {
   recordingScheduler,
@@ -34,7 +33,6 @@ function watcher(): StreamWatcher {
   const gql = createGqlClient({
     http,
     auth: { headers: async () => ({}) },
-    profile: CLIENT_PROFILES.androidApp,
     url: `${server.url}/gql`,
     limiter: createRateLimiter({
       capacity: 5,

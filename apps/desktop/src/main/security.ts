@@ -31,6 +31,17 @@ function openExternally(url: string): void {
 }
 
 /** Denies new windows, off-origin navigation, webviews and all permission requests. */
+// Windows that show someone else's site (the Twitch login window) say where they may navigate.
+const navigationAllowances = new WeakMap<Electron.WebContents, (url: string) => boolean>()
+
+/** Lets one specific webContents navigate to URLs matching `allow`. */
+export function allowNavigation(
+  contents: Electron.WebContents,
+  allow: (url: string) => boolean
+): void {
+  navigationAllowances.set(contents, allow)
+}
+
 export function hardenWebContents(rendererOrigin: string): void {
   app.on('web-contents-created', (_event, contents) => {
     contents.setWindowOpenHandler(({ url }) => {
@@ -38,7 +49,8 @@ export function hardenWebContents(rendererOrigin: string): void {
       return { action: 'deny' }
     })
     contents.on('will-navigate', (event, url) => {
-      if (isSameOrigin(url, rendererOrigin)) return
+      const allowance = navigationAllowances.get(contents)
+      if (allowance ? allowance(url) : isSameOrigin(url, rendererOrigin)) return
       event.preventDefault()
       openExternally(url)
     })

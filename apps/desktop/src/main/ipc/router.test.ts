@@ -28,7 +28,13 @@ function setup(overrides: Partial<InvokeHandlers> = {}): {
       app: { getName: () => 'Twitch Drop Collector', getVersion: () => '1.2.3' },
       shell: { openExternal },
       platform: 'win32',
-      settings: { get: () => DEFAULT_SETTINGS, update: async () => DEFAULT_SETTINGS }
+      settings: { get: () => DEFAULT_SETTINGS, update: async () => DEFAULT_SETTINGS },
+      auth: {
+        state: () => ({ status: 'signedOut' }),
+        signIn: async () => {},
+        cancelSignIn: () => {},
+        signOut: async () => {}
+      }
     }),
     ...overrides
   }

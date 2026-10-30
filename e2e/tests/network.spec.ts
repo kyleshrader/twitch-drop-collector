@@ -39,6 +39,28 @@ test('net.fetch sends our headers and body unchanged', async () => {
     expect(seen[0]?.headers['client-id']).toBe('client-123')
     expect(JSON.parse(seen[0]?.body ?? '')).toEqual({ operationName: 'Inventory' })
 
+    // Why the app's adapter uses net.request instead (apps/desktop/src/main/adapters/network.ts):
+    // net.fetch refuses custom Origin and Referer headers. If Electron ever allows them, this
+    // fails and the adapter can go back to net.fetch.
+    const refused = await app.evaluate(async ({ net }, target) => {
+      const outcome: Record<string, string> = {}
+      for (const name of ['Origin', 'Referer']) {
+        try {
+          await net.fetch(target, {
+            method: 'POST',
+            headers: { [name]: 'https://www.twitch.tv' },
+            body: '{}',
+            signal: AbortSignal.timeout(5000)
+          })
+          outcome[name] = 'sent'
+        } catch {
+          outcome[name] = 'refused'
+        }
+      }
+      return outcome
+    }, url)
+    expect(refused).toEqual({ Origin: 'refused', Referer: 'refused' })
+
     const runtime = await app.evaluate(() => ({
       webSocket: typeof WebSocket,
       abortAny: typeof AbortSignal.any

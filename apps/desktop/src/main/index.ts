@@ -1,21 +1,44 @@
-import { app, BrowserWindow, dialog, ipcMain, nativeTheme, session, shell } from 'electron'
+import {
+  app,
+  BaseWindow,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  nativeTheme,
+  net,
+  safeStorage,
+  session,
+  shell,
+  WebContentsView
+} from 'electron'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import {
+  CLIENT_PROFILES,
+  createHttpClient,
+  createIdentityClient,
+  pickUserAgent,
+  systemScheduler
+} from '@tdc/api'
 import { createSettingsService } from '@tdc/config'
+import { createAuthService } from '@tdc/core'
 import { systemClock } from '@tdc/kernel'
 import { openStorage } from '@tdc/storage'
 import icon from '../../resources/icon.png?asset'
+import { resolveEndpoints } from './adapters/endpoints'
 import { createJsonFileStore } from './adapters/json-file-store'
 import { createLoginItem } from './adapters/login-item'
-import { applyProxy } from './adapters/network'
+import { browserUserAgent, createLoginWindow, LOGIN_PARTITION } from './adapters/login-window'
+import { applyProxy, createNetFetch, requestTimeoutMs } from './adapters/network'
+import { createSafeStorageSessionStore } from './adapters/session-store'
 import { createInvokeHandlers } from './ipc/handlers'
 import { registerInvokeRoute } from './ipc/register'
 import { createInvokeRouter } from './ipc/router'
 import { createConsoleLogger } from './logger'
 import { APP_ORIGIN, isSameOrigin, mainWindowOptions } from './policy'
-import { hardenWebContents, registerAppScheme, serveRenderer } from './security'
+import { allowNavigation, hardenWebContents, registerAppScheme, serveRenderer } from './security'
 
 const devServerUrl = is.dev ? process.env['ELECTRON_RENDERER_URL'] : undefined
 // End-to-end tests run windows transparent, unfocusable and off the taskbar, so they never pop
@@ -158,10 +181,55 @@ if (!app.requestSingleInstanceLock()) {
       storage.close()
     })
 
+    // Twitch, over Electron's net stack. A session presents as the Twitch client it signed in
+    // with: the Android app (login window) or the Android TV app (device code). See
+    // docs/decisions.md.
+    const endpoints = resolveEndpoints(process.env, app.isPackaged)
+    const profile = CLIENT_PROFILES.androidApp
+    const http = createHttpClient({
+      fetch: createNetFetch(net),
+      userAgent: pickUserAgent(profile),
+      timeoutMs: () => requestTimeoutMs(settings.get().network.connectionQuality),
+      scheduler: systemScheduler,
+      logger: logger.child('http')
+    })
+    const auth = createAuthService({
+      identity: (clientProfile, deviceId) =>
+        createIdentityClient({ http, profile: clientProfile, url: endpoints.id, deviceId }),
+      store: await createSafeStorageSessionStore({
+        safeStorage,
+        platform: process.platform,
+        file: join(app.getPath('userData'), 'session.bin'),
+        logger: logger.child('auth')
+      }),
+      loginWindow: createLoginWindow({
+        BaseWindow,
+        WebContentsView,
+        session: session.fromPartition(LOGIN_PARTITION),
+        web: endpoints.web,
+        profile,
+        userAgent: browserUserAgent(app.userAgentFallback),
+        allowNavigation,
+        invisible: invisibleForTests,
+        logger: logger.child('login')
+      }),
+      // The Android app client no longer gets device codes; the Android TV client does.
+      profiles: { loginWindow: profile, deviceCode: CLIENT_PROFILES.androidTv },
+      clock: systemClock,
+      scheduler: systemScheduler,
+      logger: logger.child('auth')
+    })
+
     registerInvokeRoute(
       ipcMain,
       createInvokeRouter({
-        handlers: createInvokeHandlers({ app, shell, platform: process.platform, settings }),
+        handlers: createInvokeHandlers({
+          app,
+          shell,
+          platform: process.platform,
+          settings,
+          auth
+        }),
         isTrustedSender: (url) => isSameOrigin(url, rendererOrigin),
         logger: logger.child('ipc')
       })
@@ -170,6 +238,8 @@ if (!app.requestSingleInstanceLock()) {
     mainWindow = createWindow({
       startMinimized: loginItem.launchedAtLogin() && initial.general.startMinimized
     })
+    // Restoring validates the saved token over the network; don't hold up the window for it.
+    void auth.start()
 
     // macOS: re-create the window when the dock icon is clicked and none are open.
     app.on('activate', () => {

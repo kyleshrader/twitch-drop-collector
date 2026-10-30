@@ -7,6 +7,21 @@ export const strings = {
     version: (version: string, platform: string): string => `Version ${version} (${platform})`,
     openInventory: 'Open Twitch drops inventory'
   },
+  account: {
+    heading: 'Twitch account',
+    restoring: 'Checking your Twitch session…',
+    signedOut: 'Not signed in',
+    signedInAs: (login: string): string => `Signed in as ${login}`,
+    unverified: '(offline, not yet re-checked)',
+    signOut: 'Sign out',
+    signIn: 'Sign in with Twitch',
+    signInNote: 'You’ll get a short code to confirm at twitch.tv/activate in your usual browser.',
+    waitingForWindow: 'Finish signing in in the Twitch window…',
+    waitingForCode: 'Waiting for you to enter the code on Twitch…',
+    enterCode: 'Your code:',
+    openActivate: 'Open twitch.tv/activate (code already filled in)',
+    cancel: 'Cancel'
+  },
   settings: {
     save: 'Save settings',
     saving: 'Saving…',

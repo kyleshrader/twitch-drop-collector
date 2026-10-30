@@ -210,3 +210,55 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 
 - **Decision:** require types on exported function signatures, not on every function.
 - **Reason:** the stricter rule flagged methods inside objects whose type is already declared (`createX(): X { return { get() {…} } }`), where TypeScript already checks every return type against `X`. This is a style rule, not one of the dependency-boundary rules.
+
+## 2026-10-30 · Client identity: follow TwitchDropsMiner (chosen by Kyle)
+
+- **Decision:** present as Twitch's Android app (`CLIENT_PROFILES.androidApp`: its client ID and Dalvik user agents), the same as TwitchDropsMiner `dev-build`, for login, GQL and watching. If upstream switches profiles later, we follow.
+- **Alternatives:** register our own Twitch application (official API only, which has no drops endpoints); the web client ID.
+- **Reason:** upstream's author has researched which client works for drops and maintains it in contact with Twitch staff. Presenting as Twitch's own app is against Twitch's terms and carries a risk of the account being flagged; Kyle accepts that for this personal tool.
+
+## 2026-10-30 · M7: auth
+
+- **Service:** `createAuthService` in `@tdc/core` owns the session. It handles restore and re-validation at startup, both sign-in strategies, cancel, sign-out, `invalidate()` (for a later GQL 401), the GQL auth headers (`Authorization: OAuth …`, a per-run `Client-Session-Id`, a persistent `X-Device-Id`) and the PubSub token. `AuthState` holds user ID and login, never a token. Secret storage and the login window are ports implemented in main.
+- **Sign-in strategies:**
+  - **Login window:** Twitch's login page in a `BrowserWindow` on its own persistent partition (`persist:twitch-login`), with no preload and our secure web preferences. Its permission requests are denied, and its user agent is Electron's minus the Electron/app tokens. The login URL matches upstream's Android-client URL (double-encoded `redirect_params`). The token comes from the `#access_token=` redirect on the web origin; the window then closes, and closing it yourself cancels. This window may navigate to `https://*.twitch.tv` (through a per-webContents allowance in `security.ts`); the renderer's rules are unchanged.
+  - **Device code:** id.twitch.tv `/oauth2/device` then `/oauth2/token`, polling at Twitch's interval. `slow_down` adds 5s, an expired code is replaced automatically, and `access_denied` ends the sign-in. The code and activate link show in the UI.
+  - Which one becomes the default depends on the live check.
+- **Spec open decision, sign-in redirect method:** neither a custom protocol nor a loopback server. The login window reads the redirect URL directly.
+- **Tokens at rest (deviation from the spec's "access tokens stay in memory"):** Twitch's implicit-flow and Android-client tokens are long-lived access tokens with no refresh token, so the access token is the long-lived secret. It's stored together with user ID, login, client ID and device ID as one `safeStorage`-encrypted blob in `userData/session.bin`, written atomically. A blob that can't be decrypted is deleted.
+- **Linux without a keyring (spec open decision): don't persist.** With `getSelectedStorageBackend() === 'basic_text'` the session stays in memory only, and the user signs in each launch.
+- **Startup:** `auth.start()` runs after the window opens. If Twitch is unreachable within 30s, the saved session is kept as `signedIn` with `verified: false`. A token Twitch rejects, or one issued to a different client ID, is deleted and the user is asked to sign in again.
+- **Sign-out:** clears the in-memory token, `session.bin` and the login partition's storage, so the next sign-in asks for credentials.
+- **Electron's `net.fetch` refuses custom `Origin` and `Referer` headers** (`net::ERR_FAILED` and `net::ERR_BLOCKED_BY_CLIENT`), and Twitch's clients (and upstream) send both on GQL and identity calls. `session.webRequest` doesn't see main-process `net.fetch` requests, so it can't add them either. `createNetFetch` is now built on `net.request`, which accepts Origin as its `origin` option and Referer once `referrerPolicy: 'unsafe-url'` is set. It's the same network stack, so the spec's intent (system proxy and certificate store) holds; session cookies aren't sent. Found by the e2e device-code test. `e2e/tests/network.spec.ts` asserts that `net.fetch` still refuses them, so a future Electron that allows them gets noticed.
+- **E2E:** `e2e/tests/mock-twitch.ts` serves the login redirect, `/oauth2/validate`, `/oauth2/device` and `/oauth2/token`, and requires Origin and Referer on identity calls. `auth.spec.ts` covers:
+  - login-window sign-in, with the token absent from every IPC reply, the DOM, cookies and web storage, and absent in plain text from `session.bin`
+  - restore after a restart, then sign-out clearing `session.bin` and the login cookies
+  - device-code sign-in
+  - a revoked token at startup
+- **Test isolation:** dev builds read `TDC_TWITCH_ENDPOINTS` (JSON; ignored when packaged). The e2e helper points every endpoint at a closed local port unless a test supplies a mock, so no test reaches the real Twitch.
+
+## 2026-10-30 · M7 live check: device codes need the Android TV client; login window gets an address bar
+
+- **What we found live:** the login window signed in with the Android app client (Kyle's account). Device code with the Android app client fails with `400 invalid client`, which explains why upstream's device-code function is unused. An anonymous probe showed Twitch _does_ issue device codes to the Android TV client (`ue6666qo983tsx6so1t0vnawi233wa`, from upstream's client list).
+- **Decision (Kyle): keep device code, using the Android TV client.**
+  - A session now belongs to the client its token was issued to: login window means the Android app, device code means the Android TV app.
+  - `StoredSession.clientId` picks the profile on restore, and a saved session for an unknown client is discarded.
+  - `GqlAuth.headers()` now carries the full client identity (`Client-Id`, `Origin`, `Referer`, `User-Agent`), so the GQL client no longer holds a profile.
+  - The identity client sends its profile's user agent.
+- **Open:** whether Twitch counts drops for Android TV client tokens is only known once the miner runs (M7b). The login window stays the primary method.
+- **Activation link:** the Android TV client's `verification_uri` comes back without the code, so `activationUrl()` adds `?device-code=<code>` when missing. The "Open twitch.tv/activate" button then opens your browser with the code already filled in (Kyle's suggestion).
+- **Why not your own browser for the main sign-in:** with the Android app client, the token only comes back on a redirect to `https://www.twitch.tv/#access_token=…`, which an app can't read from your browser. Twitch won't redirect to `localhost` or a custom protocol for a client we don't own, and a Twitch app we register ourselves gets tokens that can't collect drops. Device code is the browser-based option.
+- **Login window trust (Kyle: mini browser bar):** the window is a `BaseWindow` with two `WebContentsView`s.
+  - The top one is our own address bar: static HTML from a `data:` URL, JavaScript off, its own in-memory partition, CSP `default-src 'none'`. It shows the live host and path (never the query or `#…`, so the token never appears), plus "Secure connection" for https or "Not secure" otherwise.
+  - The window title is "Sign in to Twitch (host)".
+  - The account panel explains each method before you start: what opens, to check for 🔒 www.twitch.tv, and that your password goes only to Twitch.
+  - Both views' webContents are closed with the window.
+- **Login window follow-ups (Kyle):**
+  - **Address bar restyled** like a browser's read-only field: muted fill, a 6px radius, the lock (or a red "Not secure" chip) inside the field on the left, host and path with no gap between them. The line height was fixed so descenders aren't clipped.
+  - **Window locked down:** it isn't resizable, maximizable or fullscreenable, and has no menu.
+  - **No DevTools:** both views have `devTools: false`.
+  - **No zoom:** Electron only zooms through menu items (Ctrl+wheel just emits `zoom-changed`), so with no window menu there's no zoom path on Windows or Linux. `before-input-event` blocks the zoom and DevTools shortcuts, which also covers macOS's global app menu, and pinch zoom is pinned to 1.
+  - **Tests:** e2e checks the window flags and that `openDevTools()` does nothing (it fails when the protections are removed). Unit tests cover the blocked and allowed shortcuts. An e2e Ctrl+wheel zoom check was dropped because it passed even without protection, so it proved nothing.
+- **Live re-check (Kyle, 2026-10-30): both sign-in methods work against real Twitch.** The login window signs in as the Android app; the code flow signs in as the Android TV app, with the code pre-filled on twitch.tv/activate. Kyle notes that, historically, the Android TV client is the one with access to the campaign and drop GQL queries; to be confirmed when the miner first fetches the inventory (M7b).
+- **Code sign-in is the only visible method (Kyle, 2026-10-30).** The account panel shows a single "Sign in with Twitch" button that runs the device-code flow (Android TV client), with the code pre-filled on twitch.tv/activate. The login-window strategy stays in core and main, reachable only through `auth:signIn { method: 'loginWindow' }`, so it can be tested later. Its e2e tests start it through IPC.
+- **safeStorage moved to the async API.** The sync `isEncryptionAvailable` / `encryptString` / `decryptString` are deprecated in Electron 45 and logged warnings at startup. The session store uses `isAsyncEncryptionAvailable`, `encryptStringAsync` and `decryptStringAsync`, is created asynchronously once the app is ready, and re-saves the session when decryption reports `shouldReEncrypt` (the OS key rotated). Data written with the old API still decrypts with the new one (Electron docs).

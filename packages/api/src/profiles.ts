@@ -19,6 +19,15 @@ export const CLIENT_PROFILES = {
       'Dalvik/2.1.0 (Linux; U; Android 15; SM-G990B Build/AP3A.240905.015.A2) tv.twitch.android.app/31.8.0/3108006'
     ]
   },
+  /** Twitch's Android TV app. The only one of these Twitch still issues device codes to. */
+  androidTv: {
+    name: 'Android TV app',
+    clientId: 'ue6666qo983tsx6so1t0vnawi233wa',
+    clientUrl: 'https://android.tv.twitch.tv',
+    userAgents: [
+      'Mozilla/5.0 (Linux; Android 7.1; Smart Box C1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36'
+    ]
+  },
   web: {
     name: 'Web',
     clientId: 'kimne78kx3ncx6brgo4mv6wki5h1ko',

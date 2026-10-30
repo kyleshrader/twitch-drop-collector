@@ -203,7 +203,7 @@ These are the rules worth carrying over exactly. Each one becomes a unit test in
    - **Login window:** an Electron `BrowserWindow` on an isolated, persistent session partition with no preload. It's sandboxed, never shares our app's session, and catches the redirect URL. No external Chrome is needed.
    - **Device code:** the simpler user experience, if it still works for the client ID.
 
-   Both get tried against the live API in M7, and whichever works becomes the default. The client ID question (ToS risk) gets decided then too.
+   Both get tried against the live API in M7, and whichever works becomes the default. Client identity: the Android app profile, as upstream (decided 2026-10-30, see the decision log).
 
 3. **PubSub. Accepted.** Hidden behind a `RealtimeSource` interface, so a polling fallback (GQL `CurrentDrop` plus periodic stream checks) can replace it without touching the miner.
 4. **Offline behaviour. Accepted.** A `Connectivity` service (`net.isOnline`, `powerMonitor` suspend/resume, failed-request signals) moves the miner into `paused`. On resume it re-validates auth and does a full inventory reload instead of trusting stale state.
