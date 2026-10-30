@@ -27,7 +27,8 @@ export default defineConfig(
   {
     files: ['**/*.{ts,tsx}'],
     rules: {
-      '@typescript-eslint/explicit-function-return-type': 'error'
+      // Exported signatures must be typed; inner functions may infer from their declared type.
+      '@typescript-eslint/explicit-module-boundary-types': 'error'
     }
   },
   boundaries,

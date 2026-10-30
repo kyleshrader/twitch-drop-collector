@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, nativeTheme, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme, session, shell } from 'electron'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -9,6 +9,7 @@ import { openStorage } from '@tdc/storage'
 import icon from '../../resources/icon.png?asset'
 import { createJsonFileStore } from './adapters/json-file-store'
 import { createLoginItem } from './adapters/login-item'
+import { applyProxy } from './adapters/network'
 import { createInvokeHandlers } from './ipc/handlers'
 import { registerInvokeRoute } from './ipc/register'
 import { createInvokeRouter } from './ipc/router'
@@ -114,12 +115,20 @@ if (!app.requestSingleInstanceLock()) {
       })
     }
 
+    const syncProxy = (proxy: string): void => {
+      applyProxy(session.defaultSession, proxy).catch((error: unknown) => {
+        logger.error('Could not apply the proxy setting', { error })
+      })
+    }
+
     const initial = settings.get()
     logger.setLevel(is.dev ? 'debug' : initial.logging.level)
     nativeTheme.themeSource = initial.general.theme
     // The setting is the source of truth; re-apply it in case the OS entry was changed elsewhere.
     syncLoginItem(initial.general.launchAtLogin)
+    syncProxy(initial.network.proxy)
     settings.subscribe((next, previous) => {
+      if (next.network.proxy !== previous.network.proxy) syncProxy(next.network.proxy)
       if (!is.dev && next.logging.level !== previous.logging.level) {
         logger.setLevel(next.logging.level)
       }
