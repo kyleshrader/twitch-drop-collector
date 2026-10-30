@@ -1,3 +1,4 @@
+import { DEFAULT_SETTINGS } from '@tdc/config'
 import type { Logger } from '@tdc/kernel'
 import { describe, expect, it, vi } from 'vitest'
 import { createInvokeHandlers } from './handlers'
@@ -26,7 +27,8 @@ function setup(overrides: Partial<InvokeHandlers> = {}): {
     ...createInvokeHandlers({
       app: { getName: () => 'Twitch Drop Collector', getVersion: () => '1.2.3' },
       shell: { openExternal },
-      platform: 'win32'
+      platform: 'win32',
+      settings: { get: () => DEFAULT_SETTINGS, update: async () => DEFAULT_SETTINGS }
     }),
     ...overrides
   }

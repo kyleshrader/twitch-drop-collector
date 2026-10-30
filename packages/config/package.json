@@ -17,6 +17,7 @@
     "vitest": "catalog:"
   },
   "dependencies": {
-    "@tdc/kernel": "workspace:^"
+    "@tdc/kernel": "workspace:^",
+    "zod": "catalog:"
   }
 }

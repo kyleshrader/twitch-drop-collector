@@ -19,7 +19,10 @@ export function appEnv(userDataDir: string): Record<string, string> {
   for (const [key, value] of Object.entries(process.env)) {
     if (value !== undefined && key !== 'ELECTRON_RENDERER_URL') env[key] = value
   }
-  return { ...env, TDC_USER_DATA_DIR: userDataDir }
+  // Set TDC_E2E_SHOW_WINDOWS=1 to watch the tests; otherwise windows stay invisible.
+  const invisible: Record<string, string> =
+    process.env['TDC_E2E_SHOW_WINDOWS'] === '1' ? {} : { TDC_E2E_INVISIBLE: '1' }
+  return { ...env, ...invisible, TDC_USER_DATA_DIR: userDataDir }
 }
 
 export async function launchApp(

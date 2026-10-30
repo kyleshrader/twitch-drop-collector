@@ -1,7 +1,12 @@
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme, shell } from 'electron'
+import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { createSettingsService } from '@tdc/config'
 import icon from '../../resources/icon.png?asset'
+import { createJsonFileStore } from './adapters/json-file-store'
+import { createLoginItem } from './adapters/login-item'
 import { createInvokeHandlers } from './ipc/handlers'
 import { registerInvokeRoute } from './ipc/register'
 import { createInvokeRouter } from './ipc/router'
@@ -10,18 +15,30 @@ import { APP_ORIGIN, isSameOrigin, mainWindowOptions } from './policy'
 import { hardenWebContents, registerAppScheme, serveRenderer } from './security'
 
 const devServerUrl = is.dev ? process.env['ELECTRON_RENDERER_URL'] : undefined
+// End-to-end tests run windows transparent, unfocusable and off the taskbar, so they never pop
+// up on the developer's screen. Ignored in packaged builds.
+const invisibleForTests = process.env['TDC_E2E_INVISIBLE'] === '1' && !app.isPackaged
 const rendererOrigin = devServerUrl ?? APP_ORIGIN
 const logger = createConsoleLogger({ level: is.dev ? 'debug' : 'info' })
 
 let mainWindow: BrowserWindow | null = null
 
-function createWindow(): BrowserWindow {
+function createWindow(options: { startMinimized?: boolean } = {}): BrowserWindow {
   const window = new BrowserWindow({
     ...mainWindowOptions(join(__dirname, '../preload/index.js')),
-    ...(process.platform === 'linux' ? { icon } : {})
+    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(invisibleForTests ? { opacity: 0, skipTaskbar: true, focusable: false } : {})
   })
 
-  window.on('ready-to-show', () => window.show())
+  window.on('ready-to-show', () => {
+    if (options.startMinimized) {
+      // Until the tray exists (M8), "start minimised" means minimised to the taskbar.
+      window.showInactive()
+      window.minimize()
+    } else {
+      window.show()
+    }
+  })
   if (is.dev) {
     // Surface renderer warnings and errors (including CSP violations) in the dev terminal.
     window.webContents.on('console-message', ({ level, message, sourceId, lineNumber }) => {
@@ -60,7 +77,8 @@ if (!app.requestSingleInstanceLock()) {
 } else {
   app.on('second-instance', focusMainWindow)
 
-  void app.whenReady().then(() => {
+  void (async (): Promise<void> => {
+    await app.whenReady()
     electronApp.setAppUserModelId('com.github.twitchdropcollector')
 
     // F12 toggles DevTools in development; reload shortcuts are ignored in production.
@@ -68,20 +86,70 @@ if (!app.requestSingleInstanceLock()) {
 
     serveRenderer(join(__dirname, '../renderer'))
     hardenWebContents(rendererOrigin)
+
+    const settings = await createSettingsService({
+      store: createJsonFileStore({
+        file: join(app.getPath('userData'), 'settings.json'),
+        logger: logger.child('settings')
+      }),
+      logger: logger.child('settings')
+    })
+    const loginItem = createLoginItem({
+      app,
+      platform: process.platform,
+      argv: process.argv,
+      execPath: process.execPath,
+      env: process.env,
+      homedir: homedir(),
+      desktopFileName: 'twitch-drop-collector.desktop',
+      productName: app.getName(),
+      fs: { mkdir, writeFile, rm },
+      logger: logger.child('login-item')
+    })
+    const syncLoginItem = (enabled: boolean): void => {
+      loginItem.setEnabled(enabled).catch((error: unknown) => {
+        logger.error('Could not update launch at login', { error })
+      })
+    }
+
+    const initial = settings.get()
+    logger.setLevel(is.dev ? 'debug' : initial.logging.level)
+    nativeTheme.themeSource = initial.general.theme
+    // The setting is the source of truth; re-apply it in case the OS entry was changed elsewhere.
+    syncLoginItem(initial.general.launchAtLogin)
+    settings.subscribe((next, previous) => {
+      if (!is.dev && next.logging.level !== previous.logging.level) {
+        logger.setLevel(next.logging.level)
+      }
+      if (next.general.theme !== previous.general.theme) {
+        nativeTheme.themeSource = next.general.theme
+      }
+      if (next.general.launchAtLogin !== previous.general.launchAtLogin) {
+        syncLoginItem(next.general.launchAtLogin)
+      }
+    })
+
     registerInvokeRoute(
       ipcMain,
       createInvokeRouter({
-        handlers: createInvokeHandlers({ app, shell, platform: process.platform }),
+        handlers: createInvokeHandlers({ app, shell, platform: process.platform, settings }),
         isTrustedSender: (url) => isSameOrigin(url, rendererOrigin),
         logger: logger.child('ipc')
       })
     )
-    mainWindow = createWindow()
+
+    mainWindow = createWindow({
+      startMinimized: loginItem.launchedAtLogin() && initial.general.startMinimized
+    })
 
     // macOS: re-create the window when the dock icon is clicked and none are open.
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) mainWindow = createWindow()
     })
+  })().catch((error: unknown) => {
+    logger.error('Startup failed', { error })
+    dialog.showErrorBox('Twitch Drop Collector could not start', String(error))
+    app.exit(1)
   })
 
   app.on('window-all-closed', () => {

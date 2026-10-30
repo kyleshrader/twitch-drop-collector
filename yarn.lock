@@ -860,6 +860,7 @@ __metadata:
     typescript: "catalog:"
     vite: "catalog:"
     vitest: "catalog:"
+    zod: "catalog:"
   languageName: unknown
   linkType: soft
 

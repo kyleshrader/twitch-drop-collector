@@ -152,3 +152,33 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 - **Channels so far:** `app:getInfo` and `shell:openExternal` (https only). Main → renderer push events come in M8.
 - **Tests:** `router.test.ts` covers valid calls, five invalid payloads, input on a no-input channel, untrusted and destroyed senders, unknown channels (including `__proto__`), hidden handler errors and invalid output. With input validation disabled, 6 of them fail. `e2e/tests/ipc.spec.ts` sends an invalid payload from the real renderer and gets `INVALID_INPUT`.
 - **Also:** `apps/desktop/src/main/logger.ts` is a console implementation of the kernel `Logger` until electron-log arrives in M9, and `productName` is set in `apps/desktop/package.json` so `app.getName()` returns "Twitch Drop Collector".
+
+## 2026-10-30 · M4: settings stored as a JSON file, not electron-store
+
+- **Decision:** `@tdc/config` owns the zod schema, defaults, migrations and `createSettingsService({ store, logger })`. Main implements `SettingsStore` as `userData/settings.json`, written atomically (temp file, then rename). A file that isn't valid JSON is moved aside as `settings.json.corrupt-<time>` and the app starts from defaults. The file holds `{ version, settings }`, and migrations run step by step from the file's version.
+- **Alternatives:** electron-store 12 (spec default).
+- **Reason:** electron-store 12 and `conf` 16 are ESM-only while our main process builds as CommonJS. They validate with ajv JSON Schema, a second schema system next to zod, and tie migrations to semver. electron-store also imports `electron`, so it couldn't live in `@tdc/config`. The spec lists a small JSON file wrapper as the alternative.
+- **Loading is lenient, updates are strict.** On load, each invalid or missing field falls back to its own default, and the repaired file is rewritten once with a warning, so one bad value never resets everything. Updates are partial patches validated strictly (unknown keys rejected), written in call order, and only then applied and broadcast to subscribers.
+
+## 2026-10-30 · M4: settings reach the renderer through a mirrored transport schema
+
+- **Decision:** `@tdc/ipc-contract` has its own `SettingsView` and `SettingsPatchInput`, a copy of config's schema. `apps/desktop/src/main/ipc/settings-contract.test.ts` asserts the types are equal (`expectTypeOf`, enforced by typecheck) and that both accept and reject the same sample values.
+- **Alternatives:** let `ipc-contract` or the renderer import `@tdc/config`.
+- **Reason:** that would break fixed dependency rules 4 and 7. The duplication is small, and the test turns drift into a build failure.
+
+## 2026-10-30 · M4: launch at login
+
+- **Decision:** a `LoginItem` adapter in main. On Windows it calls `app.setLoginItemSettings({ openAtLogin, args: ['--autostart'] })`; on macOS, `app.setLoginItemSettings({ openAtLogin })` (SMAppService), with `wasOpenedAtLogin` to detect login launches. On Linux it writes `$XDG_CONFIG_HOME/autostart/twitch-drop-collector.desktop` (default `~/.config`), whose `Exec` uses `$APPIMAGE` when set, quoted per the Desktop Entry spec, and removes it when disabled. The setting is the source of truth and is re-applied at every launch. Unpackaged builds never register, because they would register the bare Electron binary.
+- **Start minimised:** applies only to login launches. Until the tray exists (M8) it means minimised to the taskbar.
+- **Not yet verified:** real registration on each OS needs packaged builds (M10). Unit tests cover the calls and the files written for all three platforms.
+- **Also:** the `theme` setting drives `nativeTheme.themeSource`, so `system`/`light`/`dark` flows into the renderer's `color-scheme`. The `logging.level` setting drives the main logger, except in dev, which always uses debug. `proxy` and `connectionQuality` are stored now and used from M6.
+
+## 2026-10-30 · M4: temporary renderer structure
+
+- **Decision:** two tabs (Main, Settings) as plain component state, with no router yet; UI text lives in `src/renderer/src/strings.ts`.
+- **Reason:** the UI is temporary (port plan §5), so the router choice waits for the real UI design. One strings module makes i18n a drop-in later.
+
+## 2026-10-30 · E2E windows are invisible by default
+
+- **Decision:** with `TDC_E2E_INVISIBLE=1` (set by the e2e helper, ignored in packaged builds), windows open with `opacity: 0`, `focusable: false` and `skipTaskbar: true`. They still render and take Playwright input, but never appear on screen or steal focus. Set `TDC_E2E_SHOW_WINDOWS=1` to watch a run. A test asserts the window really is transparent and unfocusable.
+- **Limits:** Linux ignores `opacity`, but Linux CI runs under `xvfb-run` (spec), which is off-screen anyway.

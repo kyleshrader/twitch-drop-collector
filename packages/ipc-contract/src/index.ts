@@ -9,6 +9,7 @@ export {
   type InvokeInput,
   type InvokeOutput
 } from './channels'
+export { SettingsPatchInput, SettingsView } from './settings'
 export {
   IpcError,
   type IpcErrorCode,

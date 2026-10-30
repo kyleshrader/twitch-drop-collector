@@ -18,6 +18,15 @@ test.afterAll(async () => {
 const windowCount = (): Promise<number> =>
   app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length)
 
+test('test windows stay invisible unless TDC_E2E_SHOW_WINDOWS=1', async () => {
+  test.skip(process.env['TDC_E2E_SHOW_WINDOWS'] === '1', 'windows were asked to be shown')
+  const state = await app.evaluate(({ BrowserWindow }) => {
+    const window = BrowserWindow.getAllWindows()[0]
+    return window && { opacity: window.getOpacity(), focusable: window.isFocusable() }
+  })
+  expect(state).toEqual({ opacity: 0, focusable: false })
+})
+
 test('loads the renderer from app:// rather than file://', async () => {
   expect(page.url()).toBe('app://renderer/index.html')
   await expect(page.getByRole('heading', { name: 'Twitch Drop Collector' })).toBeVisible()

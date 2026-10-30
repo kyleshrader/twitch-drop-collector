@@ -1,6 +1,7 @@
 // Every renderer → main request channel, defined once with its input and output schemas.
 // Main validates input before calling a handler and validates output before replying.
 import { z } from 'zod'
+import { SettingsPatchInput, SettingsView } from './settings'
 
 export const AppInfo = z.object({
   name: z.string(),
@@ -16,7 +17,9 @@ export type OpenExternalInput = z.infer<typeof OpenExternalInput>
 
 export const invokeChannels = {
   'app:getInfo': { input: z.undefined(), output: AppInfo },
-  'shell:openExternal': { input: OpenExternalInput, output: z.object({ opened: z.boolean() }) }
+  'shell:openExternal': { input: OpenExternalInput, output: z.object({ opened: z.boolean() }) },
+  'settings:get': { input: z.undefined(), output: SettingsView },
+  'settings:update': { input: SettingsPatchInput, output: SettingsView }
 } as const satisfies Record<string, { input: z.ZodType; output: z.ZodType }>
 
 export type InvokeChannel = keyof typeof invokeChannels
