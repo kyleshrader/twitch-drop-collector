@@ -297,3 +297,19 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 - **Domain rules:**
   - A precondition drop that isn't in the campaign doesn't block (upstream would crash on it).
   - Progress updates apply the same change to every drop in the campaign, clamped to each drop's required minutes.
+
+## 2026-10-30 · M7b: inventory, channel and watch services
+
+- **Inventory (`createInventoryService`):**
+  - `refresh()` fetches `Inventory`, then `ViewerDropsDashboard`, then `DropCampaignDetails` (batched 20 at a time, by user ID) for active and upcoming list entries, and builds campaigns with the mapping. If the campaign list is missing (an Android TV session), it warns and keeps the in-progress campaigns.
+  - It also handles progress updates, estimated minutes and late claim IDs.
+  - `claim()` calls `ClaimDrop` and treats `ELIGIBLE_FOR_ALL` or `DROP_INSTANCE_ALREADY_CLAIMED` as success, then marks the drop claimed and records it in the storage claim history. Other answers or GQL errors leave the drop unclaimed.
+  - `claimAll()` claims every claimable drop in non-upcoming campaigns. The live inventory had three finished but unclaimed Crimson Desert drops, which the test now covers.
+- **Channels (`createChannelService`):**
+  - `refresh()` covers wanted, earnable-within-the-hour campaigns. Allow-listed channels are checked live in bulk (`StreamInfo`, batched), and offline ones are kept but rank last. Games without allow-lists get live, drops-enabled streams from `DirectoryPage_Game` (20 per game). Channel ID is the broadcaster's ID, not the stream's.
+  - Results are ranked and capped at 199.
+  - With the available-drops check on, a live channel counts as drops-enabled only if `AvailableDrops` lists a campaign we could earn there.
+  - `updateStream`, `setOffline` and `setViewers` apply live events.
+  - Directory slugs are built from the game name when Twitch gave none.
+- **Watch (`createWatchService`):** one watch every 20s on the target channel. A progress-check event fires about 15s after each watch, if the target hasn't changed. A new target or `restart()` (after a claim) cuts the wait short. Failed watches are reported and the loop continues. Tested on the manual clock.
+- **Test support:** `fakeGql` answers operations by name and validates every answer with the operation's schema, so fakes can't drift from the real response shapes. The services are tested on the live fixtures.
