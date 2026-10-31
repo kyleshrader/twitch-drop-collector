@@ -379,4 +379,39 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 - **Fuses**, flipped by electron-builder's `electronFuses` before signing: `runAsNode`, `enableNodeOptionsEnvironmentVariable`, `enableNodeCliInspectArguments` and `grantFileProtocolExtraPrivileges` are off. `enableEmbeddedAsarIntegrityValidation`, `onlyLoadAppFromAsar` and `enableCookieEncryption` are on. Cookie encryption is a one-way switch (it can't be turned off later without losing the cookie store); the only cookies are Twitch's in the sign-in partition. Asar integrity works on Windows and macOS, not Linux. Nothing forks with `ELECTRON_RUN_AS_NODE`; `yarn test:electron` uses the unfused `electron` package, not the packaged app.
 - **Packaged smoke test (`yarn test:packaged`):** it builds the unpacked app, then `apps/desktop/scripts/smoke-packaged.mjs` checks three things. The fuses are as configured (read with `@electron/fuses`). The app starts on a fresh temporary profile (`--user-data-dir`, which the packaged app honours), migrates its database, and logs "Main window ready" with no errors. And on Windows and macOS, a copy with one byte of `app.asar` flipped refuses to start (on Windows it ends with 0x80000003). Playwright can't drive the packaged app, because it needs the inspect flags the fuse turns off, so the e2e suite keeps running against the dev build. For this test, `TDC_E2E_INVISIBLE` is now honoured in packaged builds too; it only changes how windows are shown. Passed on Windows; macOS and Linux run in M11's CI.
 - **Image cache (upstream `cache.py`):** box art and reward images reach the renderer as `tdc-image://cache/?url=<remote>`. Main serves that scheme on the default session only, so the sign-in window's partition can't use it. It answers only for https URLs on `*.jtvnw.net` (Twitch's CDN), fetches over `net` (proxy setting applies), and accepts jpeg, png, gif, webp or avif up to 5 MB. Files live in `<profile>/images`, named by the SHA-256 of their URL. The index is in the database (migration 2, `images`). Images unused for 30 days are evicted, then the least recently shown while the folder is over 200 MB. A URL that failed isn't asked for again for 5 minutes, and requests for the same URL are shared. The CSP allows `img-src tdc-image:`; the renderer still can't reach any remote host. The temporary UI shows box art in the inventory and reward images next to drops.
-- **Not yet verified:** that the installed app (as opposed to the unpacked build) launches. That needs running the installer, which writes a Start menu entry, a desktop shortcut and an uninstall entry for the current user.
+- **Installed app (verified on Windows):** the one-click installer installs for the current user to `%LOCALAPPDATA%Programs	witch-drop-collector`, adds Start menu and desktop shortcuts and an uninstall entry, and the installed app restores the session and reaches its main window. A stale installer, built before migration 2, found the newer database and moved it aside, which led to the M11 change below.
+
+## 2026-10-31 · M11: updates, CI and releases
+
+- **Update settings:** a new `updates` settings section, with no settings-file version bump needed (a missing section reads as its defaults).
+  - `mode` is one of three values. `auto` downloads in the background, then offers Restart now and installs on quit otherwise. `notify`, the default, offers Update now, Later or Skip this version, and downloads only when asked. `off` doesn't check by itself.
+  - `prereleases` offers pre-release versions too.
+  - `skippedVersion` records Skip this version. Automatic checks hide that version, `auto` mode won't download it, and a skipped version that's already downloaded doesn't install on quit (`autoInstallOnAppQuit` follows it).
+  - Later hides the offer for that version until the next start or a manual check.
+  - Check for updates in settings always shows what it finds, a skipped version included, and works in every mode.
+  - The settings form never saves `skippedVersion`; the banner and "Offer it again" do. So a form saved after a Skip can't undo it.
+  - The default is `notify` because the user asked to choose between updating and carrying on; `auto` is one click away.
+- **Updater (`apps/desktop/src/main/updates/updater.ts`):** decides when to check (30 s after start, then every 4 h), what to offer and when to download. electron-updater (6.8, matching electron-builder 26) sits behind a small `UpdateEngine` adapter with its own automatic download off, so the rules run in plain Node tests.
+  - The first check runs 1 s after the pre-release setting changes.
+  - Main publishes `updates:state` to the window. The window shows a banner above every tab, plus a status line and Check for updates in settings. A notification goes out only while the window is hidden and notifications are on.
+  - `install` sets `quitting` first, so closing to the tray doesn't swallow the quit.
+  - The proxy setting applies to electron-updater's own session too.
+  - Errors are shortened for the UI: a 404 reads "no published releases were found".
+  - Updates are on only in packaged builds that electron-updater can update (`isUpdaterActive`: NSIS, AppImage, deb, dmg/zip), and never in invisible test runs.
+- **Hosting:** GitHub Releases on `kyleshrader/twitch-drop-collector`. That repository doesn't exist yet; this checkout has no remote.
+  - `generateUpdatesFilesForAllChannels` writes a feed file per channel (`latest.yml`, `beta.yml`, …), so stable builds never see pre-releases.
+  - Build jobs upload into a draft release for the tag, and a last job publishes it. A version with a pre-release part is marked pre-release and not latest.
+- **Newer database:** `openStorage` no longer moves aside a database from a newer schema. It throws `NewerDatabaseError`, leaves the file untouched, and main shows "Your data was saved by a newer version…" and exits. This usually means an older build was started (it happened in M10 with a stale installer), and the newer build still needs the data. Corrupt files are still moved aside.
+- **CI (`.github/workflows/ci.yml`):** Windows, macOS and Linux each run `yarn check`, the e2e suite and `yarn test:packaged`; Linux also runs the formatting check.
+  - Node comes from `.node-version`, and Corepack is installed explicitly.
+  - Linux runs under `xvfb-run`, after allowing the unprivileged user namespaces that Ubuntu's AppArmor blocks and Chromium's sandbox needs.
+  - Action versions are current majors: checkout v7, setup-node v7, upload-artifact v7.
+- **Release (`.github/workflows/release.yml`):** a `v<version>` tag must match `apps/desktop/package.json`. Signing is optional per platform, so builds without credentials come out unsigned instead of failing.
+  - Windows signs with Azure Trusted Signing (`win.azureSignOptions`, passed on the command line only when the Azure secrets exist). `publisherName` also goes into `app-update.yml`, so the updater checks downloads are signed by that publisher.
+  - macOS uses a Developer ID certificate (`CSC_LINK`), and notarization (App Store Connect API key) is turned on only when its secrets exist.
+  - macOS can only update a signed app.
+- **Not yet verified:**
+  - CI on macOS and Linux.
+  - Signed builds; no signing credentials exist yet.
+  - The done criterion, an older build updating to a tagged pre-release. That needs the GitHub repository, then two tagged releases.
+  - Verified on Windows: the installed app runs the automatic check and reports a missing feed as an error without disrupting mining.

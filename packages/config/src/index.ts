@@ -11,6 +11,8 @@ export {
   Settings,
   SettingsPatch,
   THEMES,
+  UPDATE_MODES,
+  UpdateSettings,
   type SettingsSection
 } from './schema'
 export {

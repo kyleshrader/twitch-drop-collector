@@ -44,11 +44,29 @@ export const LoggingSettings = z.object({
   level: z.enum(LOG_LEVELS)
 })
 
+/**
+ * auto: download updates in the background and install them on quit (or on Restart now).
+ * notify: say an update is out, and download it only when asked.
+ * off: never check by itself; Check for updates still works.
+ */
+export const UPDATE_MODES = ['auto', 'notify', 'off'] as const
+/** A release version, as the update feed names it. */
+const Version = z.string().regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/)
+
+export const UpdateSettings = z.object({
+  mode: z.enum(UPDATE_MODES),
+  /** Offer pre-release versions too. */
+  prereleases: z.boolean(),
+  /** A version the user chose to skip; automatic checks don't offer it. Empty for none. */
+  skippedVersion: z.union([z.literal(''), Version])
+})
+
 export const Settings = z.object({
   general: GeneralSettings,
   mining: MiningSettings,
   network: NetworkSettings,
-  logging: LoggingSettings
+  logging: LoggingSettings,
+  updates: UpdateSettings
 })
 export type Settings = z.infer<typeof Settings>
 export type SettingsSection = keyof Settings
@@ -75,6 +93,11 @@ export const DEFAULT_SETTINGS: Settings = {
   },
   logging: {
     level: 'info'
+  },
+  updates: {
+    mode: 'notify',
+    prereleases: false,
+    skippedVersion: ''
   }
 }
 
@@ -83,6 +106,7 @@ export const SettingsPatch = z.strictObject({
   general: z.strictObject(GeneralSettings.partial().shape).optional(),
   mining: z.strictObject(MiningSettings.partial().shape).optional(),
   network: z.strictObject(NetworkSettings.partial().shape).optional(),
-  logging: z.strictObject(LoggingSettings.partial().shape).optional()
+  logging: z.strictObject(LoggingSettings.partial().shape).optional(),
+  updates: z.strictObject(UpdateSettings.partial().shape).optional()
 })
 export type SettingsPatch = z.infer<typeof SettingsPatch>

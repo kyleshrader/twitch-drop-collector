@@ -1,0 +1,127 @@
+# Release: pushing a tag v<version> (matching apps/desktop/package.json) builds the installers on
+# each platform, signs them when the signing secrets are set, and publishes a GitHub release that
+# the app's updater reads. A version with a pre-release part (1.2.0-beta.1) becomes a
+# pre-release, offered only to users who include pre-releases.
+#
+# Signing (each optional; without it that platform's build is unsigned):
+#   Windows, Azure Trusted Signing: secrets AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET;
+#     variables AZURE_SIGNING_ENDPOINT, AZURE_SIGNING_ACCOUNT, AZURE_CERTIFICATE_PROFILE,
+#     AZURE_PUBLISHER_NAME (the certificate's subject CN; the updater checks it).
+#   macOS, Developer ID: secrets MAC_CERTIFICATE_P12 (base64), MAC_CERTIFICATE_PASSWORD.
+#     Notarization: secrets APPLE_API_KEY_P8 (contents), APPLE_API_KEY_ID, APPLE_API_ISSUER.
+#     macOS can only update a signed app.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      prerelease: ${{ steps.check.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: check
+        name: Tag matches the app version
+        run: |
+          version=$(node -p "require('./apps/desktop/package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match apps/desktop/package.json ($version)"
+            exit 1
+          fi
+          case "$version" in *-*) echo prerelease=true ;; *) echo prerelease=false ;; esac >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: version
+    name: build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: --win
+          - os: macos-latest
+            platform: --mac
+          - os: ubuntu-latest
+            platform: --linux
+    runs-on: ${{ matrix.os }}
+    env:
+      TURBO_TELEMETRY_DISABLED: '1'
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+
+      - name: Enable Corepack
+        run: npm install --global corepack@latest && corepack enable
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Checks
+        run: yarn check
+
+      - name: Build
+        run: yarn workspace @tdc/desktop build
+
+      - name: Package, sign and upload
+        shell: bash
+        working-directory: apps/desktop
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          MAC_CERTIFICATE_P12: ${{ secrets.MAC_CERTIFICATE_P12 }}
+          MAC_CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+        run: |
+          args=()
+          if [ "$RUNNER_OS" = Windows ] && [ -n "$AZURE_CLIENT_ID" ]; then
+            args+=(
+              "-c.win.azureSignOptions.endpoint=${{ vars.AZURE_SIGNING_ENDPOINT }}"
+              "-c.win.azureSignOptions.codeSigningAccountName=${{ vars.AZURE_SIGNING_ACCOUNT }}"
+              "-c.win.azureSignOptions.certificateProfileName=${{ vars.AZURE_CERTIFICATE_PROFILE }}"
+              "-c.win.azureSignOptions.publisherName=${{ vars.AZURE_PUBLISHER_NAME }}"
+            )
+          fi
+          if [ "$RUNNER_OS" = macOS ]; then
+            if [ -n "$MAC_CERTIFICATE_P12" ]; then
+              export CSC_LINK="$MAC_CERTIFICATE_P12" CSC_KEY_PASSWORD="$MAC_CERTIFICATE_PASSWORD"
+              if [ -n "$APPLE_API_KEY_ID" ]; then
+                export APPLE_API_KEY="$RUNNER_TEMP/AuthKey.p8"
+                printf '%s' "$APPLE_API_KEY_P8" > "$APPLE_API_KEY"
+                args+=("-c.mac.notarize=true")
+              fi
+            else
+              export CSC_IDENTITY_AUTO_DISCOVERY=false
+            fi
+          fi
+          unset MAC_CERTIFICATE_P12 MAC_CERTIFICATE_PASSWORD APPLE_API_KEY_P8
+          yarn electron-builder ${{ matrix.platform }} --publish always "${args[@]}"
+
+  publish:
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Publish the draft release
+        run: |
+          if [ "${{ needs.version.outputs.prerelease }}" = true ]; then
+            gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --prerelease --latest=false
+          else
+            gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+          fi

@@ -5,6 +5,12 @@ import { createInvokeHandlers } from './handlers'
 import { createInvokeRouter, type InvokeHandlers } from './router'
 
 const TRUSTED = 'app://renderer/index.html'
+const UNSUPPORTED = {
+  status: 'unsupported',
+  currentVersion: '1.2.3',
+  dismissed: false,
+  skipped: false
+} as const
 
 function silentLogger(): Logger {
   const logger: Logger = {
@@ -40,6 +46,14 @@ function setup(overrides: Partial<InvokeHandlers> = {}): {
         view: () => ({ status: 'stopped', wanted: [], channels: [], campaigns: [] }),
         reload: () => {},
         selectChannel: () => {}
+      },
+      updates: {
+        view: () => UNSUPPORTED,
+        check: async () => UNSUPPORTED,
+        download: async () => UNSUPPORTED,
+        install: () => false,
+        dismiss: () => UNSUPPORTED,
+        skip: async () => UNSUPPORTED
       }
     }),
     ...overrides

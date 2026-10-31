@@ -1,8 +1,9 @@
 import type { App, Shell } from 'electron'
 import type { SettingsService } from '@tdc/config'
 import type { AuthService } from '@tdc/core'
-import type { AppInfo, AuthStateView, MinerView, SettingsView } from '@tdc/ipc-contract'
+import type { AppInfo, AuthStateView, MinerView, SettingsView, UpdateView } from '@tdc/ipc-contract'
 import { isSafeExternalUrl } from '../policy'
+import type { Updater } from '../updates/updater'
 import type { InvokeHandlers } from './router'
 
 export function createInvokeHandlers(deps: {
@@ -17,8 +18,9 @@ export function createInvokeHandlers(deps: {
     reload(): void
     selectChannel(channelId: string | undefined): void
   }
+  updates: Pick<Updater, 'view' | 'check' | 'download' | 'install' | 'dismiss' | 'skip'>
 }): InvokeHandlers {
-  const { app, shell, platform, settings, auth, miner } = deps
+  const { app, shell, platform, settings, auth, miner, updates } = deps
   return {
     'app:getInfo': (): AppInfo => ({ name: app.getName(), version: app.getVersion(), platform }),
     // A fixed folder chosen by main; the renderer can't name a path.
@@ -56,6 +58,16 @@ export function createInvokeHandlers(deps: {
     'miner:selectChannel': ({ channelId }): { queued: true } => {
       miner.selectChannel(channelId)
       return { queued: true }
-    }
+    },
+    'updates:getState': (): UpdateView => updates.view(),
+    'updates:check': (): Promise<UpdateView> => updates.check({ manual: true }),
+    // Returns once the download starts; progress and the ready state arrive as events.
+    'updates:download': (): UpdateView => {
+      void updates.download()
+      return updates.view()
+    },
+    'updates:install': (): { installing: boolean } => ({ installing: updates.install() }),
+    'updates:dismiss': (): UpdateView => updates.dismiss(),
+    'updates:skip': (): Promise<UpdateView> => updates.skip()
   }
 }

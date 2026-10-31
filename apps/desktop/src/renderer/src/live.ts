@@ -1,6 +1,12 @@
 // State that main pushes: loaded once over IPC, then kept current by main → renderer events.
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AuthStateView, EventChannel, EventPayload, MinerView } from '@tdc/ipc-contract'
+import type {
+  AuthStateView,
+  EventChannel,
+  EventPayload,
+  MinerView,
+  UpdateView
+} from '@tdc/ipc-contract'
 import { useEffect } from 'react'
 import { invoke } from './ipc'
 
@@ -25,3 +31,8 @@ export const useMiner = (): MinerView | undefined =>
 
 export const useAuthState = (): AuthStateView | undefined =>
   useLive('auth:state', AUTH_KEY, () => invoke('auth:getState'))
+
+export const UPDATES_KEY = ['updates'] as const
+
+export const useUpdates = (): UpdateView | undefined =>
+  useLive('updates:state', UPDATES_KEY, () => invoke('updates:getState'))

@@ -23,7 +23,8 @@ function applyPatch(current: Settings, patch: SettingsPatch): Settings {
     general: { ...current.general, ...patch.general },
     mining: { ...current.mining, ...patch.mining },
     network: { ...current.network, ...patch.network },
-    logging: { ...current.logging, ...patch.logging }
+    logging: { ...current.logging, ...patch.logging },
+    updates: { ...current.updates, ...patch.updates }
   }
 }
 

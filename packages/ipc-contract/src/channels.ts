@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { AuthStateView, SignInMethod } from './auth'
 import { MinerView, SelectChannelInput } from './miner'
 import { SettingsPatchInput, SettingsView } from './settings'
+import { UpdateView } from './updates'
 
 export const AppInfo = z.object({
   name: z.string(),
@@ -38,7 +39,18 @@ export const invokeChannels = {
   'miner:selectChannel': {
     input: SelectChannelInput,
     output: z.object({ queued: z.literal(true) })
-  }
+  },
+  'updates:getState': { input: z.undefined(), output: UpdateView },
+  /** Checks now, whatever the update mode; offers a skipped version too. */
+  'updates:check': { input: z.undefined(), output: UpdateView },
+  /** Downloads the available version; progress shows up in updates:getState. */
+  'updates:download': { input: z.undefined(), output: UpdateView },
+  /** Quits and installs the downloaded version, then starts it again. */
+  'updates:install': { input: z.undefined(), output: z.object({ installing: z.boolean() }) },
+  /** Later: hides the offer for this version until the app starts again. */
+  'updates:dismiss': { input: z.undefined(), output: UpdateView },
+  /** Skip this version: automatic checks stop offering it (saved in settings). */
+  'updates:skip': { input: z.undefined(), output: UpdateView }
 } as const satisfies Record<string, { input: z.ZodType; output: z.ZodType }>
 
 export type InvokeChannel = keyof typeof invokeChannels

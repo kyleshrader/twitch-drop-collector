@@ -116,19 +116,23 @@ describe('openStorage', () => {
     second.close()
   })
 
-  it.each([
-    ['a corrupt file', (file: string): void => writeFileSync(file, 'this is not a database')],
-    [
-      'a database from a newer version',
-      (file: string): void => {
-        const db = openSqlite(file)
-        db.exec(`PRAGMA user_version = ${MIGRATIONS.length + 5}`)
-        db.close()
-      }
-    ]
-  ])('moves %s aside and starts fresh', (_name, prepare) => {
+  it('refuses a database from a newer version and leaves it in place', () => {
     const file = tempFile()
-    prepare(file)
+    const db = openSqlite(file)
+    db.exec(`PRAGMA user_version = ${MIGRATIONS.length + 5}`)
+    db.close()
+    expect(() => openStorage({ file, clock: fakeClock(), logger: testLogger() })).toThrow(
+      NewerDatabaseError
+    )
+    expect(readdirSync(join(file, '..'))).toEqual(['tdc.db'])
+    const reopened = openSqlite(file)
+    expect(schemaVersion(reopened)).toBe(MIGRATIONS.length + 5)
+    reopened.close()
+  })
+
+  it('moves a corrupt file aside and starts fresh', () => {
+    const file = tempFile()
+    writeFileSync(file, 'this is not a database')
     const logger = testLogger()
     const storage = openStorage({ file, clock: fakeClock(), logger })
 

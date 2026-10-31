@@ -7,6 +7,7 @@ import { MiningPanel } from './MiningPanel'
 import { invoke } from './ipc'
 import { SettingsScreen } from './SettingsScreen'
 import { strings } from './strings'
+import { UpdateBanner } from './UpdatePanel'
 
 const DROPS_INVENTORY_URL = 'https://www.twitch.tv/drops/inventory'
 
@@ -38,6 +39,7 @@ function App(): ReactNode {
   const [tab, setTab] = useState<Tab>('main')
   return (
     <AppShell title={strings.appTitle}>
+      <UpdateBanner />
       <nav role="tablist">
         {(Object.keys(strings.tabs) as Tab[]).map((key) => (
           <button

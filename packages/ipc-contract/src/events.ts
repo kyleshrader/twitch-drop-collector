@@ -3,10 +3,12 @@
 import type { z } from 'zod'
 import { AuthStateView } from './auth'
 import { MinerView } from './miner'
+import { UpdateView } from './updates'
 
 export const eventChannels = {
   'auth:state': AuthStateView,
-  'miner:state': MinerView
+  'miner:state': MinerView,
+  'updates:state': UpdateView
 } as const satisfies Record<string, z.ZodType>
 
 export type EventChannel = keyof typeof eventChannels

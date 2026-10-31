@@ -30,6 +30,7 @@ nsis:
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
+  # Release builds turn this on when the Apple credentials are set (release.yml).
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
@@ -43,5 +44,12 @@ linux:
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-# Update hosting comes with M11.
-publish: null
+# Updates come from GitHub Releases. Release builds publish into a draft release for their tag;
+# the release workflow publishes it once every platform is in. See docs/decisions.md (M11).
+publish:
+  provider: github
+  owner: kyleshrader
+  repo: twitch-drop-collector
+  releaseType: draft
+# Pre-releases (1.2.0-beta.1) get their own feed file, so stable builds never see them.
+generateUpdatesFilesForAllChannels: true

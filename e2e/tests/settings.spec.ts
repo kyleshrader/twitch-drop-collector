@@ -22,6 +22,12 @@ test('settings survive a restart', async () => {
     .fill('Rust\nMarvel Rivals\n')
   await first.window.getByLabel('Priority mode').selectOption('endingSoonest')
   await first.window.getByLabel('Connection quality (1 = fast, 6 = slow)').fill('4')
+  await first.window.getByLabel('When a new version is out').selectOption('auto')
+  await first.window.getByLabel('Include pre-release versions').check()
+  // Dev builds can't update themselves, and say so.
+  await expect(first.window.getByTestId('update-status')).toContainText(
+    'Updates aren’t available in this build.'
+  )
   await first.window.getByRole('button', { name: 'Save settings' }).click()
   await expect(first.window.getByRole('status')).toHaveText('Settings saved')
   // The theme setting is applied in main right away.
@@ -50,6 +56,8 @@ test('settings survive a restart', async () => {
     await expect(second.window.getByLabel('Connection quality (1 = fast, 6 = slow)')).toHaveValue(
       '4'
     )
+    await expect(second.window.getByLabel('When a new version is out')).toHaveValue('auto')
+    await expect(second.window.getByLabel('Include pre-release versions')).toBeChecked()
     expect(await second.app.evaluate(({ nativeTheme }) => nativeTheme.themeSource)).toBe('dark')
   } finally {
     await second.app.close()

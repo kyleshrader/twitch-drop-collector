@@ -31,11 +31,18 @@ const Logging = z.object({
   level: z.enum(['error', 'warn', 'info', 'debug'])
 })
 
+const Updates = z.object({
+  mode: z.enum(['auto', 'notify', 'off']),
+  prereleases: z.boolean(),
+  skippedVersion: z.union([z.literal(''), z.string().regex(/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/)])
+})
+
 export const SettingsView = z.object({
   general: General,
   mining: Mining,
   network: Network,
-  logging: Logging
+  logging: Logging,
+  updates: Updates
 })
 export type SettingsView = z.infer<typeof SettingsView>
 
@@ -43,6 +50,7 @@ export const SettingsPatchInput = z.strictObject({
   general: z.strictObject(General.partial().shape).optional(),
   mining: z.strictObject(Mining.partial().shape).optional(),
   network: z.strictObject(Network.partial().shape).optional(),
-  logging: z.strictObject(Logging.partial().shape).optional()
+  logging: z.strictObject(Logging.partial().shape).optional(),
+  updates: z.strictObject(Updates.partial().shape).optional()
 })
 export type SettingsPatchInput = z.infer<typeof SettingsPatchInput>

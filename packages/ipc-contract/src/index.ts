@@ -14,6 +14,7 @@ export { eventChannels, isEventChannel, type EventChannel, type EventPayload } f
 export { IMAGE_ORIGIN, IMAGE_SCHEME, imageSrc } from './images'
 export { CampaignView, ChannelView, DropView, MinerView, SelectChannelInput } from './miner'
 export { SettingsPatchInput, SettingsView } from './settings'
+export { UpdateStatus, UpdateView } from './updates'
 export {
   IpcError,
   type IpcErrorCode,

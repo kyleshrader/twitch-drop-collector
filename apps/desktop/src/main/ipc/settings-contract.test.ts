@@ -18,7 +18,13 @@ describe('settings transport schema', () => {
       { ...DEFAULT_SETTINGS, network: { proxy: 'socks5://127.0.0.1:1080', connectionQuality: 6 } },
       { ...DEFAULT_SETTINGS, network: { proxy: 'ftp://x', connectionQuality: 1 } },
       { ...DEFAULT_SETTINGS, network: { proxy: '', connectionQuality: 7 } },
-      { ...DEFAULT_SETTINGS, mining: { ...DEFAULT_SETTINGS.mining, priority: ['  '] } }
+      { ...DEFAULT_SETTINGS, mining: { ...DEFAULT_SETTINGS.mining, priority: ['  '] } },
+      {
+        ...DEFAULT_SETTINGS,
+        updates: { mode: 'auto', prereleases: true, skippedVersion: '1.2.3' }
+      },
+      { ...DEFAULT_SETTINGS, updates: { mode: 'auto', prereleases: true, skippedVersion: 'v1' } },
+      { ...DEFAULT_SETTINGS, updates: { ...DEFAULT_SETTINGS.updates, mode: 'always' } }
     ]
     for (const sample of samples) {
       expect(SettingsView.safeParse(sample).success).toBe(Settings.safeParse(sample).success)
@@ -29,6 +35,8 @@ describe('settings transport schema', () => {
       { general: { theme: 'neon' } },
       { network: { connectionQuality: 0 } },
       { logging: { level: 'trace' } },
+      { updates: { skippedVersion: '2.0.0-beta.1' } },
+      { updates: { skippedVersion: '../2.0.0' } },
       { general: { unknown: true } },
       { other: {} }
     ]

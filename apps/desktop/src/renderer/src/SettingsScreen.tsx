@@ -4,6 +4,7 @@ import { IpcError, type SettingsView } from '@tdc/ipc-contract'
 import { useState, type ReactNode } from 'react'
 import { invoke } from './ipc'
 import { strings } from './strings'
+import { UpdateStatus } from './UpdatePanel'
 
 const SETTINGS_KEY = ['settings'] as const
 const t = strings.settings
@@ -25,7 +26,9 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
     mutationFn: () =>
       invoke('settings:update', {
         ...draft,
-        mining: { ...draft.mining, priority: fromLines(priority), exclude: fromLines(exclude) }
+        mining: { ...draft.mining, priority: fromLines(priority), exclude: fromLines(exclude) },
+        // The skipped version is set from the update banner, so the form never saves it.
+        updates: { mode: draft.updates.mode, prereleases: draft.updates.prereleases }
       }),
     onSuccess: (saved) => {
       queryClient.setQueryData(SETTINGS_KEY, saved)
@@ -192,6 +195,35 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
         </button>
       </fieldset>
 
+      <fieldset>
+        <legend>{t.updates.heading}</legend>
+        <UpdateStatus />
+        <label>
+          {t.updates.mode}
+          <select
+            value={draft.updates.mode}
+            onChange={(e) =>
+              set('updates', { mode: e.target.value as SettingsView['updates']['mode'] })
+            }
+          >
+            {Object.entries(t.updates.modes).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={draft.updates.prereleases}
+            onChange={(e) => set('updates', { prereleases: e.target.checked })}
+          />
+          {t.updates.prereleases}
+        </label>
+        <SkippedVersion />
+      </fieldset>
+
       <button type="submit" disabled={save.isPending}>
         {save.isPending ? t.saving : t.save}
       </button>
@@ -207,6 +239,26 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
         </ul>
       )}
     </form>
+  )
+}
+
+/** The version skipped from the update banner, read from saved settings, with a way back. */
+function SkippedVersion(): ReactNode {
+  const queryClient = useQueryClient()
+  const settings = useQuery({ queryKey: SETTINGS_KEY, queryFn: () => invoke('settings:get') })
+  const unskip = useMutation({
+    mutationFn: () => invoke('settings:update', { updates: { skippedVersion: '' } }),
+    onSuccess: (saved) => queryClient.setQueryData(SETTINGS_KEY, saved)
+  })
+  const skipped = settings.data?.updates.skippedVersion
+  if (!skipped) return null
+  return (
+    <p>
+      {t.updates.skipped(skipped)}{' '}
+      <button type="button" onClick={() => unskip.mutate()}>
+        {t.updates.unskip}
+      </button>
+    </p>
   )
 }
 

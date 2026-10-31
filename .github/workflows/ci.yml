@@ -1,0 +1,76 @@
+# Checks, end-to-end tests and the packaged-build smoke test on Windows, macOS and Linux.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      TURBO_TELEMETRY_DISABLED: '1'
+      # Unsigned builds: don't look for a signing identity in the macOS keychain.
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+
+      # Corepack isn't bundled with Node 25+; install it the same way on every version.
+      - name: Enable Corepack
+        run: npm install --global corepack@latest && corepack enable
+
+      - name: Install
+        run: yarn install --immutable
+
+      - name: Formatting
+        if: runner.os == 'Linux'
+        run: yarn format:check
+
+      - name: Checks
+        run: yarn check
+
+      # Ubuntu's AppArmor blocks the user namespaces Chromium's sandbox needs.
+      - name: Allow Chromium's sandbox (Linux)
+        if: runner.os == 'Linux'
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: End-to-end tests
+        if: runner.os != 'Linux'
+        run: yarn test:e2e
+
+      - name: End-to-end tests (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum yarn test:e2e
+
+      - name: Packaged build
+        if: runner.os != 'Linux'
+        run: yarn test:packaged
+
+      - name: Packaged build (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum yarn test:packaged
+
+      - name: Keep test results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-${{ matrix.os }}
+          path: e2e/test-results
+          if-no-files-found: ignore

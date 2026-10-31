@@ -18,6 +18,7 @@ import {
   WebContentsView
 } from 'electron'
 import electronLog from 'electron-log/main'
+import { autoUpdater } from 'electron-updater'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -33,7 +34,7 @@ import { createSettingsService } from '@tdc/config'
 import { createAuthService, createConnectivity } from '@tdc/core'
 import type { MinerView } from '@tdc/ipc-contract'
 import { systemClock } from '@tdc/kernel'
-import { openStorage } from '@tdc/storage'
+import { NewerDatabaseError, openStorage } from '@tdc/storage'
 import icon from '../../resources/icon.png?asset'
 import { resolveEndpoints } from './adapters/endpoints'
 import { createJsonFileStore } from './adapters/json-file-store'
@@ -59,6 +60,8 @@ import {
   serveRenderer
 } from './security'
 import { createAppTray } from './shell/tray'
+import { createElectronUpdateEngine } from './adapters/update-engine'
+import { createUpdater } from './updates/updater'
 
 const devServerUrl = is.dev ? process.env['ELECTRON_RENDERER_URL'] : undefined
 // End-to-end tests run windows transparent, unfocusable and off the taskbar, so they never pop
@@ -199,10 +202,17 @@ if (!app.requestSingleInstanceLock()) {
       })
     }
 
+    // Updates are on in packaged builds whose format electron-updater can update (not in
+    // invisible test runs, which stay off the network).
+    const updatesEnabled = app.isPackaged && !invisibleForTests && autoUpdater.isUpdaterActive()
     const syncProxy = (proxy: string): void => {
-      applyProxy(session.defaultSession, proxy).catch((error: unknown) => {
-        logger.error('Could not apply the proxy setting', { error })
-      })
+      // electron-updater downloads through its own session.
+      const sessions = [session.defaultSession, ...(updatesEnabled ? [autoUpdater.netSession] : [])]
+      for (const target of sessions) {
+        applyProxy(target, proxy).catch((error: unknown) => {
+          logger.error('Could not apply the proxy setting', { error })
+        })
+      }
     }
 
     const initial = settings.get()
@@ -403,6 +413,37 @@ if (!app.requestSingleInstanceLock()) {
       app.on('before-quit', () => void mining.stop())
     }
 
+    // App updates from GitHub Releases, following the updates settings. See docs/decisions.md.
+    const updater = createUpdater({
+      engine: updatesEnabled
+        ? createElectronUpdateEngine({ updater: autoUpdater, logger: logger.child('updates') })
+        : undefined,
+      currentVersion: app.getVersion(),
+      settings,
+      clock: systemClock,
+      logger: logger.child('updates'),
+      // The window shows its own banner; a notification only while it's hidden.
+      onNews: ({ kind, version }) => {
+        if (mainWindow?.isVisible() || !settings.get().general.trayNotifications) return
+        if (!Notification.isSupported()) return
+        const notification = new Notification({
+          title:
+            kind === 'ready'
+              ? `Twitch Drop Collector ${version} is ready to install`
+              : `Twitch Drop Collector ${version} is available`,
+          body: kind === 'ready' ? 'It installs when you quit, or restart now from the window.' : ''
+        })
+        notification.on('click', focusMainWindow)
+        notification.show()
+      },
+      beforeInstall: () => {
+        quitting = true
+      }
+    })
+    updater.onChange((view) => events.publish('updates:state', view))
+    updater.start()
+    app.on('will-quit', () => updater.stop())
+
     registerInvokeRoute(
       ipcMain,
       createInvokeRouter({
@@ -417,7 +458,8 @@ if (!app.requestSingleInstanceLock()) {
             view: minerView,
             reload: () => mining?.reload(),
             selectChannel: (channelId) => mining?.selectChannel(channelId)
-          }
+          },
+          updates: updater
         }),
         isTrustedSender: (url) => isSameOrigin(url, rendererOrigin),
         logger: logger.child('ipc')
@@ -457,7 +499,13 @@ if (!app.requestSingleInstanceLock()) {
     app.on('activate', focusMainWindow)
   })().catch((error: unknown) => {
     logger.error('Startup failed', { error })
-    dialog.showErrorBox('Twitch Drop Collector could not start', String(error))
+    dialog.showErrorBox(
+      'Twitch Drop Collector could not start',
+      error instanceof NewerDatabaseError
+        ? 'Your data was saved by a newer version of Twitch Drop Collector. Install the latest ' +
+            'version to keep using it; this version leaves your data untouched.'
+        : String(error)
+    )
     app.exit(1)
   })
 

@@ -105,6 +105,41 @@ export const strings = {
       crashReportsNote:
         'Crash reports stay in the app’s folder and are never sent anywhere. Turning this off takes effect after a restart.',
       openFolder: 'Open logs folder'
+    },
+    updates: {
+      heading: 'Updates',
+      mode: 'When a new version is out',
+      modes: {
+        auto: 'Download it and install when I quit',
+        notify: 'Tell me, and let me choose',
+        off: 'Don’t check by itself'
+      },
+      prereleases: 'Include pre-release versions',
+      skipped: (version: string) => `Skipping version ${version}.`,
+      unskip: 'Offer it again',
+      check: 'Check for updates',
+      checking: 'Checking…'
     }
+  },
+  updates: {
+    current: (version: string) => `You have version ${version}.`,
+    status: {
+      unsupported: 'Updates aren’t available in this build.',
+      idle: 'Not checked yet.',
+      checking: 'Checking for updates…',
+      upToDate: 'You have the latest version.',
+      available: (version: string) => `Version ${version} is available.`,
+      downloading: (version: string, percent: number) =>
+        `Downloading version ${version}… ${Math.round(percent)}%`,
+      ready: (version: string) =>
+        `Version ${version} is ready. It installs when you quit, or restart now.`,
+      error: (reason: string) => `Could not check for updates: ${reason}`
+    },
+    lastChecked: (when: string) => `Last checked ${when}.`,
+    downloadFailed: (reason: string) => `The download failed: ${reason}`,
+    updateNow: 'Update now',
+    restartNow: 'Restart now',
+    later: 'Later',
+    skip: 'Skip this version'
   }
 } as const
