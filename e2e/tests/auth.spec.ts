@@ -188,14 +188,19 @@ test('the login window shows the page address in its own address bar', async () 
         resizable: login.isResizable(),
         maximizable: login.isMaximizable(),
         fullScreenable: login.isFullScreenable(),
-        devTools: twitchPage.isDevToolsOpened()
+        devTools: twitchPage.isDevToolsOpened(),
+        // The mock is on loopback, a secure context, so WebAuthn would be there if enabled.
+        secureContext: (await twitchPage.executeJavaScript('isSecureContext')) as boolean,
+        passkeys: (await twitchPage.executeJavaScript('typeof PublicKeyCredential')) as string
       }
     })
     expect(lockdown).toEqual({
       resizable: false,
       maximizable: false,
       fullScreenable: false,
-      devTools: false
+      devTools: false,
+      secureContext: true,
+      passkeys: 'undefined'
     })
 
     await page.getByRole('button', { name: 'Cancel' }).click()

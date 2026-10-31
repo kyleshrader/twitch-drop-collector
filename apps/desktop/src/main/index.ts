@@ -98,6 +98,10 @@ function focusMainWindow(): void {
 
 registerAppScheme()
 
+// No passkeys (WebAuthn) in any page. Twitch's sign-in page offers them, which on Windows pops up
+// a Windows Security dialog; without WebAuthn the page falls back to username and password.
+app.commandLine.appendSwitch('disable-blink-features', 'WebAuth')
+
 // Lets end-to-end tests run against an isolated profile. Ignored in packaged builds.
 const userDataOverride = process.env['TDC_USER_DATA_DIR']
 if (userDataOverride && !app.isPackaged) app.setPath('userData', userDataOverride)
