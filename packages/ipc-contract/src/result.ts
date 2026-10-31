@@ -1,6 +1,7 @@
 // Main replies with a plain envelope instead of throwing: Error subclasses lose their fields
 // crossing contextBridge, while plain objects arrive intact.
 import type { InvokeChannel, InvokeOutput } from './channels'
+import type { EventChannel, EventPayload } from './events'
 
 export type IpcErrorCode =
   'UNKNOWN_CHANNEL' | 'FORBIDDEN_SENDER' | 'INVALID_INPUT' | 'HANDLER_FAILED' | 'INVALID_OUTPUT'
@@ -29,4 +30,6 @@ export class IpcError extends Error {
 /** What the preload script exposes as window.api. */
 export interface PreloadApi {
   invoke<C extends InvokeChannel>(channel: C, input?: unknown): Promise<IpcResult<InvokeOutput<C>>>
+  /** Subscribes to a main → renderer event. Returns an unsubscribe function. */
+  on<E extends EventChannel>(event: E, listener: (payload: EventPayload<E>) => void): () => void
 }

@@ -1,7 +1,7 @@
 // All UI text in one place, so an i18n library can replace this module later.
 export const strings = {
   appTitle: 'Twitch Drop Collector',
-  tabs: { main: 'Main', settings: 'Settings' },
+  tabs: { main: 'Main', inventory: 'Inventory', settings: 'Settings' },
   main: {
     loading: 'Loading…',
     version: (version: string, platform: string): string => `Version ${version} (${platform})`,
@@ -22,6 +22,46 @@ export const strings = {
     enterCode: 'Your code:',
     openActivate: 'Open twitch.tv/activate (code already filled in)',
     cancel: 'Cancel'
+  },
+  mining: {
+    heading: 'Mining',
+    status: {
+      stopped: 'Not mining (sign in to start)',
+      loading: 'Loading campaigns…',
+      idle: 'Idle',
+      watching: 'Mining',
+      error: 'Problem'
+    },
+    watching: (name: string, game?: string, viewers?: number): string =>
+      `Watching ${name}${game ? ` playing ${game}` : ''}${viewers === undefined ? '' : ` (${viewers} viewers)`}`,
+    wanted: (games: readonly string[]): string => `Mining for: ${games.join(', ')}`,
+    minutes: (done: number, required: number): string => `${done} / ${required} min`,
+    claimed: 'Claimed',
+    reload: 'Reload campaigns',
+    letMinerChoose: 'Let the miner choose the channel',
+    channels: (count: number): string => `Channels (${count})`,
+    columns: {
+      channel: 'Channel',
+      status: 'Status',
+      game: 'Game',
+      viewers: 'Viewers',
+      drops: 'Drops'
+    },
+    allowListed: '(allow-listed)',
+    online: 'Live',
+    offline: 'Offline',
+    yes: 'Yes',
+    no: 'No',
+    watchThis: 'Watch this'
+  },
+  inventory: {
+    heading: (count: number): string => `Campaigns (${count})`,
+    empty: 'No campaigns yet. Sign in, and they appear once the miner has loaded them.',
+    state: { active: 'Active', upcoming: 'Upcoming', expired: 'Ended' },
+    allowListed: 'specific channels only',
+    linked: 'Account linked',
+    notLinked: 'Account not linked',
+    link: 'Link account'
   },
   settings: {
     save: 'Save settings',

@@ -2,6 +2,8 @@ import { useState, type ReactNode } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { AppShell } from '@tdc/ui'
 import { AccountPanel } from './AccountPanel'
+import { InventoryScreen } from './InventoryScreen'
+import { MiningPanel } from './MiningPanel'
 import { invoke } from './ipc'
 import { SettingsScreen } from './SettingsScreen'
 import { strings } from './strings'
@@ -18,6 +20,7 @@ function MainScreen(): ReactNode {
   return (
     <>
       <AccountPanel />
+      <MiningPanel />
       <p data-testid="app-version">
         {info.data
           ? strings.main.version(info.data.version, info.data.platform)
@@ -48,7 +51,13 @@ function App(): ReactNode {
           </button>
         ))}
       </nav>
-      {tab === 'main' ? <MainScreen /> : <SettingsScreen />}
+      {tab === 'main' ? (
+        <MainScreen />
+      ) : tab === 'inventory' ? (
+        <InventoryScreen />
+      ) : (
+        <SettingsScreen />
+      )}
     </AppShell>
   )
 }

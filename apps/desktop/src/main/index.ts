@@ -8,6 +8,7 @@ import {
   net,
   safeStorage,
   session,
+  Notification,
   shell,
   WebContentsView
 } from 'electron'
@@ -24,6 +25,7 @@ import {
 } from '@tdc/api'
 import { createSettingsService } from '@tdc/config'
 import { createAuthService } from '@tdc/core'
+import type { MinerView } from '@tdc/ipc-contract'
 import { systemClock } from '@tdc/kernel'
 import { openStorage } from '@tdc/storage'
 import icon from '../../resources/icon.png?asset'
@@ -34,6 +36,8 @@ import { browserUserAgent, createLoginWindow, LOGIN_PARTITION } from './adapters
 import { applyProxy, createNetFetch, requestTimeoutMs } from './adapters/network'
 import { createSafeStorageSessionStore } from './adapters/session-store'
 import { runGqlProbe } from './dev/gql-probe'
+import { createEventPublisher, throttle } from './ipc/events'
+import { createMiningRuntime } from './miner/runtime'
 import { createInvokeHandlers } from './ipc/handlers'
 import { registerInvokeRoute } from './ipc/register'
 import { createInvokeRouter } from './ipc/router'
@@ -221,6 +225,39 @@ if (!app.requestSingleInstanceLock()) {
       logger: logger.child('auth')
     })
 
+    // Main → renderer events go to the app window, validated against the contract.
+    const events = createEventPublisher({
+      target: () => (mainWindow && !mainWindow.isDestroyed() ? mainWindow.webContents : undefined),
+      logger: logger.child('events')
+    })
+    auth.onChange((state) => events.publish('auth:state', state))
+
+    // The miner runs while signed in. Not in probe mode: the probe promises read-only queries.
+    const probeMode = process.env['TDC_DEV_GQL_PROBE'] !== undefined && !app.isPackaged
+    const mining = probeMode
+      ? undefined
+      : createMiningRuntime({
+          http,
+          auth,
+          settings,
+          storage,
+          endpoints,
+          connect: (url) => new WebSocket(url),
+          onClaim: (notice) => {
+            if (!settings.get().general.trayNotifications || !Notification.isSupported()) return
+            new Notification({
+              title: `Drop claimed: ${notice.gameName}`,
+              body: notice.rewards.join(', ') || notice.dropName
+            }).show()
+          },
+          logger: logger.child('mining')
+        })
+    const stoppedView: MinerView = { status: 'stopped', wanted: [], channels: [], campaigns: [] }
+    if (mining) {
+      mining.onChange(throttle(() => events.publish('miner:state', mining.view()), 250))
+      app.on('before-quit', () => void mining.stop())
+    }
+
     registerInvokeRoute(
       ipcMain,
       createInvokeRouter({
@@ -229,7 +266,12 @@ if (!app.requestSingleInstanceLock()) {
           shell,
           platform: process.platform,
           settings,
-          auth
+          auth,
+          miner: {
+            view: () => mining?.view() ?? stoppedView,
+            reload: () => mining?.reload(),
+            selectChannel: (channelId) => mining?.selectChannel(channelId)
+          }
         }),
         isTrustedSender: (url) => isSameOrigin(url, rendererOrigin),
         logger: logger.child('ipc')

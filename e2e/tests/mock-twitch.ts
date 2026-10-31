@@ -1,8 +1,17 @@
 // A stand-in for Twitch's login page and id.twitch.tv, for end-to-end auth tests. It mirrors
 // what we've seen live: device codes only for the Android TV client ("invalid client" for the
 // Android app), and Origin/Referer on identity calls.
+import { readFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// GQL answers come from the anonymised live fixtures in @tdc/api.
+const FIXTURES = fileURLToPath(new URL('../../packages/api/fixtures/twitch/', import.meta.url))
+type FixtureItem = { data: Record<string, unknown> }
+const fixture = (file: string): FixtureItem[] =>
+  JSON.parse(readFileSync(join(FIXTURES, file), 'utf8')) as FixtureItem[]
 
 export const ANDROID_CLIENT_ID = 'kd1unb4b3q4t58fwlpcbzcbnm76a8fp'
 export const ANDROID_TV_CLIENT_ID = 'ue6666qo983tsx6so1t0vnawi233wa'
@@ -18,6 +27,10 @@ export interface MockTwitch {
   loginRequests: URL[]
   /** When true, /login shows a page and waits instead of logging in instantly. */
   holdLogin: boolean
+  /** GQL operations received, in order (operationName). */
+  gqlCalls: string[]
+  /** Drop instance IDs claimed through ClaimDrop. */
+  claims: string[]
   close(): Promise<void>
 }
 
@@ -30,6 +43,8 @@ export async function startMockTwitch(): Promise<MockTwitch> {
     ]),
     loginRequests: [],
     holdLogin: false,
+    gqlCalls: [],
+    claims: [],
     close: async () => {}
   }
   let devicePolls = 0
@@ -43,6 +58,21 @@ export async function startMockTwitch(): Promise<MockTwitch> {
     req.on('data', (chunk: Buffer) => (raw += chunk.toString()))
     req.on('end', () => {
       const form = new URLSearchParams(raw)
+
+      if (req.method === 'POST' && url.pathname === '/gql') {
+        const token = (req.headers.authorization ?? '').replace(/^OAuth /, '')
+        if (!mock.validTokens.has(token)) return json(401, { error: 'Unauthorized' })
+        const body = JSON.parse(raw) as unknown
+        const ops = (Array.isArray(body) ? body : [body]) as {
+          operationName: string
+          variables?: Record<string, unknown>
+        }[]
+        const answers = ops.map((op) => {
+          mock.gqlCalls.push(op.operationName)
+          return { data: gqlAnswer(op.operationName, op.variables ?? {}, mock) }
+        })
+        return json(200, Array.isArray(body) ? answers : answers[0]!)
+      }
 
       if (req.method === 'GET' && url.pathname === '/login') {
         mock.loginRequests.push(url)
@@ -118,4 +148,44 @@ export async function startMockTwitch(): Promise<MockTwitch> {
       server.close(() => resolve())
     })
   return mock
+}
+
+const details = new Map(
+  fixture('campaign-details.json').map((item) => {
+    const campaign = (item.data['user'] as { dropCampaign: { id: string } }).dropCampaign
+    return [campaign.id, item.data] as const
+  })
+)
+
+/** Answers a GQL operation like Twitch did when the fixtures were captured. */
+function gqlAnswer(
+  operation: string,
+  variables: Record<string, unknown>,
+  mock: MockTwitch
+): unknown {
+  switch (operation) {
+    case 'Inventory':
+      return fixture('inventory.json')[0]!.data
+    case 'ViewerDropsDashboard':
+      return fixture('campaigns.json')[0]!.data
+    case 'DropCampaignDetails':
+      return (
+        details.get(String(variables['dropID'])) ?? {
+          user: { id: '10000001', dropCampaign: null }
+        }
+      )
+    case 'DirectoryPage_Game':
+      return fixture('game-directory.json')[0]!.data
+    case 'DropCurrentSessionContext':
+      return { currentUser: { dropCurrentSession: null } }
+    case 'DropsPage_ClaimDropRewards': {
+      const input = variables['input'] as { dropInstanceID: string }
+      mock.claims.push(input.dropInstanceID)
+      return { claimDropRewards: { status: 'ELIGIBLE_FOR_ALL' } }
+    }
+    case 'PlaybackAccessToken':
+      return { streamPlaybackAccessToken: null }
+    default:
+      return {}
+  }
 }

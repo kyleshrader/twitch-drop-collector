@@ -10,6 +10,8 @@ export {
   type InvokeOutput
 } from './channels'
 export { AuthStateView, SignInMethod } from './auth'
+export { eventChannels, isEventChannel, type EventChannel, type EventPayload } from './events'
+export { CampaignView, ChannelView, DropView, MinerView, SelectChannelInput } from './miner'
 export { SettingsPatchInput, SettingsView } from './settings'
 export {
   IpcError,

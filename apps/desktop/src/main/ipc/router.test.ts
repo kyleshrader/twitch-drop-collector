@@ -34,6 +34,11 @@ function setup(overrides: Partial<InvokeHandlers> = {}): {
         signIn: async () => {},
         cancelSignIn: () => {},
         signOut: async () => {}
+      },
+      miner: {
+        view: () => ({ status: 'stopped', wanted: [], channels: [], campaigns: [] }),
+        reload: () => {},
+        selectChannel: () => {}
       }
     }),
     ...overrides

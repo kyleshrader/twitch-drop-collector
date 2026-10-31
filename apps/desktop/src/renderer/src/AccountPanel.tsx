@@ -1,39 +1,24 @@
 // Temporary account panel: Twitch sign-in state and the two sign-in methods.
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { AuthStateView } from '@tdc/ipc-contract'
+import { useMutation } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { invoke } from './ipc'
+import { useAuthState } from './live'
 import { strings } from './strings'
 
-const AUTH_KEY = ['auth'] as const
 const t = strings.account
 
 export function AccountPanel(): ReactNode {
-  const queryClient = useQueryClient()
-  const auth = useQuery({
-    queryKey: AUTH_KEY,
-    queryFn: () => invoke('auth:getState'),
-    // Until main pushes changes (M8), poll while something is in progress.
-    refetchInterval: (query) => {
-      const status = query.state.data?.status
-      return status === 'signingIn' || status === 'restoring' ? 1000 : false
-    }
-  })
-  const refresh = (state?: AuthStateView): void => {
-    if (state) queryClient.setQueryData(AUTH_KEY, state)
-    else void queryClient.invalidateQueries({ queryKey: AUTH_KEY })
-  }
+  // Main pushes every auth change, so the panel follows sign-in progress without polling.
+  const state = useAuthState()
   const signIn = useMutation({
-    mutationFn: (method: 'loginWindow' | 'deviceCode') => invoke('auth:signIn', { method }),
-    onSuccess: () => refresh()
+    mutationFn: (method: 'loginWindow' | 'deviceCode') => invoke('auth:signIn', { method })
   })
-  const cancel = useMutation({ mutationFn: () => invoke('auth:cancelSignIn'), onSuccess: refresh })
-  const signOut = useMutation({ mutationFn: () => invoke('auth:signOut'), onSuccess: refresh })
+  const cancel = useMutation({ mutationFn: () => invoke('auth:cancelSignIn') })
+  const signOut = useMutation({ mutationFn: () => invoke('auth:signOut') })
   const openLink = useMutation({
     mutationFn: (url: string) => invoke('shell:openExternal', { url })
   })
 
-  const state = auth.data
   return (
     <section aria-labelledby="account-heading">
       <h2 id="account-heading">{t.heading}</h2>

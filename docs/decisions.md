@@ -328,3 +328,14 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 - **Progress:** when Twitch has reported nothing for 60s, the miner asks `CurrentDrop`. If that has nothing, it adds one estimated minute to the active campaign, and at the 15-minute cap it switches channel.
 - **Other:** a manual channel choice wins while it's watchable. A failed task sets status `error` and retries a reload after 5 minutes. `stop()` unsubscribes everything and stops watching. The UI reads `snapshot()`: status, message, watched channel, active campaign and drop, and wanted games.
 - **Tests:** 15 scenarios with in-memory service fakes, a fake PubSub and the manual clock.
+
+## 2026-10-30 · M7b: wiring the miner into the app
+
+- **Main → renderer events:** the contract gains `eventChannels` (`auth:state`, `miner:state`), each with a zod schema. `createEventPublisher` validates every payload before `webContents.send`, so a broken or over-full payload (a token, say) never reaches the window. The preload's `window.api.on` forwards only contract events and passes only the payload, never the IPC event object. `miner:state` is throttled to one send per 250 ms.
+- **IPC:** `miner:getState`, `miner:reload` (queued; returns at once) and `miner:selectChannel` (an ID, or none to let the miner choose).
+- **Mining runtime (`apps/desktop/src/main/miner/runtime.ts`):** the composition root for mining. It builds the GQL client (5 requests per second), PubSub, HLS watcher and the inventory, channel and watch services, then the miner. The miner starts on sign-in and stops on sign-out; changing mining settings calls `refreshGames`. Claims show a system notification when `trayNotifications` is on. `before-quit` stops it.
+- **Views (`views.ts`):** main turns domain objects into plain view objects (dates as ISO strings, shown minutes capped at the requirement, campaigns sorted active, upcoming, then ended). The renderer never sees domain types.
+- **Probe mode:** with `TDC_DEV_GQL_PROBE` set (dev builds only), mining doesn't start, so the read-only probe never claims anything.
+- **Renderer:** `useLive` loads state once over IPC and then follows the events through TanStack Query's cache, which replaces the auth polling. The temporary UI gains a Mining panel on the Main tab (status, watched channel, active drop progress, wanted games, reload, channel table with manual choice) and an Inventory tab (campaigns with state, dates, account link and drops).
+- **E2E:** the mock Twitch answers GQL from the anonymised fixtures, requires a valid token, and records operations and claims. The test signs in, waits for the miner to go idle, checks that the three finished Crimson Desert drops were claimed, and checks the Inventory tab.
+- **Not yet:** a GQL 401 doesn't invalidate the session yet, PubSub ignores the proxy setting, and images aren't shown (the image cache comes with M10).
