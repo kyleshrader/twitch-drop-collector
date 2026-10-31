@@ -77,6 +77,9 @@ afterEach(async () => {
   await server.close()
 })
 
+/** Reconnects wait out the backoff (900 ms first); leave room for a slow CI runner. */
+const RECONNECT_WAIT_MS = 3_000
+
 function create(options: { pingIntervalMs?: number; pongTimeoutMs?: number } = {}): RealtimeSource {
   pubsub = createPubSub({
     url: server.url,
@@ -163,10 +166,14 @@ describe('pubsub', () => {
     await vi.waitFor(() => expect(server.open[0]?.topics.has('topic.1')).toBe(true))
 
     server.open[0]!.socket.terminate()
-    await vi.waitFor(() => {
-      expect(server.sockets).toHaveLength(2)
-      expect(server.open[0]?.topics.has('topic.1')).toBe(true)
-    })
+    // The first reconnect waits 900 ms (1 s backoff, jitter at its minimum).
+    await vi.waitFor(
+      () => {
+        expect(server.sockets).toHaveLength(2)
+        expect(server.open[0]?.topics.has('topic.1')).toBe(true)
+      },
+      { timeout: RECONNECT_WAIT_MS }
+    )
     server.publish('topic.1', { after: 'reconnect' })
     await vi.waitFor(() => expect(handler).toHaveBeenCalledWith({ after: 'reconnect' }))
   })
@@ -177,7 +184,7 @@ describe('pubsub', () => {
     realtime.start()
     await vi.waitFor(() => expect(server.open).toHaveLength(1))
     server.open[0]!.socket.send(JSON.stringify({ type: 'RECONNECT' }))
-    await vi.waitFor(() => expect(server.sockets).toHaveLength(2))
+    await vi.waitFor(() => expect(server.sockets).toHaveLength(2), { timeout: RECONNECT_WAIT_MS })
   })
 
   it('reconnects when a PONG does not arrive in time, and stays put when it does', async () => {
