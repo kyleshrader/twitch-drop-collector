@@ -29,13 +29,25 @@ test('closing the window hides it and keeps the app running', async () => {
   }
 })
 
-test('with close-to-tray off, closing the window quits', async () => {
+test('with close-to-tray off, closing the window quits (on macOS, closes it)', async () => {
   const userDataDir = newUserDataDir()
   writeFileSync(
     join(userDataDir, 'settings.json'),
     JSON.stringify({ version: 1, settings: { general: { closeToTray: false } } })
   )
   const { app } = await launchApp(userDataDir)
+  if (process.platform === 'darwin') {
+    // macOS apps stay running in the dock with no window; the dock icon opens a new one.
+    try {
+      await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.close())
+      await expect.poll(() => windowState(app)).toEqual([])
+      await app.evaluate(({ app: electronApp }) => electronApp.emit('activate'))
+      await expect.poll(() => windowState(app)).toEqual([{ visible: true, destroyed: false }])
+    } finally {
+      await app.close()
+    }
+    return
+  }
   const exited = new Promise<void>((resolve) => app.process().once('exit', () => resolve()))
   await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]?.close())
   await exited

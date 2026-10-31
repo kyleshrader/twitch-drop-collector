@@ -64,7 +64,7 @@ jobs:
           node-version-file: .node-version
 
       - name: Enable Corepack
-        run: npm install --global corepack@latest && corepack enable
+        run: npm install --global --force corepack@latest && corepack enable
 
       - name: Install
         run: yarn install --immutable

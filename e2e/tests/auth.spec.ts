@@ -196,7 +196,8 @@ test('the login window shows the page address in its own address bar', async () 
     })
     expect(lockdown).toEqual({
       resizable: false,
-      maximizable: false,
+      // Electron doesn't implement maximizable on Linux; it always reports true there.
+      maximizable: process.platform === 'linux',
       fullScreenable: false,
       devTools: false,
       secureContext: true,
