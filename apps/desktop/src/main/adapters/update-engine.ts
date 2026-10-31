@@ -15,6 +15,26 @@ export function describeUpdateError(error: unknown): string {
   return message.split('\n')[0]!.trim().slice(0, 200)
 }
 
+const NOTHING_PUBLISHED_CODES = new Set([
+  'ERR_UPDATER_NO_PUBLISHED_VERSIONS',
+  'ERR_UPDATER_LATEST_VERSION_NOT_FOUND',
+  'ERR_UPDATER_CHANNEL_FILE_NOT_FOUND'
+])
+
+/**
+ * True when the check failed only because nothing is published for this app yet: no releases,
+ * no stable release while pre-releases are off, or a release whose update files are still
+ * uploading (the tag shows up in the feed before the build finishes). That means no update.
+ */
+export function isNothingPublished(error: unknown): boolean {
+  const code = (error as { code?: unknown } | null)?.code
+  if (typeof code === 'string' && NOTHING_PUBLISHED_CODES.has(code)) return true
+  const message = error instanceof Error ? error.message : String(error)
+  // The feed parser re-wraps the missing-stable-release error under another code.
+  if (message.includes('Unable to find latest version on GitHub')) return true
+  return /^(?:HttpError: )?404\b/.test(message)
+}
+
 const withReadableErrors = async <T>(task: () => Promise<T>): Promise<T> => {
   try {
     return await task()
@@ -48,8 +68,16 @@ export function createElectronUpdateEngine(deps: {
     },
     check: () =>
       withReadableErrors(async () => {
-        const result = await updater.checkForUpdates()
-        return result?.isUpdateAvailable ? result.updateInfo.version : undefined
+        try {
+          const result = await updater.checkForUpdates()
+          return result?.isUpdateAvailable ? result.updateInfo.version : undefined
+        } catch (error) {
+          if (!isNothingPublished(error)) throw error
+          logger.info('No update is published yet', {
+            reason: error instanceof Error ? error.message.split('\n')[0] : String(error)
+          })
+          return undefined
+        }
       }),
     download: (onProgress) =>
       withReadableErrors(async () => {
