@@ -72,6 +72,17 @@ jobs:
           xvfb-run --auto-servernum yarn workspace @tdc/desktop electron ../../tooling/scripts/print-safe-storage-backend.cjs
           xvfb-run --auto-servernum yarn test:e2e
 
+      # Each e2e test runs the app on its own profile in the temp folder; show what the app logged.
+      - name: App logs from failed e2e tests (Linux)
+        if: failure() && runner.os == 'Linux'
+        run: |
+          for log in /tmp/tdc-e2e-*/logs/main.log; do
+            [ -f "$log" ] || continue
+            echo "::group::$log"
+            cat "$log"
+            echo "::endgroup::"
+          done
+
       - name: Packaged build
         if: runner.os != 'Linux'
         run: yarn test:packaged
