@@ -51,6 +51,21 @@ export function isSameOrigin(url: string, origin: string): boolean {
   return a !== null && b !== null && a.protocol === b.protocol && a.host === b.host
 }
 
+/** Twitch's image CDN; the only host the image cache fetches from. */
+const IMAGE_HOST = /(^|\.)jtvnw\.net$/
+
+/**
+ * The remote image a tdc-image:// request asks for, or null unless it is an https image on
+ * Twitch's CDN. Keeps the image cache from being used to fetch anything else.
+ */
+export function remoteImageUrl(requestUrl: string, imageOrigin: string): string | null {
+  const request = parse(requestUrl)
+  if (!request || !isSameOrigin(requestUrl, imageOrigin) || request.pathname !== '/') return null
+  const remote = parse(request.searchParams.get('url') ?? '')
+  if (!remote || remote.protocol !== 'https:' || remote.port || remote.username) return null
+  return IMAGE_HOST.test(remote.hostname) ? remote.href : null
+}
+
 /** Maps an app:// request path onto a file inside rendererDir, or null if it escapes it. */
 export function resolveRendererPath(rendererDir: string, pathname: string): string | null {
   let decoded: string

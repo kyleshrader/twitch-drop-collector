@@ -47,7 +47,7 @@ describe('migrations', () => {
     const tables = db
       .all("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
       .map((row) => row['name'])
-    expect(tables).toEqual(['cache_entries', 'claims'])
+    expect(tables).toEqual(['cache_entries', 'claims', 'images'])
     db.close()
   })
 
@@ -249,6 +249,48 @@ describe('claim history', () => {
     expect(storage.claims.has('z')).toBe(false)
     expect(storage.claims.recent(2).map((c) => c.dropId)).toEqual(['b', 'c'])
     expect(storage.claims.recent(10)[2]).toEqual(claim('a', '2026-10-01T00:00:00Z'))
+    storage.close()
+  })
+})
+
+describe('image index', () => {
+  const entry = (url: string, usedAt: string, bytes = 100) => ({
+    url,
+    file: `${url.length}.png`,
+    contentType: 'image/png',
+    bytes,
+    fetchedAt: new Date('2026-10-01T00:00:00Z'),
+    usedAt: new Date(usedAt)
+  })
+
+  it('stores, replaces and removes entries, and sums their size', () => {
+    const storage = openStorage({ file: tempFile(), clock: fakeClock(), logger: testLogger() })
+    storage.images.put(entry('https://x/a.png', '2026-10-02T00:00:00Z'))
+    storage.images.put(entry('https://x/b.png', '2026-10-03T00:00:00Z', 50))
+    storage.images.put(entry('https://x/a.png', '2026-10-04T00:00:00Z', 70))
+    expect(storage.images.get('https://x/a.png')).toEqual(
+      entry('https://x/a.png', '2026-10-04T00:00:00Z', 70)
+    )
+    expect(storage.images.totalBytes()).toBe(120)
+    storage.images.remove('https://x/a.png')
+    expect(storage.images.get('https://x/a.png')).toBeUndefined()
+    expect(storage.images.totalBytes()).toBe(50)
+    storage.close()
+  })
+
+  it('orders by last use, which touch moves forward', () => {
+    const storage = openStorage({ file: tempFile(), clock: fakeClock(), logger: testLogger() })
+    storage.images.put(entry('https://x/a.png', '2026-10-02T00:00:00Z'))
+    storage.images.put(entry('https://x/b.png', '2026-10-03T00:00:00Z'))
+    storage.images.put(entry('https://x/c.png', '2026-10-04T00:00:00Z'))
+    storage.images.touch('https://x/a.png', new Date('2026-10-05T00:00:00Z'))
+    expect(storage.images.oldest(2).map((e) => e.url)).toEqual([
+      'https://x/b.png',
+      'https://x/c.png'
+    ])
+    expect(storage.images.unusedSince(new Date('2026-10-04T00:00:00Z')).map((e) => e.url)).toEqual([
+      'https://x/b.png'
+    ])
     storage.close()
   })
 })

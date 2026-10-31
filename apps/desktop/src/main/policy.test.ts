@@ -5,6 +5,7 @@ import {
   isSafeExternalUrl,
   isSameOrigin,
   mainWindowOptions,
+  remoteImageUrl,
   resolveRendererPath
 } from './policy'
 
@@ -73,4 +74,37 @@ describe('resolveRendererPath', () => {
       expect(resolveRendererPath(dir, pathname)).toBeNull()
     }
   )
+})
+
+describe('remoteImageUrl', () => {
+  const origin = 'tdc-image://cache'
+  const ask = (remote: string): string => `${origin}/?url=${encodeURIComponent(remote)}`
+
+  it.each([
+    'https://static-cdn.jtvnw.net/ttv-boxart/2009321156_IGDB.jpg',
+    'https://static-cdn.jtvnw.net/twitch-quests-assets/REWARD/a.png'
+  ])('serves %s', (remote) => {
+    expect(remoteImageUrl(ask(remote), origin)).toBe(remote)
+  })
+
+  it.each([
+    'http://static-cdn.jtvnw.net/a.png',
+    'https://static-cdn.jtvnw.net:8443/a.png',
+    'https://user@static-cdn.jtvnw.net/a.png',
+    'https://jtvnw.net.evil.com/a.png',
+    'https://evil-jtvnw.net/a.png',
+    'https://localhost/a.png',
+    'file:///C:/Windows/win.ini',
+    'not a url'
+  ])('refuses %s', (remote) => {
+    expect(remoteImageUrl(ask(remote), origin)).toBeNull()
+  })
+
+  it('refuses other hosts, paths, and a missing url', () => {
+    const remote = encodeURIComponent('https://static-cdn.jtvnw.net/a.png')
+    expect(remoteImageUrl(`tdc-image://other/?url=${remote}`, origin)).toBeNull()
+    expect(remoteImageUrl(`tdc-image://cache/x?url=${remote}`, origin)).toBeNull()
+    expect(remoteImageUrl(`app://cache/?url=${remote}`, origin)).toBeNull()
+    expect(remoteImageUrl(`${origin}/`, origin)).toBeNull()
+  })
 })

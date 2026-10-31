@@ -24,6 +24,18 @@ export const MIGRATIONS: readonly string[] = [
     claimed_at  INTEGER NOT NULL
   ) STRICT;
   CREATE INDEX claims_claimed_at ON claims (claimed_at DESC);
+  `,
+  // 2: index of the image files cached on disk
+  `
+  CREATE TABLE images (
+    url          TEXT    NOT NULL PRIMARY KEY,
+    file         TEXT    NOT NULL,
+    content_type TEXT    NOT NULL,
+    bytes        INTEGER NOT NULL,
+    fetched_at   INTEGER NOT NULL,
+    used_at      INTEGER NOT NULL
+  ) STRICT;
+  CREATE INDEX images_used_at ON images (used_at);
   `
 ]
 

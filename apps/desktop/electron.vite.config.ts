@@ -3,12 +3,13 @@ import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 import type { Plugin } from 'vite'
 
-// The renderer talks to nothing but its own origin; network calls go through main.
+// The renderer talks to nothing but its own origin; network calls go through main, and remote
+// images come from main's image cache (tdc-image:).
 const CSP = [
   "default-src 'none'",
   "script-src 'self'",
   "style-src 'self'",
-  "img-src 'self' data:",
+  "img-src 'self' data: tdc-image:",
   "font-src 'self'",
   "connect-src 'self'",
   "base-uri 'none'",

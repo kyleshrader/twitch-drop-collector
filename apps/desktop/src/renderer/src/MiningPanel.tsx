@@ -4,6 +4,7 @@ import type { ChannelView, DropView } from '@tdc/ipc-contract'
 import type { ReactNode } from 'react'
 import { invoke } from './ipc'
 import { useMiner } from './live'
+import { RemoteImage } from './RemoteImage'
 import { strings } from './strings'
 
 const t = strings.mining
@@ -50,6 +51,7 @@ export function MiningPanel(): ReactNode {
           {miner.active.drop && (
             <>
               <br />
+              <RemoteImage url={miner.active.drop.imageUrl} width={32} height={32} />
               {miner.active.drop.name} ({miner.active.drop.rewards.join(', ')}){' '}
               <DropProgress drop={miner.active.drop} />
             </>

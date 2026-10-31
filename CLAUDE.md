@@ -10,6 +10,7 @@ Full spec: docs/spec.md. Decision log: docs/decisions.md.
 - Dev: yarn dev
 - Checks: yarn check (constraints, typecheck, lint, test, and test:electron for code that runs on Electron's Node)
 - End-to-end: yarn test:e2e (builds the app, then runs Playwright against it; windows stay invisible, set TDC_E2E_SHOW_WINDOWS=1 to watch)
+- Packaged build: yarn test:packaged (packs the app unpacked into apps/desktop/dist, then checks fuses, startup and asar integrity); installers: yarn workspace @tdc/desktop build:win|build:mac|build:linux
 
 ## Always
 

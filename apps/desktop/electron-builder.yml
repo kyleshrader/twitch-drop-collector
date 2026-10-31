@@ -1,16 +1,26 @@
 appId: com.github.twitchdropcollector
 productName: Twitch Drop Collector
+# The workspace name (@tdc/desktop) isn't a valid file name; installers and paths use this one.
+extraMetadata:
+  name: twitch-drop-collector
 directories:
   buildResources: build
+# Only the build output and runtime resources go into the app. package.json is always included.
 files:
-  - '!**/.vscode/*'
-  - '!src/*'
-  - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintcache,dev-app-update.yml,CHANGELOG.md,README.md}'
-  - '!{.env,.env.*,.npmrc}'
-  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - out/**
+  - resources/**
+  - '!**/*.map'
 asarUnpack:
   - resources/**
+# Flipped right before signing. See docs/decisions.md (M10).
+electronFuses:
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
 win:
   executableName: twitch-drop-collector
 nsis:
@@ -20,15 +30,11 @@ nsis:
   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
-  extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  executableName: twitch-drop-collector
   target:
     - AppImage
     - deb
@@ -37,6 +43,5 @@ linux:
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
+# Update hosting comes with M11.
+publish: null

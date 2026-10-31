@@ -888,6 +888,7 @@ __metadata:
   resolution: "@tdc/desktop@workspace:apps/desktop"
   dependencies:
     "@electron-toolkit/utils": "npm:^4.0.0"
+    "@electron/fuses": "npm:^1.8.0"
     "@tanstack/react-query": "npm:^5.105.0"
     "@tdc/api": "workspace:^"
     "@tdc/config": "workspace:^"

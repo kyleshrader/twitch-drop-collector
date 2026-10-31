@@ -13,12 +13,14 @@
     "test": "vitest run --passWithNoTests",
     "postinstall": "install-electron && electron-builder install-app-deps",
     "build:unpack": "electron-vite build && electron-builder --dir",
+    "test:packaged": "node scripts/smoke-packaged.mjs",
     "build:win": "electron-vite build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "devDependencies": {
     "@electron-toolkit/utils": "^4.0.0",
+    "@electron/fuses": "^1.8.0",
     "@tanstack/react-query": "^5.105.0",
     "@tdc/api": "workspace:^",
     "@tdc/config": "workspace:^",

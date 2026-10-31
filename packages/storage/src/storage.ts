@@ -5,12 +5,14 @@ import type { Clock, Logger } from '@tdc/kernel'
 import { existsSync, renameSync } from 'node:fs'
 import { createCache, type Cache } from './cache'
 import { createClaimHistory, type ClaimHistory } from './claims'
+import { createImageIndex, type ImageIndex } from './images'
 import { openSqlite, type Database } from './database'
 import { MIGRATIONS, runMigrations } from './migrations'
 
 export interface Storage {
   cache: Cache
   claims: ClaimHistory
+  images: ImageIndex
   close(): void
 }
 
@@ -56,6 +58,7 @@ export function openStorage(deps: {
   return {
     cache: createCache({ db, clock, logger }),
     claims: createClaimHistory({ db }),
+    images: createImageIndex({ db }),
     close: () => db.close()
   }
 }

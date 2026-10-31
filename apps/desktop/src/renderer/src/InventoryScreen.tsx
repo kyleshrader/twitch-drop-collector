@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { invoke } from './ipc'
 import { useMiner } from './live'
 import { DropProgress } from './MiningPanel'
+import { RemoteImage } from './RemoteImage'
 import { strings } from './strings'
 
 const t = strings.inventory
@@ -23,6 +24,7 @@ export function InventoryScreen(): ReactNode {
       {miner.campaigns.map((c) => (
         <article key={c.id} data-testid="campaign" aria-label={`${c.game}: ${c.name}`}>
           <h3>
+            <RemoteImage url={c.imageUrl} width={45} height={60} />
             {c.game}: {c.name}
           </h3>
           <p>
@@ -47,6 +49,7 @@ export function InventoryScreen(): ReactNode {
           <ul>
             {c.drops.map((d) => (
               <li key={d.id}>
+                <RemoteImage url={d.imageUrl} width={32} height={32} />
                 {d.name}: {d.rewards.join(', ')} <DropProgress drop={d} />
               </li>
             ))}

@@ -2,3 +2,9 @@
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
 }
+
+.remote-image {
+  vertical-align: middle;
+  margin-right: 0.5em;
+  object-fit: contain;
+}

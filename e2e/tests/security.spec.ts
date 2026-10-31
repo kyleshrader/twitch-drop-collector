@@ -1,5 +1,8 @@
 import { expect, test, type ElectronApplication, type Page } from '@playwright/test'
 import { spawn } from 'node:child_process'
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { DatabaseSync } from 'node:sqlite'
 import electronPath from 'electron'
 import { appEnv, launchApp, MAIN_ENTRY } from './app'
 
@@ -130,4 +133,44 @@ test('a second launch exits and focuses the existing window', async () => {
     )
     .toBe(false)
   expect(await windowCount()).toBe(1)
+})
+
+test('remote images load only through the image cache, and only from Twitch’s CDN', async () => {
+  // Seed the cache with a 1×1 PNG, so the allowed case needs no network.
+  const cdnUrl = 'https://static-cdn.jtvnw.net/e2e/pixel.png'
+  const imagesDir = join(userDataDir, 'images')
+  mkdirSync(imagesDir, { recursive: true })
+  writeFileSync(
+    join(imagesDir, 'pixel.png'),
+    Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+      'base64'
+    )
+  )
+  const db = new DatabaseSync(join(userDataDir, 'tdc.db'))
+  const now = Date.now()
+  db.prepare(
+    `INSERT INTO images (url, file, content_type, bytes, fetched_at, used_at)
+     VALUES (?, 'pixel.png', 'image/png', 70, ?, ?)`
+  ).run(cdnUrl, now, now)
+  db.close()
+
+  const load = (src: string): Promise<string> =>
+    page.evaluate(
+      (url) =>
+        new Promise<string>((resolve) => {
+          const img = new Image()
+          img.onload = () => resolve(`loaded ${img.naturalWidth}x${img.naturalHeight}`)
+          img.onerror = () => resolve('failed')
+          img.src = url
+        }),
+      src
+    )
+  const cached = (url: string): string => `tdc-image://cache/?url=${encodeURIComponent(url)}`
+
+  expect(await load(cached(cdnUrl))).toBe('loaded 1x1')
+  // Straight from the CDN: blocked by the CSP.
+  expect(await load(cdnUrl)).toBe('failed')
+  // Through the cache, but not from Twitch's CDN: refused by main.
+  expect(await load(cached('https://example.com/pixel.png'))).toBe('failed')
 })

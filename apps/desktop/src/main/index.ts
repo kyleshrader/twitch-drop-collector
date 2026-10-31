@@ -50,13 +50,21 @@ import { createInvokeRouter } from './ipc/router'
 import { createCrashReports, watchProcesses } from './diagnostics'
 import { createAppLogger } from './logger'
 import { APP_ORIGIN, isSameOrigin, mainWindowOptions } from './policy'
-import { allowNavigation, hardenWebContents, registerAppScheme, serveRenderer } from './security'
+import { createImageCache } from './images/image-cache'
+import {
+  allowNavigation,
+  hardenWebContents,
+  registerAppSchemes,
+  serveImages,
+  serveRenderer
+} from './security'
 import { createAppTray } from './shell/tray'
 
 const devServerUrl = is.dev ? process.env['ELECTRON_RENDERER_URL'] : undefined
 // End-to-end tests run windows transparent, unfocusable and off the taskbar, so they never pop
-// up on the developer's screen. Ignored in packaged builds.
-const invisibleForTests = process.env['TDC_E2E_INVISIBLE'] === '1' && !app.isPackaged
+// up on the developer's screen. Honoured in packaged builds too, for the packaged smoke test; it
+// changes nothing but how windows are shown.
+const invisibleForTests = process.env['TDC_E2E_INVISIBLE'] === '1'
 const rendererOrigin = devServerUrl ?? APP_ORIGIN
 const logsFolder = (): string => join(app.getPath('userData'), 'logs')
 const logger = createAppLogger({
@@ -88,6 +96,8 @@ function createWindow(options: { startMinimized?: boolean } = {}): BrowserWindow
   })
 
   window.on('ready-to-show', () => {
+    // The packaged-build smoke test waits for this line.
+    logger.info('Main window ready', { version: app.getVersion() })
     // Starting minimised means staying in the tray; without a tray, minimised to the taskbar.
     if (!options.startMinimized) {
       window.show()
@@ -135,7 +145,7 @@ function focusMainWindow(): void {
   mainWindow.focus()
 }
 
-registerAppScheme()
+registerAppSchemes()
 
 // No passkeys (WebAuthn) in any page. Twitch's sign-in page offers them, which on Windows pops up
 // a Windows Security dialog; without WebAuthn the page falls back to username and password.
@@ -233,8 +243,30 @@ if (!app.requestSingleInstanceLock()) {
       const purged = storage.cache.purgeExpired()
       if (purged > 0) logger.child('storage').debug('Purged expired cache entries', { purged })
     }
+    // Box art and reward images, fetched by main (the renderer's CSP allows no remote hosts).
+    const images = createImageCache({
+      index: storage.images,
+      dir: join(app.getPath('userData'), 'images'),
+      fetch: createNetFetch(net),
+      clock: systemClock,
+      logger: logger.child('images')
+    })
+    serveImages(images)
+    const pruneImages = (): void => {
+      images.prune().catch((error: unknown) => {
+        logger.child('images').warn('Could not prune cached images', { error })
+      })
+    }
+
     purgeCache()
-    const purgeTimer = setInterval(purgeCache, 60 * 60 * 1000)
+    pruneImages()
+    const purgeTimer = setInterval(
+      () => {
+        purgeCache()
+        pruneImages()
+      },
+      60 * 60 * 1000
+    )
     app.on('will-quit', () => {
       clearInterval(purgeTimer)
       storage.close()
