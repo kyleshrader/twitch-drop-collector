@@ -28,7 +28,9 @@ export function appEnv(userDataDir: string): Record<string, string> {
     // Tests never talk to the real Twitch: unless a test supplies a mock, every endpoint points
     // at a closed local port.
     TDC_TWITCH_ENDPOINTS: JSON.stringify(twitchEndpoints('http://127.0.0.1:9')),
-    TDC_USER_DATA_DIR: userDataDir
+    TDC_USER_DATA_DIR: userDataDir,
+    // Undo the --password-store=basic switch Playwright's loader adds (see the app's main).
+    TDC_E2E_REAL_KEYRING: '1'
   }
 }
 

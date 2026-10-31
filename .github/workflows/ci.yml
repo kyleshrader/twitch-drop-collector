@@ -69,7 +69,6 @@ jobs:
           eval "$(dbus-launch --sh-syntax)"
           echo -n ci | gnome-keyring-daemon --unlock > /dev/null
           export $(gnome-keyring-daemon --start --components=secrets)
-          xvfb-run --auto-servernum yarn workspace @tdc/desktop electron ../../tooling/scripts/print-safe-storage-backend.cjs
           xvfb-run --auto-servernum yarn test:e2e
 
       # Each e2e test runs the app on its own profile in the temp folder; show what the app logged.

@@ -160,6 +160,13 @@ if (userDataOverride && !app.isPackaged) {
   app.setPath('userData', userDataOverride)
   app.setPath('crashDumps', join(userDataOverride, 'Crashpad'))
 }
+// Playwright's Electron loader adds --password-store=basic (meant for browsers it drives), which
+// on Linux makes safeStorage use a hard-coded key, so the app keeps the session in memory only.
+// End-to-end tests set TDC_E2E_REAL_KEYRING=1 to restore the normal keyring detection, so they
+// cover the real keyring. Ignored in packaged builds.
+if (process.env['TDC_E2E_REAL_KEYRING'] === '1' && !app.isPackaged) {
+  app.commandLine.removeSwitch('password-store')
+}
 
 if (!app.requestSingleInstanceLock()) {
   // Another instance owns the lock; it receives 'second-instance' and focuses its window.
