@@ -16,7 +16,8 @@ import {
   createWatchService,
   type AuthService,
   type AuthState,
-  type ClaimNotice
+  type ClaimNotice,
+  type Connectivity
 } from '@tdc/core'
 import { createRateLimiter, systemClock, type Logger } from '@tdc/kernel'
 import type { MinerView } from '@tdc/ipc-contract'
@@ -39,6 +40,7 @@ export function createMiningRuntime(deps: {
   storage: Storage
   endpoints: TwitchEndpoints
   connect: (url: string) => WebSocketLike
+  connectivity: Connectivity
   onClaim: (notice: ClaimNotice) => void
   logger: Logger
 }): MiningRuntime {
@@ -103,21 +105,46 @@ export function createMiningRuntime(deps: {
     onClaim: deps.onClaim
   })
 
-  // Mine while signed in; stop on sign-out (and restart cleanly on the next sign-in).
+  // Mine while signed in and connected; stop on sign-out, pause while offline or asleep. Every
+  // start is a fresh one (full reload), so nothing stale survives a pause.
+  const { connectivity } = deps
   let mining = false
+  let resuming = false
   const follow = (state: AuthState): void => {
-    if (state.status === 'signedIn' && !mining) {
+    const shouldMine = state.status === 'signedIn' && connectivity.state() === 'online'
+    if (shouldMine && !mining) {
       mining = true
       logger.info('Starting the miner', { userId: state.user.id })
       miner.start()
-    } else if (state.status === 'signedOut' && mining) {
+    } else if (!shouldMine && mining && state.status !== 'signingIn') {
       mining = false
-      logger.info('Stopping the miner')
+      logger.info('Stopping the miner', {
+        reason: state.status === 'signedIn' ? 'paused' : 'signed out'
+      })
       void miner.stop()
     }
   }
   const offAuth = auth.onChange(follow)
+  const offConnectivity = connectivity.onChange((next) => {
+    if (next !== 'online') return follow(auth.state())
+    // Back online: re-check the saved session first (it may have expired meanwhile). Restoring
+    // reports its state, which starts the miner when still signed in.
+    resuming = true
+    void auth
+      .start()
+      .finally(() => (resuming = false))
+      .then(() => follow(auth.state()))
+  })
   follow(auth.state())
+
+  const paused = (): MinerView['message'] | undefined => {
+    if (auth.state().status !== 'signedIn') return undefined
+    const state = connectivity.state()
+    if (state === 'offline') return 'Offline: mining resumes when the connection is back'
+    if (state === 'asleep') return 'The computer is asleep'
+    if (resuming) return 'Back online: checking your session…'
+    return undefined
+  }
 
   const offSettings = settings.subscribe((next, previous) => {
     if (mining && JSON.stringify(next.mining) !== JSON.stringify(previous.mining)) {
@@ -126,13 +153,30 @@ export function createMiningRuntime(deps: {
   })
 
   return {
-    view: () =>
-      toMinerView(miner.snapshot(), inventory.campaigns(), channels.channels(), clock.now()),
+    view() {
+      const view = toMinerView(
+        miner.snapshot(),
+        inventory.campaigns(),
+        channels.channels(),
+        clock.now()
+      )
+      const message = paused()
+      if (message === undefined) return view
+      // Paused: nothing is being watched, whatever the stopped miner last reported.
+      return {
+        status: 'paused',
+        message,
+        wanted: view.wanted,
+        channels: view.channels,
+        campaigns: view.campaigns
+      }
+    },
     onChange(listener) {
       const offs = [
         miner.onChange(listener),
         inventory.onChange(listener),
-        channels.onChange(listener)
+        channels.onChange(listener),
+        connectivity.onChange(listener)
       ]
       return () => offs.forEach((off) => off())
     },
@@ -140,6 +184,7 @@ export function createMiningRuntime(deps: {
     selectChannel: (channelId) => miner.selectChannel(channelId),
     async stop() {
       offAuth()
+      offConnectivity()
       offSettings()
       mining = false
       await miner.stop()

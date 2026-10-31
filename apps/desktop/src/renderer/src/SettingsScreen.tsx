@@ -64,6 +64,14 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
         <label>
           <input
             type="checkbox"
+            checked={draft.general.closeToTray}
+            onChange={(e) => set('general', { closeToTray: e.target.checked })}
+          />
+          {t.general.closeToTray}
+        </label>
+        <label>
+          <input
+            type="checkbox"
             checked={draft.general.trayNotifications}
             onChange={(e) => set('general', { trayNotifications: e.target.checked })}
           />

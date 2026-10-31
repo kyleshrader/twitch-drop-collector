@@ -12,6 +12,12 @@ export {
   type TwitchUser
 } from './auth/auth-service'
 export { createChannelService, type ChannelService } from './channels/channel-service'
+export {
+  createConnectivity,
+  type Connectivity,
+  type ConnectivityState,
+  type PowerEvents
+} from './connectivity/connectivity'
 export { awaitsConnection, currentMinutes, isActive, isUpcoming } from './domain/rules'
 export type {
   Benefit,

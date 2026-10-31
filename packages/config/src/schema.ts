@@ -11,8 +11,10 @@ const GameNames = z.array(z.string().trim().min(1).max(200)).max(500)
 
 export const GeneralSettings = z.object({
   launchAtLogin: z.boolean(),
-  /** When launched at login, start minimised (to the tray from M8) instead of showing the window. */
+  /** When launched at login, start in the tray instead of showing the window. */
   startMinimized: z.boolean(),
+  /** Closing the window hides it to the tray and keeps mining; Quit is in the tray menu. */
+  closeToTray: z.boolean(),
   trayNotifications: z.boolean(),
   theme: z.enum(THEMES)
 })
@@ -53,6 +55,7 @@ export const DEFAULT_SETTINGS: Settings = {
   general: {
     launchAtLogin: false,
     startMinimized: false,
+    closeToTray: true,
     trayNotifications: true,
     theme: 'system'
   },

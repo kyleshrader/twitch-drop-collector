@@ -30,7 +30,8 @@ export const strings = {
       loading: 'Loading campaigns…',
       idle: 'Idle',
       watching: 'Mining',
-      error: 'Problem'
+      error: 'Problem',
+      paused: 'Paused'
     },
     watching: (name: string, game?: string, viewers?: number): string =>
       `Watching ${name}${game ? ` playing ${game}` : ''}${viewers === undefined ? '' : ` (${viewers} viewers)`}`,
@@ -72,7 +73,8 @@ export const strings = {
     general: {
       heading: 'General',
       launchAtLogin: 'Start at login',
-      startMinimized: 'Start minimised when started at login',
+      startMinimized: 'Start in the tray when started at login',
+      closeToTray: 'Keep mining in the tray when the window is closed',
       trayNotifications: 'Show a notification when a drop is claimed',
       theme: 'Theme',
       themes: { system: 'Follow system', light: 'Light', dark: 'Dark' }

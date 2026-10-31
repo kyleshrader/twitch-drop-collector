@@ -8,6 +8,7 @@ const GameNames = z.array(z.string().trim().min(1).max(200)).max(500)
 const General = z.object({
   launchAtLogin: z.boolean(),
   startMinimized: z.boolean(),
+  closeToTray: z.boolean(),
   trayNotifications: z.boolean(),
   theme: z.enum(['system', 'light', 'dark'])
 })

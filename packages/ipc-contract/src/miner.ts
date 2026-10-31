@@ -44,7 +44,8 @@ export const CampaignView = z.object({
 export type CampaignView = z.infer<typeof CampaignView>
 
 export const MinerView = z.object({
-  status: z.enum(['stopped', 'loading', 'idle', 'watching', 'error']),
+  /** `paused`: offline or the computer is asleep; mining resumes by itself. */
+  status: z.enum(['stopped', 'loading', 'idle', 'watching', 'error', 'paused']),
   message: z.string().optional(),
   watching: ChannelView.optional(),
   active: z

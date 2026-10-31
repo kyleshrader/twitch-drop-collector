@@ -14,7 +14,7 @@ test('settings survive a restart', async () => {
 
   const first = await launchApp(userDataDir)
   await openSettings(first.window)
-  await first.window.getByLabel('Start minimised when started at login').check()
+  await first.window.getByLabel('Start in the tray when started at login').check()
   await first.window.getByLabel('Show a notification when a drop is claimed').uncheck()
   await first.window.getByLabel('Theme').selectOption('dark')
   await first.window
@@ -38,7 +38,7 @@ test('settings survive a restart', async () => {
   const second = await launchApp(userDataDir)
   try {
     await openSettings(second.window)
-    await expect(second.window.getByLabel('Start minimised when started at login')).toBeChecked()
+    await expect(second.window.getByLabel('Start in the tray when started at login')).toBeChecked()
     await expect(
       second.window.getByLabel('Show a notification when a drop is claimed')
     ).not.toBeChecked()

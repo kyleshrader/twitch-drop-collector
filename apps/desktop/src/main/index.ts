@@ -4,12 +4,16 @@ import {
   BrowserWindow,
   dialog,
   ipcMain,
+  Menu,
+  nativeImage,
   nativeTheme,
   net,
+  powerMonitor,
   safeStorage,
   session,
   Notification,
   shell,
+  Tray,
   WebContentsView
 } from 'electron'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
@@ -24,7 +28,7 @@ import {
   systemScheduler
 } from '@tdc/api'
 import { createSettingsService } from '@tdc/config'
-import { createAuthService } from '@tdc/core'
+import { createAuthService, createConnectivity } from '@tdc/core'
 import type { MinerView } from '@tdc/ipc-contract'
 import { systemClock } from '@tdc/kernel'
 import { openStorage } from '@tdc/storage'
@@ -44,6 +48,7 @@ import { createInvokeRouter } from './ipc/router'
 import { createConsoleLogger } from './logger'
 import { APP_ORIGIN, isSameOrigin, mainWindowOptions } from './policy'
 import { allowNavigation, hardenWebContents, registerAppScheme, serveRenderer } from './security'
+import { createAppTray } from './shell/tray'
 
 const devServerUrl = is.dev ? process.env['ELECTRON_RENDERER_URL'] : undefined
 // End-to-end tests run windows transparent, unfocusable and off the taskbar, so they never pop
@@ -53,6 +58,12 @@ const rendererOrigin = devServerUrl ?? APP_ORIGIN
 const logger = createConsoleLogger({ level: is.dev ? 'debug' : 'info' })
 
 let mainWindow: BrowserWindow | null = null
+/** True once the app is really quitting, so closing the window must not just hide it. */
+let quitting = false
+/** Set once settings and the tray exist: whether closing the window hides it instead. */
+let hideOnClose = (): boolean => false
+/** Called when the window is shown or hidden, so the tray menu can follow. */
+let onWindowVisibility = (): void => {}
 
 function createWindow(options: { startMinimized?: boolean } = {}): BrowserWindow {
   const window = new BrowserWindow({
@@ -62,14 +73,21 @@ function createWindow(options: { startMinimized?: boolean } = {}): BrowserWindow
   })
 
   window.on('ready-to-show', () => {
-    if (options.startMinimized) {
-      // Until the tray exists (M8), "start minimised" means minimised to the taskbar.
+    // Starting minimised means staying in the tray; without a tray, minimised to the taskbar.
+    if (!options.startMinimized) {
+      window.show()
+    } else if (!hideOnClose()) {
       window.showInactive()
       window.minimize()
-    } else {
-      window.show()
     }
   })
+  window.on('close', (event) => {
+    if (quitting || !hideOnClose()) return
+    event.preventDefault()
+    window.hide()
+  })
+  window.on('show', () => onWindowVisibility())
+  window.on('hide', () => onWindowVisibility())
   if (is.dev) {
     // Surface renderer warnings and errors (including CSP violations) in the dev terminal.
     window.webContents.on('console-message', ({ level, message, sourceId, lineNumber }) => {
@@ -236,6 +254,26 @@ if (!app.requestSingleInstanceLock()) {
     })
     auth.onChange((state) => events.publish('auth:state', state))
 
+    // Online and awake? net.isOnline() is reliable when it says offline; power events cover sleep.
+    const connectivity = createConnectivity({
+      isOnline: () => net.isOnline(),
+      power: {
+        // One branch per event: powerMonitor's typings overload on the literal event name.
+        on(event, listener) {
+          if (event === 'suspend') {
+            powerMonitor.on('suspend', listener)
+            return () => powerMonitor.off('suspend', listener)
+          }
+          powerMonitor.on('resume', listener)
+          return () => powerMonitor.off('resume', listener)
+        }
+      },
+      scheduler: systemScheduler,
+      logger: logger.child('connectivity')
+    })
+    connectivity.start()
+    app.on('will-quit', () => connectivity.stop())
+
     // The miner runs while signed in. Not in probe mode: the probe promises read-only queries.
     const probeMode = process.env['TDC_DEV_GQL_PROBE'] !== undefined && !app.isPackaged
     const mining = probeMode
@@ -247,6 +285,7 @@ if (!app.requestSingleInstanceLock()) {
           storage,
           endpoints,
           connect: (url) => new WebSocket(url),
+          connectivity,
           onClaim: (notice) => {
             if (!settings.get().general.trayNotifications || !Notification.isSupported()) return
             new Notification({
@@ -257,8 +296,46 @@ if (!app.requestSingleInstanceLock()) {
           logger: logger.child('mining')
         })
     const stoppedView: MinerView = { status: 'stopped', wanted: [], channels: [], campaigns: [] }
+    const minerView = (): MinerView => mining?.view() ?? stoppedView
+
+    // The tray keeps the app reachable while the window is hidden. Not in invisible e2e runs, so
+    // tests don't put an icon on the developer's taskbar; those runs act as if the tray exists.
+    const toggleWindow = (): void => {
+      if (mainWindow?.isVisible()) mainWindow.hide()
+      else focusMainWindow()
+    }
+    const tray = invisibleForTests
+      ? undefined
+      : createAppTray({
+          Tray,
+          Menu,
+          nativeImage,
+          icon: nativeImage.createFromPath(icon),
+          platform: process.platform,
+          windowVisible: () => mainWindow?.isVisible() ?? false,
+          onAction: (action) => {
+            if (action === 'toggleWindow') toggleWindow()
+            else if (action === 'reload') mining?.reload()
+            else app.quit()
+          }
+        })
+    tray?.update(minerView())
+    hideOnClose = () =>
+      settings.get().general.closeToTray && (tray !== undefined || invisibleForTests)
+    onWindowVisibility = () => tray?.refresh()
+    app.on('before-quit', () => {
+      quitting = true
+    })
+    app.on('will-quit', () => tray?.destroy())
+
     if (mining) {
-      mining.onChange(throttle(() => events.publish('miner:state', mining.view()), 250))
+      mining.onChange(
+        throttle(() => {
+          const view = mining.view()
+          events.publish('miner:state', view)
+          tray?.update(view)
+        }, 250)
+      )
       app.on('before-quit', () => void mining.stop())
     }
 
@@ -272,7 +349,7 @@ if (!app.requestSingleInstanceLock()) {
           settings,
           auth,
           miner: {
-            view: () => mining?.view() ?? stoppedView,
+            view: minerView,
             reload: () => mining?.reload(),
             selectChannel: (channelId) => mining?.selectChannel(channelId)
           }
@@ -311,10 +388,8 @@ if (!app.requestSingleInstanceLock()) {
         .finally(() => app.quit())
     }
 
-    // macOS: re-create the window when the dock icon is clicked and none are open.
-    app.on('activate', () => {
-      if (BrowserWindow.getAllWindows().length === 0) mainWindow = createWindow()
-    })
+    // macOS: the dock icon shows the window again, re-creating it if none is open.
+    app.on('activate', focusMainWindow)
   })().catch((error: unknown) => {
     logger.error('Startup failed', { error })
     dialog.showErrorBox('Twitch Drop Collector could not start', String(error))
