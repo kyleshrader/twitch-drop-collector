@@ -6,7 +6,9 @@
       "outputs": ["out/**", "dist/**"]
     },
     "typecheck": {},
-    "test": {},
+    "test": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/tooling/vitest.config.mjs"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
@@ -25,6 +27,8 @@
         "GNOME_KEYRING_CONTROL"
       ]
     },
-    "test:electron": {}
+    "test:electron": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/tooling/vitest.config.mjs"]
+    }
   }
 }

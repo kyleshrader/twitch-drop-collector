@@ -27,3 +27,6 @@ dist
 # Playwright
 e2e/test-results
 e2e/playwright-report
+
+# Vitest job summaries from CI
+test-reports

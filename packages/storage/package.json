@@ -8,8 +8,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
-    "test:electron": "node ../../tooling/scripts/vitest-in-electron.mjs"
+    "test": "vitest run --passWithNoTests --config ../../tooling/vitest.config.mjs",
+    "test:electron": "node ../../tooling/scripts/vitest-in-electron.mjs --config ../../tooling/vitest.config.mjs"
   },
   "devDependencies": {
     "@types/node": "catalog:",

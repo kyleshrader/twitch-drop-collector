@@ -9,7 +9,7 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests --config ../../tooling/vitest.config.mjs"
   },
   "devDependencies": {
     "@types/node": "catalog:",

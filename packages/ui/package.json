@@ -8,7 +8,7 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests --config ../../tooling/vitest.config.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0"

@@ -47,6 +47,12 @@ jobs:
       - name: Checks
         run: yarn check
 
+      # Each package's Vitest run left its summary in test-reports/ (tooling/vitest.config.mjs).
+      - name: Test report
+        if: always()
+        shell: bash
+        run: node tooling/scripts/test-report.mjs "${{ runner.os }} Test Report"
+
       # Ubuntu's AppArmor blocks the user namespaces Chromium's sandbox needs.
       - name: Allow Chromium's sandbox (Linux)
         if: runner.os == 'Linux'

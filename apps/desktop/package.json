@@ -10,7 +10,7 @@
     "start": "electron-vite preview",
     "build": "electron-vite build",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
-    "test": "vitest run --passWithNoTests",
+    "test": "vitest run --passWithNoTests --config ../../tooling/vitest.config.mjs",
     "postinstall": "install-electron && electron-builder install-app-deps",
     "build:unpack": "electron-vite build && electron-builder --dir",
     "test:packaged": "node scripts/smoke-packaged.mjs",
