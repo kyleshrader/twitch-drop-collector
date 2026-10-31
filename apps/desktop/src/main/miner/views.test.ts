@@ -97,6 +97,15 @@ describe('toMinerView', () => {
     })
   })
 
+  it('flags finished drops that wait for a connected game account', () => {
+    const unlinked = { ...campaign('acct', -48, -1, 'EXPIRED'), linked: false }
+    unlinked.drops = unlinked.drops.map((d) => ({ ...d, realMinutes: 60, claimId: 'i' }))
+    const [drop] = toMinerView({ status: 'idle', wanted: [] }, [unlinked], [], NOW).campaigns[0]!
+      .drops
+    expect(drop).toMatchObject({ claimed: false, awaitsConnection: true })
+    expect(view.campaigns[0]!.drops[0]!.awaitsConnection).toBe(false)
+  })
+
   it('describes channels by online state', () => {
     expect(view.channels.map((c) => [c.id, c.online, c.viewers])).toEqual([
       ['c1', true, 42],

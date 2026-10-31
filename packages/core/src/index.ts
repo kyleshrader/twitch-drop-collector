@@ -12,7 +12,7 @@ export {
   type TwitchUser
 } from './auth/auth-service'
 export { createChannelService, type ChannelService } from './channels/channel-service'
-export { currentMinutes, isActive, isUpcoming } from './domain/rules'
+export { awaitsConnection, currentMinutes, isActive, isUpcoming } from './domain/rules'
 export type {
   Benefit,
   Campaign,

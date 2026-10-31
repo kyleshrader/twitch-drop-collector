@@ -1,5 +1,6 @@
 // Domain state → the plain views the renderer gets (dates as ISO strings, no class instances).
 import {
+  awaitsConnection,
   currentMinutes,
   isActive,
   isUpcoming,
@@ -22,7 +23,7 @@ export function channelView(c: Channel): ChannelView {
   }
 }
 
-export function dropView(d: Drop): DropView {
+export function dropView(d: Drop, c: Campaign, now: Date): DropView {
   const imageUrl = d.benefits[0]?.imageUrl
   return {
     id: d.id,
@@ -30,6 +31,7 @@ export function dropView(d: Drop): DropView {
     minutes: Math.min(currentMinutes(d), d.requiredMinutes),
     requiredMinutes: d.requiredMinutes,
     claimed: d.claimed,
+    awaitsConnection: awaitsConnection(d, c, now),
     rewards: d.benefits.map((b) => b.name),
     ...(imageUrl ? { imageUrl } : {}),
     startsAt: d.startsAt.toISOString(),
@@ -52,7 +54,7 @@ export function campaignView(c: Campaign, now: Date): CampaignView {
     startsAt: c.startsAt.toISOString(),
     endsAt: c.endsAt.toISOString(),
     allowListed: c.allowedChannels.length > 0,
-    drops: c.drops.map(dropView)
+    drops: c.drops.map((d) => dropView(d, c, now))
   }
 }
 
@@ -78,7 +80,7 @@ export function toMinerView(
             campaignId: active.campaign.id,
             campaign: active.campaign.name,
             game: active.campaign.game.name,
-            ...(active.drop ? { drop: dropView(active.drop) } : {})
+            ...(active.drop ? { drop: dropView(active.drop, active.campaign, now) } : {})
           }
         }
       : {}),

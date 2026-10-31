@@ -231,6 +231,7 @@ export function createAuthService(deps: {
         await forgetSession(EXPIRED_MESSAGE)
         return
       }
+      logger.info('Restored the saved session', { userId: info.user_id, client: profile.name })
       setState({
         status: 'signedIn',
         user: { id: info.user_id, login: info.login },

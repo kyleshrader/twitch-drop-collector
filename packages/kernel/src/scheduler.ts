@@ -7,7 +7,10 @@ export interface AbortSignalLike {
 
 /** Waiting, injected so time-based code is testable. The timer-based one lives in @tdc/api. */
 export interface Scheduler {
-  /** Resolves after ms, or rejects with AbortError as soon as signal aborts. */
+  /**
+   * Resolves after ms, or rejects with AbortError as soon as signal aborts. Infinity never
+   * resolves, so it waits for the abort.
+   */
   sleep(ms: number, signal?: AbortSignalLike): Promise<void>
 }
 

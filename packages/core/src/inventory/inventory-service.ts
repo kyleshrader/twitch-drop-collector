@@ -16,6 +16,7 @@ import { buildCampaigns } from './mapping'
 
 /** Twitch's answers to a claim that mean "it's yours". */
 const CLAIM_OK = new Set(['ELIGIBLE_FOR_ALL', 'DROP_INSTANCE_ALREADY_CLAIMED'])
+const ALREADY_CLAIMED = 'DROP_INSTANCE_ALREADY_CLAIMED'
 
 export interface InventoryService {
   campaigns(): readonly Campaign[]
@@ -31,9 +32,13 @@ export interface InventoryService {
     channel: Channel
   ): { reachedCap: boolean }
   setClaimId(dropId: string, claimId: string): void
-  /** Claims one drop. True when Twitch confirms (or it was already claimed). */
+  /**
+   * Claims one drop. True only for a new claim; a drop Twitch says was already claimed is marked
+   * claimed but returns false. Each drop is asked for once per run: if Twitch confirmed it but
+   * still lists it unclaimed, asking again won't help.
+   */
   claim(dropId: string, signal?: AbortSignal): Promise<boolean>
-  /** Claims every claimable drop in active and expired campaigns. Returns the drops claimed. */
+  /** Claims every claimable drop in active and expired campaigns. Returns the drops newly claimed. */
   claimAll(signal?: AbortSignal): Promise<Drop[]>
   onChange(listener: (campaigns: readonly Campaign[]) => void): () => void
 }
@@ -51,6 +56,8 @@ export function createInventoryService(deps: {
     onListenerError: (error) => logger.error('Inventory listener failed', { error })
   })
   let campaigns: readonly Campaign[] = []
+  /** Claim IDs Twitch has already answered with a success this run. */
+  const answered = new Set<string>()
 
   const publish = (next: readonly Campaign[]): void => {
     campaigns = next
@@ -71,11 +78,17 @@ export function createInventoryService(deps: {
     const found = find(dropId)
     if (!found) return false
     const { campaign, drop } = found
-    if (drop.claimed) return true
-    if (!drop.claimId || !canClaimDrop(drop, campaign, clock.now())) return false
+    if (drop.claimed) return false
+    const claimId = drop.claimId
+    if (!claimId || !canClaimDrop(drop, campaign, clock.now())) return false
+    if (answered.has(claimId)) {
+      logger.debug('Twitch already answered this claim; not asking again', { dropId })
+      return false
+    }
+    let status: string | undefined
     try {
-      const result = await client.request(gql.ClaimDrop, { dropInstanceId: drop.claimId }, signal)
-      const status = result.claimDropRewards?.status
+      const result = await client.request(gql.ClaimDrop, { dropInstanceId: claimId }, signal)
+      status = result.claimDropRewards?.status ?? undefined
       if (!status || !CLAIM_OK.has(status)) {
         logger.warn('Twitch did not confirm a claim', { dropId, status })
         return false
@@ -85,7 +98,12 @@ export function createInventoryService(deps: {
       logger.warn('Claim failed', { dropId, error: error.message })
       return false
     }
+    answered.add(claimId)
     replace(markClaimed(campaign, dropId))
+    if (status === ALREADY_CLAIMED) {
+      logger.info('Drop was already claimed', { game: campaign.game.name, drop: drop.name })
+      return false
+    }
     claims.record({
       dropId,
       campaignId: campaign.id,
@@ -94,7 +112,7 @@ export function createInventoryService(deps: {
       rewards: drop.benefits.map((b) => b.name),
       claimedAt: clock.now()
     })
-    logger.info('Claimed a drop', { game: campaign.game.name, drop: drop.name })
+    logger.info('Claimed a drop', { game: campaign.game.name, drop: drop.name, status })
     return true
   }
 

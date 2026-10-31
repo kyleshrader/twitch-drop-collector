@@ -106,10 +106,27 @@ export function canEarnCampaignWithin(c: Campaign, ctx: EarnContext, cutoff: Dat
   )
 }
 
-export function canClaimDrop(d: Drop, c: Campaign, now: Date): boolean {
+/** Finished and claimable, ignoring whether the game account is connected. */
+function claimWindowOpen(d: Drop, c: Campaign, now: Date): boolean {
   return (
     d.claimId !== undefined && !d.claimed && now.getTime() < c.endsAt.getTime() + CLAIM_GRACE_MS
   )
+}
+
+/** Whether a claim needs a connected game account. Badges and emotes don't. */
+const needsConnection = (c: Campaign): boolean => !c.linked && !hasBadgeOrEmote(c)
+
+/**
+ * We claim only for connected accounts. Twitch sometimes accepts a claim before the account is
+ * connected, but then the reward never arrives, and repeated automatic claims stand out.
+ */
+export function canClaimDrop(d: Drop, c: Campaign, now: Date): boolean {
+  return claimWindowOpen(d, c, now) && !needsConnection(c)
+}
+
+/** Finished, but waiting for the user to connect the game account before it can be claimed. */
+export function awaitsConnection(d: Drop, c: Campaign, now: Date): boolean {
+  return claimWindowOpen(d, c, now) && needsConnection(c)
 }
 
 // ---- minutes ---------------------------------------------------------------------------------

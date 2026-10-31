@@ -19,6 +19,8 @@ export const DropView = z.object({
   minutes: z.number(),
   requiredMinutes: z.number(),
   claimed: z.boolean(),
+  /** Finished, but only claimable once the game account is connected. */
+  awaitsConnection: z.boolean(),
   rewards: z.array(z.string()),
   imageUrl: z.string().optional(),
   startsAt: z.string(),

@@ -37,6 +37,7 @@ export const strings = {
     wanted: (games: readonly string[]): string => `Mining for: ${games.join(', ')}`,
     minutes: (done: number, required: number): string => `${done} / ${required} min`,
     claimed: 'Claimed',
+    awaitsConnection: 'Ready to claim: connect your game account, then claim it on Twitch',
     reload: 'Reload campaigns',
     letMinerChoose: 'Let the miner choose the channel',
     channels: (count: number): string => `Channels (${count})`,

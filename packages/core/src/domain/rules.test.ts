@@ -15,6 +15,7 @@ import {
 } from './builders.test-support'
 import {
   applyDropMinutes,
+  awaitsConnection,
   bumpEstimatedMinutes,
   campaignAvailability,
   campaignRemainingMinutes,
@@ -158,6 +159,18 @@ describe('claiming', () => {
   it('is not possible without a claim ID or once claimed', () => {
     expect(canClaimDrop(drop(), c, NOW)).toBe(false)
     expect(canClaimDrop(drop({ claimId: 'x', claimed: true }), c, NOW)).toBe(false)
+  })
+
+  it('waits for a connected game account, except for badges and emotes', () => {
+    const unlinked = campaign({ endsAt: hoursFromNow(-1), linked: false })
+    const finished = drop({ claimId: 'x' })
+    expect(canClaimDrop(finished, unlinked, NOW)).toBe(false)
+    expect(awaitsConnection(finished, unlinked, NOW)).toBe(true)
+    expect(awaitsConnection(finished, c, NOW)).toBe(false)
+    expect(awaitsConnection(drop(), unlinked, NOW)).toBe(false)
+
+    const badge = drop({ claimId: 'x', benefits: [benefit({ type: 'BADGE' })] })
+    expect(canClaimDrop(badge, campaign({ ...unlinked, drops: [badge] }), NOW)).toBe(true)
   })
 
   it('marks the drop claimed and complete', () => {

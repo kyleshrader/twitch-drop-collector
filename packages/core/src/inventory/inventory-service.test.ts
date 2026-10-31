@@ -132,7 +132,7 @@ describe('inventory service', () => {
     // The live inventory really has three finished, unclaimed Crimson Desert drops.
     const client = twitch()
     client.handle('DropsPage_ClaimDropRewards', () => ({
-      claimDropRewards: { status: 'DROP_INSTANCE_ALREADY_CLAIMED' }
+      claimDropRewards: { status: 'ELIGIBLE_FOR_ALL' }
     }))
     const { service } = setup(client)
     await service.refresh()
@@ -141,6 +141,52 @@ describe('inventory service', () => {
     expect(client.calls['DropsPage_ClaimDropRewards']).toHaveLength(3)
     const crimson = service.campaigns().find((c) => c.game.name === 'Crimson Desert')!
     expect(crimson.drops.every((d) => d.claimed)).toBe(true)
+  })
+
+  it('marks drops Twitch says were already claimed, without counting them as new', async () => {
+    const client = twitch()
+    client.handle('DropsPage_ClaimDropRewards', () => ({
+      claimDropRewards: { status: 'DROP_INSTANCE_ALREADY_CLAIMED' }
+    }))
+    const { service, claims } = setup(client)
+    await service.refresh()
+    expect(await service.claimAll()).toEqual([])
+    const crimson = service.campaigns().find((c) => c.game.name === 'Crimson Desert')!
+    expect(crimson.drops.every((d) => d.claimed)).toBe(true)
+    expect(claims.record).not.toHaveBeenCalled()
+  })
+
+  it('never claims for a game account that isn’t connected', async () => {
+    const client = twitch()
+    client.handle('Inventory', () => {
+      const data = clone(inventoryFixture[0]!.data)
+      for (const c of data.currentUser.inventory.dropCampaignsInProgress) {
+        c.self.isAccountConnected = false
+      }
+      return data
+    })
+    client.handle('DropsPage_ClaimDropRewards', () => ({
+      claimDropRewards: { status: 'ELIGIBLE_FOR_ALL' }
+    }))
+    const { service } = setup(client)
+    await service.refresh()
+    expect(await service.claimAll()).toEqual([])
+    expect(client.calls['DropsPage_ClaimDropRewards'] ?? []).toHaveLength(0)
+  })
+
+  // Found live: for a campaign whose game account isn't connected, Twitch confirms the claim
+  // but keeps listing the drop unclaimed, so every reload claimed and announced it again.
+  it('asks Twitch about each drop once per run', async () => {
+    const client = twitch()
+    client.handle('DropsPage_ClaimDropRewards', () => ({
+      claimDropRewards: { status: 'ELIGIBLE_FOR_ALL' }
+    }))
+    const { service } = setup(client)
+    await service.refresh()
+    expect(await service.claimAll()).toHaveLength(3)
+    await service.refresh()
+    expect(await service.claimAll()).toEqual([])
+    expect(client.calls['DropsPage_ClaimDropRewards']).toHaveLength(3)
   })
 
   it('records a claim ID that arrives later', async () => {

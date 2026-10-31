@@ -12,7 +12,11 @@ export function DropProgress({ drop }: { drop: DropView }): ReactNode {
   return (
     <span>
       <progress max={drop.requiredMinutes} value={drop.minutes} />{' '}
-      {drop.claimed ? t.claimed : t.minutes(drop.minutes, drop.requiredMinutes)}
+      {drop.claimed
+        ? t.claimed
+        : drop.awaitsConnection
+          ? t.awaitsConnection
+          : t.minutes(drop.minutes, drop.requiredMinutes)}
     </span>
   )
 }
