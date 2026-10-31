@@ -100,7 +100,11 @@ export const strings = {
     logging: {
       heading: 'Logging',
       level: 'Log level',
-      levels: { error: 'Errors', warn: 'Warnings', info: 'Info', debug: 'Debug' }
+      levels: { error: 'Errors', warn: 'Warnings', info: 'Info', debug: 'Debug' },
+      crashReports: 'Keep crash reports on this computer',
+      crashReportsNote:
+        'Crash reports stay in the app’s folder and are never sent anywhere. Turning this off takes effect after a restart.',
+      openFolder: 'Open logs folder'
     }
   }
 } as const

@@ -178,6 +178,18 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
             ))}
           </select>
         </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={draft.general.crashReports}
+            onChange={(e) => set('general', { crashReports: e.target.checked })}
+          />
+          {t.logging.crashReports}
+        </label>
+        <p>{t.logging.crashReportsNote}</p>
+        <button type="button" onClick={() => void invoke('app:openLogsFolder')}>
+          {t.logging.openFolder}
+        </button>
       </fieldset>
 
       <button type="submit" disabled={save.isPending}>

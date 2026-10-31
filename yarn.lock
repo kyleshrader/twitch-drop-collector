@@ -902,6 +902,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^6.1.2"
     electron: "npm:45.1.0"
     electron-builder: "npm:^26.18.0"
+    electron-log: "npm:^5.4.4"
     electron-vite: "npm:^6.0.0"
     react: "catalog:"
     react-dom: "catalog:"
@@ -2257,6 +2258,13 @@ __metadata:
     electron-builder: ./cli.js
     install-app-deps: ./install-app-deps.js
   checksum: 10c0/6a7369d4cb370dc276e3d7d827b3926abb7974ad1548259a12568893635aba852c1d7158fc78a9067772143657d99d6207c87a7aaa5fc02300670a6edbd83200
+  languageName: node
+  linkType: hard
+
+"electron-log@npm:^5.4.4":
+  version: 5.4.4
+  resolution: "electron-log@npm:5.4.4"
+  checksum: 10c0/bdcf44eb9d35306352d8ee827159c4b95c171f3c0c77e2a75c05c7da626e8f83588a82d6c02e6e18ff6d70056cdbc9a845a820e905151aa8a0040b46c8143b13
   languageName: node
   linkType: hard
 

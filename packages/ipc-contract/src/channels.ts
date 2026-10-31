@@ -19,6 +19,8 @@ export type OpenExternalInput = z.infer<typeof OpenExternalInput>
 
 export const invokeChannels = {
   'app:getInfo': { input: z.undefined(), output: AppInfo },
+  /** Opens the folder with the log files (and crash dumps, when on) in the file manager. */
+  'app:openLogsFolder': { input: z.undefined(), output: z.object({ opened: z.boolean() }) },
   'shell:openExternal': { input: OpenExternalInput, output: z.object({ opened: z.boolean() }) },
   'settings:get': { input: z.undefined(), output: SettingsView },
   'settings:update': { input: SettingsPatchInput, output: SettingsView },

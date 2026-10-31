@@ -16,7 +16,9 @@ export const GeneralSettings = z.object({
   /** Closing the window hides it to the tray and keeps mining; Quit is in the tray menu. */
   closeToTray: z.boolean(),
   trayNotifications: z.boolean(),
-  theme: z.enum(THEMES)
+  theme: z.enum(THEMES),
+  /** Consent to keep crash dumps (on this computer only). Off until the user turns it on. */
+  crashReports: z.boolean()
 })
 
 export const MiningSettings = z.object({
@@ -57,7 +59,8 @@ export const DEFAULT_SETTINGS: Settings = {
     startMinimized: false,
     closeToTray: true,
     trayNotifications: true,
-    theme: 'system'
+    theme: 'system',
+    crashReports: false
   },
   mining: {
     priority: [],

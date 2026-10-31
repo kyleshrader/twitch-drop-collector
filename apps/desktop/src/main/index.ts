@@ -2,6 +2,7 @@ import {
   app,
   BaseWindow,
   BrowserWindow,
+  crashReporter,
   dialog,
   ipcMain,
   Menu,
@@ -16,6 +17,7 @@ import {
   Tray,
   WebContentsView
 } from 'electron'
+import electronLog from 'electron-log/main'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -45,7 +47,8 @@ import { createMiningRuntime } from './miner/runtime'
 import { createInvokeHandlers } from './ipc/handlers'
 import { registerInvokeRoute } from './ipc/register'
 import { createInvokeRouter } from './ipc/router'
-import { createConsoleLogger } from './logger'
+import { createCrashReports, watchProcesses } from './diagnostics'
+import { createAppLogger } from './logger'
 import { APP_ORIGIN, isSameOrigin, mainWindowOptions } from './policy'
 import { allowNavigation, hardenWebContents, registerAppScheme, serveRenderer } from './security'
 import { createAppTray } from './shell/tray'
@@ -55,7 +58,19 @@ const devServerUrl = is.dev ? process.env['ELECTRON_RENDERER_URL'] : undefined
 // up on the developer's screen. Ignored in packaged builds.
 const invisibleForTests = process.env['TDC_E2E_INVISIBLE'] === '1' && !app.isPackaged
 const rendererOrigin = devServerUrl ?? APP_ORIGIN
-const logger = createConsoleLogger({ level: is.dev ? 'debug' : 'info' })
+const logsFolder = (): string => join(app.getPath('userData'), 'logs')
+const logger = createAppLogger({
+  log: electronLog,
+  file: () => join(logsFolder(), 'main.log'),
+  level: is.dev ? 'debug' : 'info',
+  console: is.dev
+})
+watchProcesses({
+  app,
+  process,
+  isAppPage: (contents) => isSameOrigin(contents.getURL(), rendererOrigin),
+  logger: logger.child('process')
+})
 
 let mainWindow: BrowserWindow | null = null
 /** True once the app is really quitting, so closing the window must not just hide it. */
@@ -89,13 +104,19 @@ function createWindow(options: { startMinimized?: boolean } = {}): BrowserWindow
   window.on('show', () => onWindowVisibility())
   window.on('hide', () => onWindowVisibility())
   if (is.dev) {
-    // Surface renderer warnings and errors (including CSP violations) in the dev terminal.
+    // Renderer warnings (CSP violations among them) in the dev terminal; errors are always logged.
     window.webContents.on('console-message', ({ level, message, sourceId, lineNumber }) => {
-      if (level === 'warning' || level === 'error') {
-        console.log(`[renderer:${level}] ${message} (${sourceId}:${lineNumber})`)
-      }
+      if (level === 'warning')
+        console.log(`[renderer:warning] ${message} (${sourceId}:${lineNumber})`)
     })
   }
+  // A crashed page leaves a blank window: load it again, but not in a crash loop.
+  let lastRecovery = 0
+  window.webContents.on('render-process-gone', (_event, details) => {
+    if (details.reason === 'clean-exit' || Date.now() - lastRecovery < 60_000) return
+    lastRecovery = Date.now()
+    if (!window.isDestroyed()) window.webContents.reload()
+  })
   window.on('closed', () => {
     if (mainWindow === window) mainWindow = null
   })
@@ -122,7 +143,10 @@ app.commandLine.appendSwitch('disable-blink-features', 'WebAuth')
 
 // Lets end-to-end tests run against an isolated profile. Ignored in packaged builds.
 const userDataOverride = process.env['TDC_USER_DATA_DIR']
-if (userDataOverride && !app.isPackaged) app.setPath('userData', userDataOverride)
+if (userDataOverride && !app.isPackaged) {
+  app.setPath('userData', userDataOverride)
+  app.setPath('crashDumps', join(userDataOverride, 'Crashpad'))
+}
 
 if (!app.requestSingleInstanceLock()) {
   // Another instance owns the lock; it receives 'second-instance' and focuses its window.
@@ -177,7 +201,15 @@ if (!app.requestSingleInstanceLock()) {
     // The setting is the source of truth; re-apply it in case the OS entry was changed elsewhere.
     syncLoginItem(initial.general.launchAtLogin)
     syncProxy(initial.network.proxy)
+    // Before any window exists, so crashes of every page process are covered.
+    const crashReports = createCrashReports({
+      crashReporter,
+      dumpsDir: app.getPath('crashDumps'),
+      logger: logger.child('crash')
+    })
+    if (initial.general.crashReports) crashReports.enable()
     settings.subscribe((next, previous) => {
+      if (next.general.crashReports && !previous.general.crashReports) crashReports.enable()
       if (next.network.proxy !== previous.network.proxy) syncProxy(next.network.proxy)
       if (!is.dev && next.logging.level !== previous.logging.level) {
         logger.setLevel(next.logging.level)
@@ -346,6 +378,7 @@ if (!app.requestSingleInstanceLock()) {
           app,
           shell,
           platform: process.platform,
+          logsFolder: logsFolder(),
           settings,
           auth,
           miner: {

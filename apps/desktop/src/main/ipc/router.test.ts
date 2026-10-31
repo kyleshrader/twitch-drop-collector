@@ -26,8 +26,9 @@ function setup(overrides: Partial<InvokeHandlers> = {}): {
   const handlers = {
     ...createInvokeHandlers({
       app: { getName: () => 'Twitch Drop Collector', getVersion: () => '1.2.3' },
-      shell: { openExternal },
+      shell: { openExternal, openPath: async () => '' },
       platform: 'win32',
+      logsFolder: '/profile/logs',
       settings: { get: () => DEFAULT_SETTINGS, update: async () => DEFAULT_SETTINGS },
       auth: {
         state: () => ({ status: 'signedOut' }),

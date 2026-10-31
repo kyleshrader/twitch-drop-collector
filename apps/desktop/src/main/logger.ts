@@ -1,26 +1,58 @@
-// Temporary console-backed Logger until electron-log is wired in at M9.
+// The app's Logger, written by electron-log to a rotating file (and the console in development).
+// Packages only see @tdc/kernel's Logger interface.
 import type { LogFields, Logger, LogLevel } from '@tdc/kernel'
-
-const RANK: Record<LogLevel, number> = { error: 0, warn: 1, info: 2, debug: 3 }
 
 export interface RootLogger extends Logger {
   /** Changes the level for this logger and every child created from it. */
   setLevel(level: LogLevel): void
 }
 
-export function createConsoleLogger(options: { level: LogLevel }): RootLogger {
-  const state = { level: options.level }
+/** The slice of electron-log's main logger this uses, so tests can pass a fake. */
+export interface ElectronLogLike {
+  error(...params: unknown[]): void
+  warn(...params: unknown[]): void
+  info(...params: unknown[]): void
+  debug(...params: unknown[]): void
+  // Wide enough for electron-log's own types, which know more levels and path arguments.
+  transports: {
+    file: {
+      level: string | false
+      maxSize: number
+      format: unknown
+      resolvePathFn: (...args: never[]) => string
+    }
+    console: { level: string | false }
+  }
+}
+
+/** Rotated to main.old.log at this size, so at most twice this on disk. */
+export const LOG_FILE_MAX_BYTES = 5 * 1024 * 1024
+
+export function createAppLogger(options: {
+  log: ElectronLogLike
+  /** Asked on every write, so it can follow a profile folder chosen after startup. */
+  file: () => string
+  level: LogLevel
+  /** Also write to the console (development). */
+  console: boolean
+}): RootLogger {
+  const { log } = options
+  log.transports.file.resolvePathFn = options.file
+  log.transports.file.maxSize = LOG_FILE_MAX_BYTES
+  log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}'
+  const setLevel = (level: LogLevel): void => {
+    log.transports.file.level = level
+    log.transports.console.level = options.console ? level : false
+  }
+  setLevel(options.level)
 
   const scoped = (scope: string | undefined): Logger => {
-    const prefix = scope ? `[${scope}]` : ''
+    const prefix = scope ? `[${scope}] ` : ''
     const write =
       (at: LogLevel) =>
       (message: string, fields?: LogFields): void => {
-        if (RANK[at] > RANK[state.level]) return
-        const line = [`${at.toUpperCase()}${prefix}`, message]
-        const method = at === 'debug' ? 'log' : at
-        if (fields) console[method](...line, fields)
-        else console[method](...line)
+        if (fields) log[at](`${prefix}${message}`, fields)
+        else log[at](`${prefix}${message}`)
       }
     return {
       error: write('error'),
@@ -31,10 +63,5 @@ export function createConsoleLogger(options: { level: LogLevel }): RootLogger {
     }
   }
 
-  return {
-    ...scoped(undefined),
-    setLevel: (level): void => {
-      state.level = level
-    }
-  }
+  return { ...scoped(undefined), setLevel }
 }

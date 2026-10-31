@@ -7,8 +7,9 @@ import type { InvokeHandlers } from './router'
 
 export function createInvokeHandlers(deps: {
   app: Pick<App, 'getName' | 'getVersion'>
-  shell: Pick<Shell, 'openExternal'>
+  shell: Pick<Shell, 'openExternal' | 'openPath'>
   platform: string
+  logsFolder: string
   settings: Pick<SettingsService, 'get' | 'update'>
   auth: Pick<AuthService, 'state' | 'signIn' | 'cancelSignIn' | 'signOut'>
   miner: {
@@ -20,6 +21,10 @@ export function createInvokeHandlers(deps: {
   const { app, shell, platform, settings, auth, miner } = deps
   return {
     'app:getInfo': (): AppInfo => ({ name: app.getName(), version: app.getVersion(), platform }),
+    // A fixed folder chosen by main; the renderer can't name a path.
+    'app:openLogsFolder': async (): Promise<{ opened: boolean }> => ({
+      opened: (await shell.openPath(deps.logsFolder)) === ''
+    }),
     'shell:openExternal': async ({ url }): Promise<{ opened: boolean }> => {
       // The schema already requires https; this keeps main's own rule authoritative.
       if (!isSafeExternalUrl(url)) return { opened: false }
