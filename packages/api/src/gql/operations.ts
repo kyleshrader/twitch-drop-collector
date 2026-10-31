@@ -214,12 +214,20 @@ export const CurrentDrop = defineOperation({
 
 export const ClaimDrop = defineOperation({
   name: 'DropsPage_ClaimDropRewards',
-  sha256: 'a455deea71bdc9015b78eb49f4acfbce8baa7ccbedd28e549bb025bd0f751930',
+  // The twitch.tv version: unlike upstream's older one it reports account-link failures, which
+  // still come with status ELIGIBLE_FOR_ALL.
+  sha256: '3b8a08f5a35dc95d7de229dea731a106a9aa9fa2e84c8f693fd159943f273e4f',
   variables: (input: { dropInstanceId: string }) => ({
     input: { dropInstanceID: input.dropInstanceId }
   }),
   data: z.looseObject({
-    claimDropRewards: z.looseObject({ status: z.string() }).nullable()
+    claimDropRewards: z
+      .looseObject({
+        status: z.string(),
+        isUserAccountConnected: z.boolean().nullish(),
+        error: z.looseObject({ code: z.string(), message: z.string().nullish() }).nullish()
+      })
+      .nullable()
   })
 })
 

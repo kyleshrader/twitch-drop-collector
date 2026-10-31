@@ -2,6 +2,7 @@ import campaignDetailsFixture from '@tdc/api/fixtures/twitch/campaign-details.js
 import campaignsFixture from '@tdc/api/fixtures/twitch/campaigns.json'
 import inventoryFixture from '@tdc/api/fixtures/twitch/inventory.json'
 import { describe, expect, it, vi } from 'vitest'
+import type { Campaign } from '../domain/types'
 import { fakeGql, testLogger, type FakeGql } from '../test-support/fake-gql'
 import { createInventoryService } from './inventory-service'
 
@@ -172,6 +173,51 @@ describe('inventory service', () => {
     await service.refresh()
     expect(await service.claimAll()).toEqual([])
     expect(client.calls['DropsPage_ClaimDropRewards'] ?? []).toHaveLength(0)
+  })
+
+  // The live answer when the game account isn't linked on the publisher's side, although the
+  // campaign data says it's connected: ELIGIBLE_FOR_ALL, plus the flag and the error.
+  it('treats ACCOUNT_LINK_REQUIRED as not linked, without claiming or retrying', async () => {
+    const client = twitch()
+    client.handle('DropsPage_ClaimDropRewards', () => ({
+      claimDropRewards: {
+        status: 'ELIGIBLE_FOR_ALL',
+        isUserAccountConnected: false,
+        error: {
+          code: 'ACCOUNT_LINK_REQUIRED',
+          message: 'You must link your account to the reward’s client to claim this reward.'
+        }
+      }
+    }))
+    const { service, claims } = setup(client)
+    await service.refresh()
+    expect(await service.claimAll()).toEqual([])
+    const crimson = (): Campaign =>
+      service.campaigns().find((c) => c.game.name === 'Crimson Desert')!
+    expect(crimson().linked).toBe(false)
+    expect(crimson().drops.some((d) => d.claimed)).toBe(false)
+    expect(claims.record).not.toHaveBeenCalled()
+
+    // Still not linked after a reload, and not asked again.
+    const asked = client.calls['DropsPage_ClaimDropRewards']!.length
+    await service.refresh()
+    expect(crimson().linked).toBe(false)
+    expect(await service.claimAll()).toEqual([])
+    expect(client.calls['DropsPage_ClaimDropRewards']).toHaveLength(asked)
+  })
+
+  it('treats any other claim error as a failure', async () => {
+    const client = twitch()
+    client.handle('Inventory', () => claimableInventory())
+    client.handle('DropsPage_ClaimDropRewards', () => ({
+      claimDropRewards: { status: 'ELIGIBLE_FOR_ALL', error: { code: 'SOMETHING_ELSE' } }
+    }))
+    const { service, claims } = setup(client)
+    await service.refresh()
+    const drop = service.campaigns().find((c) => c.game.name === 'Crimson Desert')!.drops[0]!
+    expect(await service.claim(drop.id)).toBe(false)
+    expect(service.find(drop.id)?.drop.claimed).toBe(false)
+    expect(claims.record).not.toHaveBeenCalled()
   })
 
   // Found live: for a campaign whose game account isn't connected, Twitch confirms the claim

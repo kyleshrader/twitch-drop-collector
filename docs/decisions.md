@@ -350,3 +350,9 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 ## 2026-10-30 · No passkeys in the app
 
 - Twitch's sign-in page offers passkeys, and inside Electron on Windows that opens a Windows Security (Windows Hello) dialog. Electron has no per-window setting for WebAuthn, so main starts Chromium with `--disable-blink-features=WebAuth`. Pages then have no `PublicKeyCredential`, and Twitch's page falls back to username and password. Our own renderer doesn't use WebAuthn, so the app-wide switch costs nothing. Checked with a probe (`PublicKeyCredential` is gone, even in a secure context; the `WebAuthentication` name does nothing) and in the login-window e2e test.
+
+## 2026-10-30 · Claims read Twitch's account-link error
+
+- A claim the user's browser made for the unlinked Crimson Desert account came back with `status: ELIGIBLE_FOR_ALL`, but also `isUserAccountConnected: false` and `error.code: ACCOUNT_LINK_REQUIRED`. Twitch's campaign data still called that account connected. The link is checked on the publisher's side, so only the claim answer shows the problem.
+- `ClaimDrop` now uses twitch.tv's current persisted query (`3b8a08f5…`), which returns those fields; upstream's older one (`a455deea…`) answers with `status` only. Both hashes are still known to Twitch: checked without a token or claim input, so nothing was claimed (a made-up hash returns `PersistedQueryNotFound`).
+- `ACCOUNT_LINK_REQUIRED` or `isUserAccountConnected: false`: the drop stays unclaimed, nothing is recorded or announced, and the campaign counts as not linked for the rest of the run, so it isn't asked again and the UI shows "Ready to claim: connect your game account…". Any other `error` is a failed claim.

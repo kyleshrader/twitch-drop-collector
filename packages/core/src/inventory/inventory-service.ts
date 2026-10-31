@@ -58,6 +58,13 @@ export function createInventoryService(deps: {
   let campaigns: readonly Campaign[] = []
   /** Claim IDs Twitch has already answered with a success this run. */
   const answered = new Set<string>()
+  /**
+   * Campaigns whose claim Twitch refused for want of a linked account, although its campaign data
+   * calls the account connected. They count as not linked for the rest of the run.
+   */
+  const linkRequired = new Set<string>()
+  const withLinkOverrides = (list: readonly Campaign[]): Campaign[] =>
+    list.map((c) => (linkRequired.has(c.id) ? { ...c, linked: false } : c))
 
   const publish = (next: readonly Campaign[]): void => {
     campaigns = next
@@ -88,7 +95,27 @@ export function createInventoryService(deps: {
     let status: string | undefined
     try {
       const result = await client.request(gql.ClaimDrop, { dropInstanceId: claimId }, signal)
-      status = result.claimDropRewards?.status ?? undefined
+      const answer = result.claimDropRewards
+      status = answer?.status
+      // A refused claim can still say ELIGIBLE_FOR_ALL; the error and link flag tell the truth.
+      if (
+        answer?.error?.code === 'ACCOUNT_LINK_REQUIRED' ||
+        answer?.isUserAccountConnected === false
+      ) {
+        answered.add(claimId)
+        linkRequired.add(campaign.id)
+        replace({ ...campaign, linked: false })
+        logger.info('Claim needs a linked game account', {
+          game: campaign.game.name,
+          drop: drop.name
+        })
+        return false
+      }
+      if (answer?.error) {
+        answered.add(claimId)
+        logger.warn('Twitch refused a claim', { dropId, status, error: answer.error.code })
+        return false
+      }
       if (!status || !CLAIM_OK.has(status)) {
         logger.warn('Twitch did not confirm a claim', { dropId, status })
         return false
@@ -144,8 +171,9 @@ export function createInventoryService(deps: {
           .filter((c): c is NonNullable<typeof c> => c !== null && c !== undefined)
       })
       for (const problem of problems) logger.warn('Skipped a campaign', { problem })
-      publish(built)
-      return built
+      const next = withLinkOverrides(built)
+      publish(next)
+      return next
     },
 
     updateDropMinutes(dropId, minutes) {
