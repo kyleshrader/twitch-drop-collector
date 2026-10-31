@@ -922,8 +922,10 @@ __metadata:
     "@playwright/test": "npm:^1.64.1"
     "@tdc/desktop": "workspace:^"
     "@types/node": "catalog:"
+    "@types/ws": "npm:^8.18.2"
     electron: "npm:45.1.0"
     typescript: "catalog:"
+    ws: "npm:^8.22.0"
   languageName: unknown
   linkType: soft
 

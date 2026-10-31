@@ -357,6 +357,19 @@ if (!app.requestSingleInstanceLock()) {
 
     // The miner runs while signed in. Not in probe mode: the probe promises read-only queries.
     const probeMode = process.env['TDC_DEV_GQL_PROBE'] !== undefined && !app.isPackaged
+    // Invisible e2e runs log notifications instead of showing them, so tests don't pop anything
+    // up on the developer's desktop; the tests read them from the log.
+    const notify = (note: { title: string; body: string; onClick?: () => void }): void => {
+      if (invisibleForTests) {
+        logger.info('Notification', { title: note.title, body: note.body })
+        return
+      }
+      if (!Notification.isSupported()) return
+      const notification = new Notification({ title: note.title, body: note.body })
+      if (note.onClick) notification.on('click', note.onClick)
+      notification.show()
+    }
+
     const mining = probeMode
       ? undefined
       : createMiningRuntime({
@@ -368,11 +381,11 @@ if (!app.requestSingleInstanceLock()) {
           connect: (url) => new WebSocket(url),
           connectivity,
           onClaim: (notice) => {
-            if (!settings.get().general.trayNotifications || !Notification.isSupported()) return
-            new Notification({
+            if (!settings.get().general.trayNotifications) return
+            notify({
               title: `Drop claimed: ${notice.gameName}`,
               body: notice.rewards.join(', ') || notice.dropName
-            }).show()
+            })
           },
           logger: logger.child('mining')
         })
@@ -432,16 +445,15 @@ if (!app.requestSingleInstanceLock()) {
       // The window shows its own banner; a notification only while it's hidden.
       onNews: ({ kind, version }) => {
         if (mainWindow?.isVisible() || !settings.get().general.trayNotifications) return
-        if (!Notification.isSupported()) return
-        const notification = new Notification({
+        notify({
           title:
             kind === 'ready'
               ? `Twitch Drop Collector ${version} is ready to install`
               : `Twitch Drop Collector ${version} is available`,
-          body: kind === 'ready' ? 'It installs when you quit, or restart now from the window.' : ''
+          body:
+            kind === 'ready' ? 'It installs when you quit, or restart now from the window.' : '',
+          onClick: focusMainWindow
         })
-        notification.on('click', focusMainWindow)
-        notification.show()
       },
       beforeInstall: () => {
         quitting = true

@@ -1,14 +1,9 @@
 // M9: a forced error in each process ends up in the log file, and crash dumps are kept only when
 // the user has turned crash reports on.
 import { expect, test } from '@playwright/test'
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { launchApp, newUserDataDir } from './app'
-
-const logOf = (userDataDir: string) => (): string => {
-  const file = join(userDataDir, 'logs', 'main.log')
-  return existsSync(file) ? readFileSync(file, 'utf8') : ''
-}
+import { launchApp, logOf, newUserDataDir } from './app'
 
 /** Every file under `dir`, recursively. */
 function filesUnder(dir: string): string[] {

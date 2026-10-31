@@ -1,6 +1,6 @@
 // Launches the built desktop app (apps/desktop/out) with an isolated user data directory.
 import { _electron as electron, type ElectronApplication, type Page } from '@playwright/test'
-import { mkdtempSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -11,6 +11,12 @@ export const MAIN_ENTRY = fileURLToPath(
 
 export function newUserDataDir(): string {
   return mkdtempSync(join(tmpdir(), 'tdc-e2e-'))
+}
+
+/** Reads the app's log file (empty until it exists); for expect.poll. */
+export const logOf = (userDataDir: string) => (): string => {
+  const file = join(userDataDir, 'logs', 'main.log')
+  return existsSync(file) ? readFileSync(file, 'utf8') : ''
 }
 
 /** process.env without undefined values, minus anything that would switch the app to dev mode. */

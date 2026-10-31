@@ -397,6 +397,7 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
   - `install` sets `quitting` first, so closing to the tray doesn't swallow the quit.
   - The proxy setting applies to electron-updater's own session too.
   - Errors are shortened for the UI: a 404 reads "no published releases were found".
+  - A check that finds nothing published for this build is "up to date", only logged. That covers no releases, no stable release while pre-releases are off, and a tag whose update files are still uploading (the tag reaches the feed before the build finishes). The first tagged release showed those as errors.
   - Updates are on only in packaged builds that electron-updater can update (`isUpdaterActive`: NSIS, AppImage, deb, dmg/zip), and never in invisible test runs.
 - **Hosting:** GitHub Releases on `kyleshrader/twitch-drop-collector`. That repository doesn't exist yet; this checkout has no remote.
   - `generateUpdatesFilesForAllChannels` writes a feed file per channel (`latest.yml`, `beta.yml`, …), so stable builds never see pre-releases.
@@ -410,9 +411,18 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
   - Windows signs with Azure Trusted Signing (`win.azureSignOptions`, passed on the command line only when the Azure secrets exist). `publisherName` also goes into `app-update.yml`, so the updater checks downloads are signed by that publisher.
   - macOS uses a Developer ID certificate (`CSC_LINK`), and notarization (App Store Connect API key) is turned on only when its secrets exist.
   - macOS can only update a signed app.
-- **Not yet verified:**
-  - CI on macOS and Linux.
-  - Signed builds; no signing credentials exist yet.
-  - The done criterion, an older build updating to a tagged pre-release. That needs the GitHub repository, then two tagged releases.
-  - Verified on Windows: the installed app runs the automatic check and reports a missing feed as an error without disrupting mining.
+- **Where M11 stands (2026-10-31):**
+  - CI passes on Windows, macOS and Linux. Each job's summary has one test report, with a section per package (`tooling/vitest.config.mjs`, `tooling/scripts/test-report.mjs`).
+  - `v0.1.0-beta.1` is published as a pre-release from the release workflow, unsigned, with installers and update feeds for all three platforms. The `.deb` needed a `homepage` in the app's package.json.
+  - Signing is deferred by the user's choice: no Azure Trusted Signing or Apple Developer account for now. The workflow signs as soon as the secrets exist. Until then SmartScreen and Gatekeeper warn, and macOS can't apply updates.
+  - Testing a second release (auto mode, Skip this version) is skipped by the user's choice; the updater's rules are unit-tested.
 - **Keyring in e2e (found when CI first ran):** Playwright's Electron loader appends Chromium switches meant for browsers it drives, including `--password-store=basic`. On Linux that forces safeStorage onto its hard-coded `basic_text` key, so the app correctly kept the session in memory only, and the sign-in tests that check `session.bin` failed. Launched normally, the app found the GNOME keyring (checked in a Linux container). E2e runs set `TDC_E2E_REAL_KEYRING=1`, and a dev build then removes the switch before the app is ready. Packaged builds ignore it. Linux CI runs the suite with an unlocked GNOME keyring on a D-Bus session, and `turbo.json` passes the display, D-Bus and desktop variables through to `test:e2e`, since Turborepo's strict env mode drops undeclared variables. On macOS the same loader adds `--use-mock-keychain`, which still encrypts, so it's left alone.
+
+## 2026-10-31 · M12: end-to-end coverage
+
+- **Mining end to end (`e2e/tests/miner.spec.ts`):** with a game on the priority list, the app watches its most-watched live channel, shows progress and claims that arrive over PubSub, moves on to the next drop, switches channels when the stream ends, follows a manual channel pick, goes idle when the game leaves the priority list, and stops on sign-out.
+- **Mock Twitch (`e2e/tests/mock-twitch.ts`):** besides login, identity and GQL it now serves Usher and the HLS playlists (segment HEAD requests are recorded as watching), and PubSub on the same port. Tests publish messages to the topics the app listens to.
+  - The fixtures' dates are moved so that their capture moment (about 2026-10-30 09:00 UTC) is now. Without this the campaigns had already ended, and the existing miner test would have changed meaning as the remaining ones expired.
+  - The one fixture campaign that's linked and has no allow-list (Black Desert) is the mining game. The directory fixture's streams are served as Black Desert streams for its slug.
+- **Notifications in tests:** invisible e2e runs log notifications (`Notification` with title and body) instead of showing them, so claims no longer pop up on the developer's desktop. Tests check claim notifications in the log.
+- **Covered elsewhere:** the updater's rules and the tray menu are unit-tested. Updates are off in unpackaged builds, so the e2e suite only checks that settings says so.
