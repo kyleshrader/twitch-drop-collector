@@ -45,7 +45,9 @@ export async function createSafeStorageSessionStore(deps: {
   const { safeStorage, platform, file, logger } = deps
   const persistent = await canPersistSecrets(safeStorage, platform)
   if (!persistent) {
-    logger.warn('No secure storage available; you will need to sign in each time the app starts')
+    logger.warn('No secure storage available; you will need to sign in each time the app starts', {
+      ...(platform === 'linux' ? { backend: safeStorage.getSelectedStorageBackend() } : {})
+    })
   }
   let memory: StoredSession | undefined
 

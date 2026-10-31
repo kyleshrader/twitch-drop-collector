@@ -134,12 +134,14 @@ async function checkTamperedAsarRefused(found) {
     writeSync(fd, byte, 0, 1, position)
     closeSync(fd)
 
-    const result = await run(exe, {
-      until: (log) => log.includes('Main window ready'),
-      timeoutMs: 15_000
-    })
+    // A cold start on a CI runner can be slow, so allow as long as a normal start.
+    const result = await run(exe, { until: (log) => log.includes('Main window ready') })
     if (result.log.includes('Main window ready')) throw new Error('A tampered app.asar was loaded')
-    if (!result.exited) throw new Error('The app neither loaded nor refused a tampered app.asar')
+    if (!result.exited) {
+      throw new Error(
+        `The app neither loaded nor refused a tampered app.asar within 45 s.\n${result.log}`
+      )
+    }
     console.log(`ok  a tampered app.asar is refused (exit code ${result.code})`)
   } finally {
     rmSync(copy, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 })

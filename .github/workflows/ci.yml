@@ -64,11 +64,12 @@ jobs:
         env:
           XDG_CURRENT_DESKTOP: GNOME
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq gnome-keyring
-          dbus-run-session -- bash -c '
-            echo -n ci | gnome-keyring-daemon --unlock --components=secrets > /dev/null
-            xvfb-run --auto-servernum yarn test:e2e
-          '
+          sudo apt-get update -qq && sudo apt-get install -y -qq gnome-keyring dbus-x11
+          eval "$(dbus-launch --sh-syntax)"
+          echo -n ci | gnome-keyring-daemon --unlock > /dev/null
+          export $(gnome-keyring-daemon --start --components=secrets)
+          xvfb-run --auto-servernum yarn workspace @tdc/desktop electron ../../tooling/scripts/print-safe-storage-backend.cjs
+          xvfb-run --auto-servernum yarn test:e2e
 
       - name: Packaged build
         if: runner.os != 'Linux'

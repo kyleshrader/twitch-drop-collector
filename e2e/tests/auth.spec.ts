@@ -178,6 +178,16 @@ test('the login window shows the page address in its own address bar', async () 
 
     // Fixed size and no DevTools. (Zoom shortcuts are covered by unit tests: Electron has no
     // built-in zoom except through menus, which this window doesn't have.)
+    // The address bar can show the URL before the page's own webContents reports it.
+    await expect
+      .poll(() =>
+        app.evaluate(({ webContents }) =>
+          webContents
+            .getAllWebContents()
+            .some((w) => w.getURL().includes('/login') && !w.getURL().startsWith('data:'))
+        )
+      )
+      .toBe(true)
     const lockdown = await app.evaluate(async ({ BaseWindow, webContents }) => {
       const login = BaseWindow.getAllWindows().find((w) => w.getTitle().startsWith('Sign in'))!
       const twitchPage = webContents
