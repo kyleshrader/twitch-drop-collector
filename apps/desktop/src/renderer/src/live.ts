@@ -1,5 +1,5 @@
 // State that main pushes: loaded once over IPC, then kept current by main → renderer events.
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, type QueryClient } from '@tanstack/react-query'
 import type {
   AuthStateView,
   EventChannel,
@@ -7,32 +7,42 @@ import type {
   MinerView,
   UpdateView
 } from '@tdc/ipc-contract'
-import { useEffect } from 'react'
 import { invoke } from './ipc'
-
-function useLive<E extends EventChannel>(
-  event: E,
-  key: readonly string[],
-  load: () => Promise<EventPayload<E>>
-): EventPayload<E> | undefined {
-  const queryClient = useQueryClient()
-  useEffect(
-    () => window.api.on(event, (payload) => queryClient.setQueryData(key, payload)),
-    [event, key, queryClient]
-  )
-  return useQuery({ queryKey: key, queryFn: load, staleTime: Number.POSITIVE_INFINITY }).data
-}
 
 export const MINER_KEY = ['miner'] as const
 export const AUTH_KEY = ['auth'] as const
-
-export const useMiner = (): MinerView | undefined =>
-  useLive('miner:state', MINER_KEY, () => invoke('miner:getState'))
-
-export const useAuthState = (): AuthStateView | undefined =>
-  useLive('auth:state', AUTH_KEY, () => invoke('auth:getState'))
-
 export const UPDATES_KEY = ['updates'] as const
 
+const LIVE: { [E in EventChannel]: readonly string[] } = {
+  'miner:state': MINER_KEY,
+  'auth:state': AUTH_KEY,
+  'updates:state': UPDATES_KEY
+}
+
+/**
+ * Keeps the cached state current for the window's whole life. Subscribing per screen would miss
+ * whatever changes while that screen isn't shown (the data never goes stale to be loaded again).
+ */
+export function followLiveState(queryClient: QueryClient): () => void {
+  const offs = (Object.keys(LIVE) as EventChannel[]).map((event) =>
+    window.api.on(event, (payload) => queryClient.setQueryData(LIVE[event], payload))
+  )
+  return () => offs.forEach((off) => off())
+}
+
+function useLive<E extends EventChannel>(
+  event: E,
+  load: () => Promise<EventPayload<E>>
+): EventPayload<E> | undefined {
+  return useQuery({ queryKey: LIVE[event], queryFn: load, staleTime: Number.POSITIVE_INFINITY })
+    .data
+}
+
+export const useMiner = (): MinerView | undefined =>
+  useLive('miner:state', () => invoke('miner:getState'))
+
+export const useAuthState = (): AuthStateView | undefined =>
+  useLive('auth:state', () => invoke('auth:getState'))
+
 export const useUpdates = (): UpdateView | undefined =>
-  useLive('updates:state', UPDATES_KEY, () => invoke('updates:getState'))
+  useLive('updates:state', () => invoke('updates:getState'))

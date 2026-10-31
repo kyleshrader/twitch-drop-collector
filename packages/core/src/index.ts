@@ -18,7 +18,14 @@ export {
   type ConnectivityState,
   type PowerEvents
 } from './connectivity/connectivity'
-export { awaitsConnection, currentMinutes, isActive, isUpcoming } from './domain/rules'
+export {
+  awaitsConnection,
+  currentMinutes,
+  isActive,
+  isUpcoming,
+  type EarnContext
+} from './domain/rules'
+export { watchBlocker, type WatchBlocker } from './domain/selection'
 export type {
   Benefit,
   Campaign,

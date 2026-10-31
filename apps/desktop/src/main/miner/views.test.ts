@@ -6,6 +6,7 @@ import { createEventPublisher } from '../ipc/events'
 import { toMinerView } from './views'
 
 const NOW = new Date('2026-10-30T12:00:00Z')
+const ctx = { now: NOW, preferences: { enableBadgesEmotes: false } }
 const at = (hours: number): Date => new Date(NOW.getTime() + hours * 3_600_000)
 
 const campaign = (
@@ -74,7 +75,7 @@ describe('toMinerView', () => {
     snapshot,
     campaigns,
     [live, { ...live, id: 'c2', stream: undefined }],
-    NOW
+    ctx
   )
 
   it('matches the contract the renderer validates', () => {
@@ -100,7 +101,7 @@ describe('toMinerView', () => {
   it('flags finished drops that wait for a connected game account', () => {
     const unlinked = { ...campaign('acct', -48, -1, 'EXPIRED'), linked: false }
     unlinked.drops = unlinked.drops.map((d) => ({ ...d, realMinutes: 60, claimId: 'i' }))
-    const [drop] = toMinerView({ status: 'idle', wanted: [] }, [unlinked], [], NOW).campaigns[0]!
+    const [drop] = toMinerView({ status: 'idle', wanted: [] }, [unlinked], [], ctx).campaigns[0]!
       .drops
     expect(drop).toMatchObject({ claimed: false, awaitsConnection: true })
     expect(view.campaigns[0]!.drops[0]!.awaitsConnection).toBe(false)
@@ -112,6 +113,25 @@ describe('toMinerView', () => {
       ['c2', false, undefined]
     ])
     expect(view.watching).toMatchObject({ login: 'streamer', game: 'Rust' })
+  })
+
+  it('says which channels a manual pick would work for, and why not', () => {
+    // The fixture campaign's drop already counts as done (50 + 15 estimated of 60 minutes).
+    expect(view.channels.map((c) => [c.id, c.unwatchable])).toEqual([
+      ['c1', 'nothingToEarn'],
+      ['c2', 'offline']
+    ])
+    const fresh = campaign('fresh', -1, 24)
+    fresh.drops = fresh.drops.map((d) => ({ ...d, realMinutes: 0, extraMinutes: 0 }))
+    const withMinutesLeft = toMinerView(snapshot, [fresh], [live], ctx)
+    expect(withMinutesLeft.channels[0]!.unwatchable).toBeUndefined()
+  })
+
+  it('reports the user’s pick', () => {
+    expect(view.selected).toBeUndefined()
+    expect(toMinerView({ ...snapshot, selectedId: 'c1' }, campaigns, [live], ctx).selected).toBe(
+      'c1'
+    )
   })
 })
 

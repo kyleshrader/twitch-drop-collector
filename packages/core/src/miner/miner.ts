@@ -29,6 +29,8 @@ export interface MinerSnapshot {
   /** What watching is progressing right now. */
   active?: { campaign: Campaign; drop?: Drop }
   wanted: readonly Game[]
+  /** The channel the user picked, while the pick stands (it's followed only when watchable). */
+  selectedId?: string
 }
 
 export interface ClaimNotice {
@@ -124,7 +126,8 @@ export function createMiner(deps: {
       ...(message ? { message } : {}),
       ...(channel ? { watching: channel } : {}),
       ...(campaign ? { active: { campaign, ...(drop ? { drop } : {}) } } : {}),
-      wanted
+      wanted,
+      ...(selectedId ? { selectedId } : {})
     }
   }
   const publish = (): void => events.emit('change', snapshot())
@@ -463,7 +466,16 @@ export function createMiner(deps: {
     refreshGames: () => enqueue('games update', gamesUpdate),
     selectChannel(channelId) {
       selectedId = channelId
-      enqueue('select channel', async () => switchChannel())
+      publish()
+      enqueue('select channel', async () => {
+        switchChannel()
+        const picked = channelId ? channels.get(channelId) : undefined
+        if (picked && watching()?.id !== picked.id) {
+          logger.info('The picked channel would progress nothing; not switching', {
+            channel: picked.login
+          })
+        }
+      })
     },
     snapshot,
     onChange: (listener) => events.on('change', listener)

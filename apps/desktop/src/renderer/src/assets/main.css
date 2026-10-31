@@ -8,3 +8,34 @@
   margin-right: 0.5em;
   object-fit: contain;
 }
+
+/* Game list editor. The suggestions push what follows down rather than covering it, so they can
+   stay open while adding several games without hiding the next field. */
+.game-list {
+  margin-block: 0.5em;
+}
+.game-list .combobox {
+  max-width: 24em;
+}
+.game-list .combobox input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.game-list [role='listbox'] {
+  max-height: 16em;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: Canvas;
+  color: CanvasText;
+  border: 1px solid GrayText;
+}
+.game-list [role='option'] {
+  padding: 0.25em 0.5em;
+  cursor: pointer;
+}
+.game-list [role='option'][aria-selected='true'] {
+  background: SelectedItem;
+  color: SelectedItemText;
+}

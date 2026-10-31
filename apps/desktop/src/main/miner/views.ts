@@ -4,14 +4,17 @@ import {
   currentMinutes,
   isActive,
   isUpcoming,
+  watchBlocker,
   type Campaign,
   type Channel,
   type Drop,
-  type MinerSnapshot
+  type EarnContext,
+  type MinerSnapshot,
+  type WatchBlocker
 } from '@tdc/core'
 import type { CampaignView, ChannelView, DropView, MinerView } from '@tdc/ipc-contract'
 
-export function channelView(c: Channel): ChannelView {
+export function channelView(c: Channel, unwatchable?: WatchBlocker): ChannelView {
   return {
     id: c.id,
     login: c.login,
@@ -19,7 +22,8 @@ export function channelView(c: Channel): ChannelView {
     aclBased: c.aclBased,
     online: c.stream !== undefined,
     ...(c.stream?.game ? { game: c.stream.game.name } : {}),
-    ...(c.stream ? { viewers: c.stream.viewers, dropsEnabled: c.stream.dropsEnabled } : {})
+    ...(c.stream ? { viewers: c.stream.viewers, dropsEnabled: c.stream.dropsEnabled } : {}),
+    ...(unwatchable ? { unwatchable } : {})
   }
 }
 
@@ -64,16 +68,20 @@ export function toMinerView(
   snapshot: MinerSnapshot,
   campaigns: readonly Campaign[],
   channels: readonly Channel[],
-  now: Date
+  ctx: EarnContext
 ): MinerView {
+  const { now } = ctx
   const views = campaigns
     .map((c) => campaignView(c, now))
     .sort((a, b) => STATE_ORDER[a.state] - STATE_ORDER[b.state] || a.endsAt.localeCompare(b.endsAt))
   const active = snapshot.active
+  // The same rule the miner follows for manual picks, so the list only offers picks that work.
+  const view = (c: Channel): ChannelView =>
+    channelView(c, watchBlocker(c, campaigns, snapshot.wanted, ctx))
   return {
     status: snapshot.status,
     ...(snapshot.message ? { message: snapshot.message } : {}),
-    ...(snapshot.watching ? { watching: channelView(snapshot.watching) } : {}),
+    ...(snapshot.watching ? { watching: view(snapshot.watching) } : {}),
     ...(active
       ? {
           active: {
@@ -85,7 +93,8 @@ export function toMinerView(
         }
       : {}),
     wanted: snapshot.wanted.map((g) => g.name),
-    channels: channels.map(channelView),
+    ...(snapshot.selectedId ? { selected: snapshot.selectedId } : {}),
+    channels: channels.map(view),
     campaigns: views
   }
 }

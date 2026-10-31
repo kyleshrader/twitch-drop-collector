@@ -22,7 +22,8 @@ import {
   pickChannel,
   rankChannels,
   selectWantedGames,
-  shouldSwitch
+  shouldSwitch,
+  watchBlocker
 } from './selection'
 import type { Game, MiningPreferences } from './types'
 
@@ -103,6 +104,25 @@ describe('canWatch', () => {
     const special = [forGame(SPECIAL_GAME)]
     const ch = channel({ stream: stream({ game: MARVEL, dropsEnabled: false }) })
     expect(canWatch(ch, special, [], ctx())).toBe(true)
+  })
+})
+
+describe('watchBlocker', () => {
+  const wanted = [RUST]
+  const campaigns = [forGame(RUST)]
+
+  it.each([
+    ['nothing for a watchable channel', channel(), undefined],
+    ['offline', channel({ stream: undefined }), 'offline'],
+    ['drops off', channel({ stream: stream({ dropsEnabled: false }) }), 'dropsOff'],
+    ['another game', channel({ stream: stream({ game: MARVEL }) }), 'otherGame']
+  ])('says %s', (_name, ch, expected) => {
+    expect(watchBlocker(ch, campaigns, wanted, ctx())).toBe(expected)
+  })
+
+  it('says nothing is left to earn when the wanted game has no earnable campaign', () => {
+    const unlinked = [forGame(RUST, { linked: false })]
+    expect(watchBlocker(channel(), unlinked, wanted, ctx())).toBe('nothingToEarn')
   })
 })
 

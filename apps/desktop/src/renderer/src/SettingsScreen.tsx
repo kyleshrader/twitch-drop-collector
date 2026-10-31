@@ -2,6 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IpcError, type SettingsView } from '@tdc/ipc-contract'
 import { useState, type ReactNode } from 'react'
+import { GameListEditor } from './GameListEditor'
 import { invoke } from './ipc'
 import { strings } from './strings'
 import { UpdateStatus } from './UpdatePanel'
@@ -9,24 +10,14 @@ import { UpdateStatus } from './UpdatePanel'
 const SETTINGS_KEY = ['settings'] as const
 const t = strings.settings
 
-const toLines = (values: readonly string[]): string => values.join('\n')
-const fromLines = (text: string): string[] =>
-  text
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line !== '')
-
 function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
   const queryClient = useQueryClient()
   const [draft, setDraft] = useState(initial)
-  const [priority, setPriority] = useState(toLines(initial.mining.priority))
-  const [exclude, setExclude] = useState(toLines(initial.mining.exclude))
 
   const save = useMutation({
     mutationFn: () =>
       invoke('settings:update', {
         ...draft,
-        mining: { ...draft.mining, priority: fromLines(priority), exclude: fromLines(exclude) },
         // The skipped version is set from the update banner, so the form never saves it.
         updates: { mode: draft.updates.mode, prereleases: draft.updates.prereleases }
       }),
@@ -99,14 +90,20 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
 
       <fieldset>
         <legend>{t.mining.heading}</legend>
-        <label>
-          {t.mining.priority}
-          <textarea rows={5} value={priority} onChange={(e) => setPriority(e.target.value)} />
-        </label>
-        <label>
-          {t.mining.exclude}
-          <textarea rows={3} value={exclude} onChange={(e) => setExclude(e.target.value)} />
-        </label>
+        <GameListEditor
+          label={t.mining.priority}
+          value={draft.mining.priority}
+          onChange={(priority) => set('mining', { priority })}
+          taken={draft.mining.exclude}
+          ordered
+        />
+        <GameListEditor
+          label={t.mining.exclude}
+          value={draft.mining.exclude}
+          onChange={(exclude) => set('mining', { exclude })}
+          taken={draft.mining.priority}
+        />
+        <p>{strings.gameList.hint}</p>
         <label>
           {t.mining.priorityMode}
           <select

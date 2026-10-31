@@ -424,5 +424,22 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 - **Mock Twitch (`e2e/tests/mock-twitch.ts`):** besides login, identity and GQL it now serves Usher and the HLS playlists (segment HEAD requests are recorded as watching), and PubSub on the same port. Tests publish messages to the topics the app listens to.
   - The fixtures' dates are moved so that their capture moment (about 2026-10-30 09:00 UTC) is now. Without this the campaigns had already ended, and the existing miner test would have changed meaning as the remaining ones expired.
   - The one fixture campaign that's linked and has no allow-list (Black Desert) is the mining game. The directory fixture's streams are served as Black Desert streams for its slug.
+- **Window state missed changes (found by the Linux CI run):** each screen subscribed to main's state events only while it was shown, and the cached state never goes stale, so a change made while another tab was open (saving settings, for one) didn't show until the next change. The window now follows `miner:state`, `auth:state` and `updates:state` for its whole life (`followLiveState` in `live.ts`). The mining test stays on Settings until the change has gone out, so it catches this on every platform. Faster runners had hidden it by switching back within the 250 ms event throttle.
 - **Notifications in tests:** invisible e2e runs log notifications (`Notification` with title and body) instead of showing them, so claims no longer pop up on the developer's desktop. Tests check claim notifications in the log.
 - **Covered elsewhere:** the updater's rules and the tray menu are unit-tested. Updates are off in unpackaged builds, so the e2e suite only checks that settings says so.
+
+## 2026-10-31 · Priority and exclude lists: search with suggestions
+
+- The priority and exclude lists in settings are lists edited through a search box (`GameListEditor.tsx`) instead of one-per-line text boxes. Typing filters the games that have an active or upcoming campaign, A to Z with box art. Games already on the list are left out. Enter or "Add “…”" adds any name as typed, so a game with no campaign yet can still be listed (names must match Twitch's, as before).
+- It's an ARIA combobox: arrow keys, Enter and Escape work, and the suggestions are a labelled listbox, so e2e tests drive it by role.
+- The priority list has ↑/↓ buttons for its order, and both lists have remove buttons.
+- A game can be on only one of the two lists: each editor neither suggests nor accepts the other list's games.
+- The suggestions stay open after each add (the user prefers adding several in a row). They sit in the page flow and push what follows down, so they never cover the next field, where a stray click would add a game.
+- Suggestions come from the miner's campaigns, so they appear once signed in and loaded. Searching Twitch's whole game catalog would need another GQL operation, checked live first; not done.
+
+## 2026-10-31 · Manual channel picks say when they can't work
+
+- "Watch this" seemed broken on a live account: the list showed 199 channels (many from allow-lists), and the miner silently ignores a pick that wouldn't progress a wanted drop (offline, drops off, another game, or nothing earnable such as an unlinked campaign). That rule stays; the list now follows it.
+- Each channel in the miner view carries `unwatchable` (`offline`, `dropsOff`, `otherGame`, `nothingToEarn`), from `watchBlocker` in core, which agrees with `canWatch`. The list offers "Watch this" only on channels that can be watched, says why not on the others, and shows "Watching" on the current one.
+- The view also reports the pick (`selected`), shown as "(your pick)" until "Let the miner choose" clears it. The miner logs when it can't follow a pick.
+- M11 check: the installed 0.0.0 build on Windows found 0.1.0-beta.1 with pre-releases on, downloaded and installed it, and restarted as 0.1.0-beta.1. That is the "older build updates to it" criterion, unsigned.

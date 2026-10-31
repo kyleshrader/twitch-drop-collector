@@ -17,9 +17,25 @@ test('settings survive a restart', async () => {
   await first.window.getByLabel('Start in the tray when started at login').check()
   await first.window.getByLabel('Show a notification when a drop is claimed').uncheck()
   await first.window.getByLabel('Theme').selectOption('dark')
-  await first.window
-    .getByLabel('Priority games (one per line, highest first)')
-    .fill('Rust\nMarvel Rivals\n')
+  // Signed out there are no campaigns to suggest, so games are added by typing their names.
+  const priority = first.window.getByRole('combobox', { name: 'Priority games (highest first)' })
+  for (const game of ['Rust', 'Marvel Rivals']) {
+    await priority.fill(game)
+    await priority.press('Enter')
+  }
+  await first.window.getByRole('button', { name: 'Move Marvel Rivals up' }).click()
+  const exclude = first.window.getByRole('combobox', { name: 'Excluded games' })
+  await exclude.fill('Fortnite')
+  await first.window.getByRole('option', { name: 'Add “Fortnite”' }).click()
+  // A game can't be on both lists: the other list doesn't offer it, and Enter doesn't add it.
+  await exclude.fill('rust')
+  await expect(exclude).toHaveAttribute('aria-expanded', 'false')
+  await exclude.press('Enter')
+  await priority.fill('fortnite')
+  await expect(priority).toHaveAttribute('aria-expanded', 'false')
+  await priority.press('Enter')
+  await exclude.fill('')
+  await priority.fill('')
   await first.window.getByLabel('Priority mode').selectOption('endingSoonest')
   await first.window.getByLabel('Connection quality (1 = fast, 6 = slow)').fill('4')
   await first.window.getByLabel('When a new version is out').selectOption('auto')
@@ -36,10 +52,11 @@ test('settings survive a restart', async () => {
 
   const file = JSON.parse(await readFile(join(userDataDir, 'settings.json'), 'utf8')) as {
     version: number
-    settings: { mining: { priority: string[] } }
+    settings: { mining: { priority: string[]; exclude: string[] } }
   }
   expect(file.version).toBe(1)
-  expect(file.settings.mining.priority).toEqual(['Rust', 'Marvel Rivals'])
+  expect(file.settings.mining.priority).toEqual(['Marvel Rivals', 'Rust'])
+  expect(file.settings.mining.exclude).toEqual(['Fortnite'])
 
   const second = await launchApp(userDataDir)
   try {
@@ -50,8 +67,13 @@ test('settings survive a restart', async () => {
     ).not.toBeChecked()
     await expect(second.window.getByLabel('Theme')).toHaveValue('dark')
     await expect(
-      second.window.getByLabel('Priority games (one per line, highest first)')
-    ).toHaveValue('Rust\nMarvel Rivals')
+      second.window
+        .getByRole('list', { name: 'Priority games (highest first)' })
+        .getByRole('listitem')
+    ).toHaveText([/^Marvel Rivals/, /^Rust/])
+    await expect(
+      second.window.getByRole('list', { name: 'Excluded games' }).getByRole('listitem')
+    ).toHaveText([/^Fortnite/])
     await expect(second.window.getByLabel('Priority mode')).toHaveValue('endingSoonest')
     await expect(second.window.getByLabel('Connection quality (1 = fast, 6 = slow)')).toHaveValue(
       '4'

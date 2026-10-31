@@ -9,7 +9,9 @@ export const ChannelView = z.object({
   online: z.boolean(),
   game: z.string().optional(),
   viewers: z.number().optional(),
-  dropsEnabled: z.boolean().optional()
+  dropsEnabled: z.boolean().optional(),
+  /** Why watching it wouldn't progress a wanted drop; absent when it would. */
+  unwatchable: z.enum(['offline', 'dropsOff', 'otherGame', 'nothingToEarn']).optional()
 })
 export type ChannelView = z.infer<typeof ChannelView>
 
@@ -57,6 +59,8 @@ export const MinerView = z.object({
     })
     .optional(),
   wanted: z.array(z.string()),
+  /** ID of the channel the user picked, while the pick stands. */
+  selected: z.string().optional(),
   channels: z.array(ChannelView),
   campaigns: z.array(CampaignView)
 })

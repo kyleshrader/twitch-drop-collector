@@ -154,12 +154,10 @@ export function createMiningRuntime(deps: {
 
   return {
     view() {
-      const view = toMinerView(
-        miner.snapshot(),
-        inventory.campaigns(),
-        channels.channels(),
-        clock.now()
-      )
+      const view = toMinerView(miner.snapshot(), inventory.campaigns(), channels.channels(), {
+        now: clock.now(),
+        preferences: settings.get().mining
+      })
       const message = paused()
       if (message === undefined) return view
       // Paused: nothing is being watched, whatever the stopped miner last reported.

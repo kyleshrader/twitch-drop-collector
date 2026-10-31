@@ -87,15 +87,23 @@ export function MiningPanel(): ReactNode {
                 <td>
                   {channelName(c)}
                   {c.aclBased && ` ${t.allowListed}`}
+                  {miner.selected === c.id && ` ${t.yourPick}`}
                 </td>
                 <td>{c.online ? t.online : t.offline}</td>
                 <td>{c.game ?? ''}</td>
                 <td>{c.viewers ?? ''}</td>
                 <td>{c.dropsEnabled === undefined ? '' : c.dropsEnabled ? t.yes : t.no}</td>
                 <td>
-                  <button type="button" onClick={() => select.mutate(c.id)}>
-                    {t.watchThis}
-                  </button>
+                  {/* Only offer picks the miner would follow; say why not otherwise. */}
+                  {miner.watching?.id === c.id ? (
+                    t.watchingNow
+                  ) : c.unwatchable ? (
+                    t.unwatchable[c.unwatchable]
+                  ) : (
+                    <button type="button" onClick={() => select.mutate(c.id)}>
+                      {t.watchThis}
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}

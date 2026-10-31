@@ -76,6 +76,24 @@ export function canWatch(
   )
 }
 
+/** Why watching a channel wouldn't progress anything: the first reason that applies. */
+export type WatchBlocker = 'offline' | 'dropsOff' | 'otherGame' | 'nothingToEarn'
+
+/** Undefined when `canWatch`; otherwise why not, for the channel list and manual picks. */
+export function watchBlocker(
+  channel: Channel,
+  campaigns: readonly Campaign[],
+  wanted: readonly Game[],
+  ctx: EarnContext
+): WatchBlocker | undefined {
+  if (canWatch(channel, campaigns, wanted, ctx)) return undefined
+  const live = channel.stream
+  if (!live) return 'offline'
+  if (!live.dropsEnabled) return 'dropsOff'
+  if (!live.game || !wanted.some((g) => g.id === live.game?.id)) return 'otherGame'
+  return 'nothingToEarn'
+}
+
 /** Worth leaving `watching` for `candidate`: a strictly better game, or same game but ACL-based. */
 export function shouldSwitch(
   candidate: Channel,

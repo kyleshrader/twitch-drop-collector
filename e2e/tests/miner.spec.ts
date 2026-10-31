@@ -49,12 +49,6 @@ test('the miner loads campaigns, claims finished drops and shows it all live', a
     const log = logOf(userDataDir)
     await expect.poll(() => log().match(/Drop claimed: Crimson Desert/g)?.length ?? 0).toBe(3)
 
-    // Reload fetches the inventory again.
-    const inventoryCalls = (): number => twitch.gqlCalls.filter((c) => c === 'Inventory').length
-    const before = inventoryCalls()
-    await page.getByRole('button', { name: 'Reload campaigns' }).click()
-    await expect.poll(inventoryCalls).toBeGreaterThan(before)
-
     await page.getByRole('tab', { name: 'Inventory' }).click()
     const crimson = page.getByRole('article', { name: /^Crimson Desert/ })
     await expect(crimson).toBeVisible()
@@ -62,12 +56,22 @@ test('the miner loads campaigns, claims finished drops and shows it all live', a
     await expect(page.getByRole('article', { name: /^Dark and Darker/ })).toContainText(
       'Account not linked'
     )
+
+    // Reload fetches the inventory again. (The mock still reports those drops unclaimed, so
+    // they're claimed again; that's why this comes last.)
+    await page.getByRole('tab', { name: 'Main' }).click()
+    const inventoryCalls = (): number => twitch.gqlCalls.filter((c) => c === 'Inventory').length
+    const before = inventoryCalls()
+    await page.getByRole('button', { name: 'Reload campaigns' }).click()
+    await expect.poll(inventoryCalls).toBeGreaterThan(before)
   } finally {
     await app.close()
   }
 })
 
 test('the miner watches a priority game, follows progress, claims and switches channels', async () => {
+  // A long flow, with a 4 s wait after the claim; slower CI runners need more than 30 s.
+  test.setTimeout(60_000)
   const {
     app,
     window: page,
@@ -80,14 +84,40 @@ test('the miner watches a priority game, follows progress, claims and switches c
   const active = page.getByTestId('miner-active')
   const name = (c: (typeof MINING_CHANNELS)[number]): string => c.broadcaster.displayName
   try {
+    // With nothing on the priority list the miner loads campaigns, then idles.
+    await page.getByRole('button', { name: 'Sign in with Twitch' }).click()
+    await expect(page.getByTestId('miner-status')).toHaveText(
+      'Idle: No campaigns to mine right now',
+      { timeout: 15_000 }
+    )
+
+    // The priority list suggests games that have campaigns; typing narrows them down.
     await page.getByRole('tab', { name: 'Settings' }).click()
-    await page
-      .getByLabel('Priority games (one per line, highest first)')
-      .fill(MINING_GAME.displayName)
+    const priority = page.getByRole('combobox', { name: 'Priority games (highest first)' })
+    await priority.click()
+    await expect(page.getByRole('option', { name: 'Dark and Darker' })).toBeVisible()
+    await priority.fill('black')
+    const suggestions = page.getByRole('listbox', {
+      name: 'Priority games (highest first): suggestions'
+    })
+    await expect(suggestions.getByRole('option')).toHaveText([
+      MINING_GAME.displayName,
+      'Add “black”'
+    ])
+    await page.getByRole('option', { name: MINING_GAME.displayName }).click()
+    await expect(
+      page.getByRole('list', { name: 'Priority games (highest first)' }).getByRole('listitem')
+    ).toHaveText([new RegExp(`^${MINING_GAME.displayName}`)])
+    // A priority game isn't offered for the excluded list.
+    await page.getByRole('combobox', { name: 'Excluded games' }).click()
+    const excludeSuggestions = page
+      .getByRole('listbox', { name: 'Excluded games: suggestions' })
+      .getByRole('option')
+    await expect(excludeSuggestions.filter({ hasText: 'Dark and Darker' })).toBeVisible()
+    expect(await excludeSuggestions.allTextContents()).not.toContain(MINING_GAME.displayName)
     await page.getByRole('button', { name: 'Save settings' }).click()
     await expect(page.getByRole('status')).toHaveText('Settings saved')
     await page.getByRole('tab', { name: 'Main' }).click()
-    await page.getByRole('button', { name: 'Sign in with Twitch' }).click()
 
     // The most-watched live channel for the game, watched the way Twitch counts it.
     await expect(page.getByTestId('miner-status')).toHaveText('Mining', { timeout: 15_000 })
@@ -121,21 +151,30 @@ test('the miner watches a priority game, follows progress, claims and switches c
     await expect(watching).toContainText(`Watching ${name(second!)}`)
     await expect.poll(() => twitch.watched).toContain(second!.broadcaster.login)
 
+    // Only channels the miner would follow offer "Watch this"; the others say why not.
+    const row = (c: (typeof MINING_CHANNELS)[number]) =>
+      page.getByRole('row', { name: new RegExp(name(c)) })
+    await expect(row(first!).getByRole('button', { name: 'Watch this' })).toHaveCount(0)
+    await expect(row(first!).getByRole('cell').last()).toHaveText('Offline')
+    await expect(row(second!).getByRole('cell').last()).toHaveText('Watching')
+
     // The user picks a channel; letting the miner choose again keeps a channel that's as good.
-    await page
-      .getByRole('row', { name: new RegExp(name(third!)) })
-      .getByRole('button', { name: 'Watch this' })
-      .click()
+    await row(third!).getByRole('button', { name: 'Watch this' }).click()
     await expect(watching).toContainText(`Watching ${name(third!)}`)
+    await expect(row(third!)).toContainText('(your pick)')
     await page.getByRole('button', { name: 'Let the miner choose the channel' }).click()
+    await expect(row(third!)).not.toContainText('(your pick)')
     await expect(watching).toContainText(`Watching ${name(third!)}`)
-    await expect(page.getByRole('row', { name: new RegExp(name(first!)) })).toContainText('Offline')
 
     // Taking the game off the priority list stops watching it.
     await page.getByRole('tab', { name: 'Settings' }).click()
-    await page.getByLabel('Priority games (one per line, highest first)').fill('')
+    await page.getByRole('button', { name: `Remove ${MINING_GAME.displayName}` }).click()
     await page.getByRole('button', { name: 'Save settings' }).click()
     await expect(page.getByRole('status')).toHaveText('Settings saved')
+    // Stay on Settings until the miner has dropped the channels and its new state has gone out
+    // to the window (events are sent at most every 250 ms): the Main tab must still show it.
+    await expect.poll(() => twitch.topics.size).toBe(2)
+    await page.waitForTimeout(500)
     await page.getByRole('tab', { name: 'Main' }).click()
     await expect(page.getByTestId('miner-status')).toHaveText(
       'Idle: No campaigns to mine right now'

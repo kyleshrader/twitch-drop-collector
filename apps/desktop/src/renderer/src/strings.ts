@@ -54,7 +54,15 @@ export const strings = {
     offline: 'Offline',
     yes: 'Yes',
     no: 'No',
-    watchThis: 'Watch this'
+    watchThis: 'Watch this',
+    watchingNow: 'Watching',
+    yourPick: '(your pick)',
+    unwatchable: {
+      offline: 'Offline',
+      dropsOff: 'Drops off',
+      otherGame: 'Not a wanted game',
+      nothingToEarn: 'Nothing to earn here'
+    }
   },
   inventory: {
     heading: (count: number): string => `Campaigns (${count})`,
@@ -64,6 +72,17 @@ export const strings = {
     linked: 'Account linked',
     notLinked: 'Account not linked',
     link: 'Link account'
+  },
+  gameList: {
+    empty: 'None yet.',
+    placeholder: 'Type to search games with campaigns',
+    hint: 'Games with current or upcoming campaigns are suggested. To add any other game, type its name as Twitch shows it and press Enter.',
+    options: (label: string) => `${label}: suggestions`,
+    upcoming: '(upcoming)',
+    addTyped: (name: string) => `Add “${name}”`,
+    moveUp: (name: string) => `Move ${name} up`,
+    moveDown: (name: string) => `Move ${name} down`,
+    remove: (name: string) => `Remove ${name}`
   },
   settings: {
     save: 'Save settings',
@@ -81,8 +100,8 @@ export const strings = {
     },
     mining: {
       heading: 'Mining',
-      priority: 'Priority games (one per line, highest first)',
-      exclude: 'Excluded games (one per line)',
+      priority: 'Priority games (highest first)',
+      exclude: 'Excluded games',
       priorityMode: 'Priority mode',
       priorityModes: {
         priorityOnly: 'Priority list only',
