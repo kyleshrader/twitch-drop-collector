@@ -359,6 +359,10 @@ export function createMiner(deps: {
     ) {
       inventory.updateDropMinutes(event.data.drop_id, event.data.current_progress_min)
       lastProgressAt = clock.now().getTime()
+      logger.debug('Progress from Twitch', {
+        drop: found.drop.name,
+        minutes: event.data.current_progress_min
+      })
       publish()
     }
   }
@@ -390,6 +394,10 @@ export function createMiner(deps: {
       if (session && found && canEarnCampaign(found.campaign, ctx(), channel)) {
         inventory.updateDropMinutes(session.dropID, session.currentMinutesWatched)
         lastProgressAt = clock.now().getTime()
+        logger.debug('Progress from the current-drop query', {
+          drop: found.drop.name,
+          minutes: session.currentMinutesWatched
+        })
         publish()
         return
       }
@@ -397,6 +405,7 @@ export function createMiner(deps: {
       if (!campaign) return
       const { reachedCap } = inventory.bumpEstimatedMinutes(campaign.id, ctx(), channel)
       lastProgressAt = clock.now().getTime()
+      logger.debug('No progress from Twitch; estimated a minute', { campaign: campaign.name })
       if (reachedCap) {
         logger.warn('Twitch stopped reporting progress for too long; switching', {
           channel: channel.login
