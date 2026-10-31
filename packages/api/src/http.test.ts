@@ -83,10 +83,12 @@ describe('http client', () => {
   it('retries when the server is too slow, then gives up after maxAttempts', async () => {
     server.handle(() => ({ status: 200, delayMs: 500 }))
     const { http } = client({ timeoutMs: 50 })
-    await expect(
-      http.request({ method: 'GET', url: `${server.url}/slow`, maxAttempts: 2 })
-    ).rejects.toBeInstanceOf(RequestFailedError)
-    expect(server.requests).toHaveLength(2)
+    // Count attempts on the client: a slow runner can time out an attempt before the server
+    // has read it.
+    const failure = http.request({ method: 'GET', url: `${server.url}/slow`, maxAttempts: 2 })
+    await expect(failure).rejects.toBeInstanceOf(RequestFailedError)
+    await expect(failure).rejects.toMatchObject({ attempts: 2 })
+    expect(server.requests.length).toBeGreaterThanOrEqual(1)
   })
 
   it('retries connection errors', async () => {
