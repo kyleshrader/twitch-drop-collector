@@ -58,7 +58,8 @@ jobs:
 
       # The sign-in tests check the session is saved encrypted, which on Linux needs a keyring
       # (without one the app keeps the session in memory only). An unlocked GNOME keyring on a
-      # private D-Bus session gives Electron's safeStorage its libsecret backend.
+      # private D-Bus session gives Electron's safeStorage its libsecret backend. turbo.json
+      # passes the D-Bus and desktop variables through to the tests.
       - name: End-to-end tests (Linux)
         if: runner.os == 'Linux'
         env:

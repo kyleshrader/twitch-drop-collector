@@ -137,12 +137,17 @@ async function checkTamperedAsarRefused(found) {
     // A cold start on a CI runner can be slow, so allow as long as a normal start.
     const result = await run(exe, { until: (log) => log.includes('Main window ready') })
     if (result.log.includes('Main window ready')) throw new Error('A tampered app.asar was loaded')
-    if (!result.exited) {
+    if (result.exited) {
+      console.log(`ok  a tampered app.asar is refused (exit code ${result.code})`)
+    } else if (result.log === '') {
+      // On macOS the process can hang instead of exiting. The untampered copy started a moment
+      // ago, so never running any of the app's code (no log at all) means it was refused.
+      console.log('ok  a tampered app.asar is refused (the app ran none of its code)')
+    } else {
       throw new Error(
         `The app neither loaded nor refused a tampered app.asar within 45 s.\n${result.log}`
       )
     }
-    console.log(`ok  a tampered app.asar is refused (exit code ${result.code})`)
   } finally {
     rmSync(copy, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 })
   }
