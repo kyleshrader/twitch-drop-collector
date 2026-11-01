@@ -6,6 +6,7 @@ import { GameListEditor } from './GameListEditor'
 import { invoke } from './ipc'
 import { SETTINGS_KEY } from './live'
 import { strings } from './strings'
+import { useUiChoice } from './ui-choice'
 import { UpdateStatus } from './UpdatePanel'
 const t = strings.settings
 
@@ -14,12 +15,16 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
   const [draft, setDraft] = useState(initial)
 
   const save = useMutation({
-    mutationFn: () =>
-      invoke('settings:update', {
+    mutationFn: () => {
+      // The UI choice and the skipped version are set by their own buttons, so the form keeps
+      // whatever is saved for them (a stale draft can't undo them).
+      const saved = queryClient.getQueryData<SettingsView>(SETTINGS_KEY) ?? draft
+      return invoke('settings:update', {
         ...draft,
-        // The skipped version is set from the update banner, so the form never saves it.
+        general: { ...draft.general, ui: saved.general.ui },
         updates: { mode: draft.updates.mode, prereleases: draft.updates.prereleases }
-      }),
+      })
+    },
     onSuccess: (saved) => {
       queryClient.setQueryData(SETTINGS_KEY, saved)
       setDraft(saved)
@@ -36,6 +41,8 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
         save.mutate()
       }}
     >
+      <TryNewUi />
+
       <fieldset>
         <legend>{t.general.heading}</legend>
         <label>
@@ -235,6 +242,21 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
         </ul>
       )}
     </form>
+  )
+}
+
+/** Switches to the new UI at once (no Save needed); the new UI has the way back. */
+function TryNewUi(): ReactNode {
+  const { switchTo, switching, failed } = useUiChoice()
+  return (
+    <fieldset>
+      <legend>{t.ui.heading}</legend>
+      <p>{t.ui.about}</p>
+      <button type="button" disabled={switching} onClick={() => switchTo('next')}>
+        {t.ui.tryNew}
+      </button>
+      {failed && <span role="alert"> {t.ui.failed}</span>}
+    </fieldset>
   )
 }
 

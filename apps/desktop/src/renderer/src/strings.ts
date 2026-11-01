@@ -126,6 +126,12 @@ export const strings = {
     remove: (name: string) => `Remove ${name}`
   },
   settings: {
+    ui: {
+      heading: 'Interface',
+      about: 'A new interface is being built. Try it at any time; it has a button to come back.',
+      tryNew: 'Try the new UI',
+      failed: 'Could not switch. Try again.'
+    },
     save: 'Save settings',
     saving: 'Saving…',
     saved: 'Settings saved',

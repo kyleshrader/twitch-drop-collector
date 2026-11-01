@@ -5,6 +5,8 @@ export const SETTINGS_VERSION = 1
 
 export const PRIORITY_MODES = ['priorityOnly', 'endingSoonest', 'lowAvailabilityFirst'] as const
 export const THEMES = ['system', 'light', 'dark'] as const
+/** Which window UI to show: the current one, or the new one while it's being built. */
+export const UI_CHOICES = ['classic', 'next'] as const
 export const LOG_LEVELS = ['error', 'warn', 'info', 'debug'] as const
 
 const GameNames = z.array(z.string().trim().min(1).max(200)).max(500)
@@ -18,7 +20,9 @@ export const GeneralSettings = z.object({
   trayNotifications: z.boolean(),
   theme: z.enum(THEMES),
   /** Consent to keep crash dumps (on this computer only). Off until the user turns it on. */
-  crashReports: z.boolean()
+  crashReports: z.boolean(),
+  /** The window's UI: classic, or the new one in preview (switchable from both). */
+  ui: z.enum(UI_CHOICES)
 })
 
 export const MiningSettings = z.object({
@@ -78,7 +82,8 @@ export const DEFAULT_SETTINGS: Settings = {
     closeToTray: true,
     trayNotifications: true,
     theme: 'system',
-    crashReports: false
+    crashReports: false,
+    ui: 'classic'
   },
   mining: {
     priority: [],

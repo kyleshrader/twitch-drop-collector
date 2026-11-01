@@ -21,6 +21,7 @@ Full spec: docs/spec.md. Decision log: docs/decisions.md.
 - packages/kernel, core, api, storage, config never import electron or react.
 - packages/kernel imports nothing from the workspace and no Node/DOM/Electron APIs.
 - Renderer imports only packages/ui and packages/ipc-contract.
+- New UI work goes in apps/desktop/src/renderer/src/next/ (CSS modules, own strings); the classic UI stays until the switch-over (docs/decisions.md, 2026-11-01).
 - Look up current versions and config syntax in docs; don't rely on memory.
 - Log library and design choices in docs/decisions.md.
 

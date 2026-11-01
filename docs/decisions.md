@@ -458,3 +458,11 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 
 - E2e runs hid the main window with `opacity: 0`. On Linux a fully transparent window gets no frames, and every Playwright click or check waited about 2 s for one, so the inventory test needed 42 s on Linux (3 s on Windows) and timed out in CI. Found by timing it in a Linux container: a visible window took 3.3 s, and of the invisible options only `opacity` mattered.
 - On Linux the test window is now opaque and placed at (-32000, -32000); elsewhere it stays transparent, since macOS pulls off-screen windows back. Both stay unfocusable and off the taskbar (`invisibleWindowOptions` in `policy.ts`). The Linux e2e suite went from about 1.5 minutes to 46 s, and the mining test no longer needs a longer timeout.
+
+## 2026-11-01 · Classic and new UI side by side
+
+- The new UI is built in place while the classic one stays available. `general.ui` (`classic` by default, or `next`) picks which one the window shows; the window's root (`Root.tsx`) follows the cached settings, so a switch takes effect at once. Existing settings files get the default (settings are read field by field), so no migration.
+- Both UIs switch through `useUiChoice` (`ui-choice.ts`): the classic settings screen has "Try the new UI", the new UI has "Back to the classic UI". The classic settings form keeps whatever UI choice is saved, so a stale draft can't undo a switch.
+- The new UI lives in `apps/desktop/src/renderer/src/next/`, with its own strings, and shares only the data layer (`live.ts`, `ipc.ts`, and pure logic such as `inventory-filters.ts`). Its styles are CSS modules (class names local to each file); the classic stylesheet is global but uses only its own class names plus `:root`, so the two don't collide. Under the strict TS config, CSS-module classes are read by destructuring, not dot access.
+- The e2e suite runs on the classic UI; `ui-switch.spec.ts` covers switching both ways and across a restart. The new UI's screens get their own tests as they're built.
+- When the new UI is done: delete the classic screens, `main.css`, `Root.tsx`'s switch, the setting and the classic-only tests in one change.

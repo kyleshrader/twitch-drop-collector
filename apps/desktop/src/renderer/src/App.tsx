@@ -1,3 +1,6 @@
+// The classic UI. Its stylesheet is global (class names only, plus :root); the new UI uses CSS
+// modules, so the two don't collide.
+import './assets/main.css'
 import { useState, type ReactNode } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { AppShell } from '@tdc/ui'

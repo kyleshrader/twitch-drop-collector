@@ -11,6 +11,7 @@ export {
   Settings,
   SettingsPatch,
   THEMES,
+  UI_CHOICES,
   UPDATE_MODES,
   UpdateSettings,
   type SettingsSection

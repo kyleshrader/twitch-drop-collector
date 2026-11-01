@@ -33,6 +33,8 @@ describe('settings transport schema', () => {
     const patches: unknown[] = [
       { general: { theme: 'dark' } },
       { general: { theme: 'neon' } },
+      { general: { ui: 'next' } },
+      { general: { ui: 'fancy' } },
       { network: { connectionQuality: 0 } },
       { logging: { level: 'trace' } },
       { updates: { skippedVersion: '2.0.0-beta.1' } },
