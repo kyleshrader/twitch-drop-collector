@@ -2,6 +2,7 @@
 import {
   awaitsConnection,
   currentMinutes,
+  hasBadgeOrEmote,
   isActive,
   isUpcoming,
   watchBlocker,
@@ -58,6 +59,7 @@ export function campaignView(c: Campaign, now: Date): CampaignView {
     startsAt: c.startsAt.toISOString(),
     endsAt: c.endsAt.toISOString(),
     allowListed: c.allowedChannels.length > 0,
+    badgesEmotes: hasBadgeOrEmote(c),
     drops: c.drops.map((d) => dropView(d, c, now))
   }
 }

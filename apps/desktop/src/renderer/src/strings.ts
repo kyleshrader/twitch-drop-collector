@@ -71,7 +71,48 @@ export const strings = {
     allowListed: 'specific channels only',
     linked: 'Account linked',
     notLinked: 'Account not linked',
-    link: 'Link account'
+    noAccountNeeded: 'No game account needed',
+    priorityRank: (rank: number) => `Priority #${rank}`,
+    excluded: 'Excluded',
+    lists: {
+      addPriority: 'Add to priority',
+      addExcluded: 'Add to excluded',
+      removePriority: 'Remove from priority',
+      removeExcluded: 'Remove from excluded',
+      addPriorityFor: (game: string) => `Add ${game} to priority`,
+      addExcludedFor: (game: string) => `Add ${game} to excluded`,
+      removePriorityFor: (game: string) => `Remove ${game} from priority`,
+      removeExcludedFor: (game: string) => `Remove ${game} from excluded`,
+      saveFailed: 'Could not save the change.'
+    },
+    link: 'Link account',
+    filters: {
+      label: 'Filter campaigns',
+      search: 'Search',
+      searchPlaceholder: 'Game or campaign',
+      facets: {
+        status: 'Status',
+        game: 'Game',
+        list: 'Your lists',
+        account: 'Game account',
+        progress: 'Progress',
+        rewards: 'Rewards'
+      },
+      options: {
+        status: { active: 'Active', upcoming: 'Upcoming', expired: 'Ended' },
+        list: { priority: 'Priority', excluded: 'Excluded', neither: 'Neither' },
+        account: { linked: 'Linked', notLinked: 'Not linked', notNeeded: 'Not needed' },
+        progress: { notStarted: 'Not started', inProgress: 'In progress', finished: 'Finished' },
+        rewards: { items: 'Game items', badgesEmotes: 'Badges and emotes' }
+      },
+      showAll: (count: number) => `Show all ${count}`,
+      showFewer: 'Show fewer',
+      clear: 'Clear',
+      clearFacet: (facet: string) => `Clear ${facet}`,
+      showing: (shown: number, total: number) => `Showing ${shown} of ${total}`,
+      clearAll: 'Clear all filters',
+      none: 'No campaigns match these filters.'
+    }
   },
   gameList: {
     empty: 'None yet.',

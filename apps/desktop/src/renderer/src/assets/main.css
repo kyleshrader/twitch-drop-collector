@@ -39,3 +39,59 @@
   background: SelectedItem;
   color: SelectedItemText;
 }
+
+/* Inventory: a filter sidebar (categories with checkboxes, shop-style) beside the campaigns.
+   On a narrow window the sidebar goes above the list. */
+.inventory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em 2em;
+  align-items: flex-start;
+}
+.inventory-filters {
+  flex: 0 0 14em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75em;
+}
+.inventory-results {
+  flex: 1 1 24em;
+  min-width: 0;
+}
+.inventory-filters > label input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.25em;
+}
+.inventory-filters fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  align-items: flex-start;
+  border: none;
+  border-top: 1px solid GrayText;
+  margin: 0;
+  padding: 0.5em 0 0;
+}
+.inventory-filters legend {
+  font-weight: 600;
+  padding: 0;
+}
+.inventory-filters .count {
+  color: GrayText;
+}
+.inventory-filters label.empty {
+  color: GrayText;
+}
+button.link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: LinkText;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.inventory-results [role='status'] {
+  margin-top: 0;
+}

@@ -4,10 +4,9 @@ import { IpcError, type SettingsView } from '@tdc/ipc-contract'
 import { useState, type ReactNode } from 'react'
 import { GameListEditor } from './GameListEditor'
 import { invoke } from './ipc'
+import { SETTINGS_KEY } from './live'
 import { strings } from './strings'
 import { UpdateStatus } from './UpdatePanel'
-
-const SETTINGS_KEY = ['settings'] as const
 const t = strings.settings
 
 function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {

@@ -443,3 +443,13 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 - Each channel in the miner view carries `unwatchable` (`offline`, `dropsOff`, `otherGame`, `nothingToEarn`), from `watchBlocker` in core, which agrees with `canWatch`. The list offers "Watch this" only on channels that can be watched, says why not on the others, and shows "Watching" on the current one.
 - The view also reports the pick (`selected`), shown as "(your pick)" until "Let the miner choose" clears it. The miner logs when it can't follow a pick.
 - M11 check: the installed 0.0.0 build on Windows found 0.1.0-beta.1 with pre-releases on, downloaded and installed it, and restarted as 0.1.0-beta.1. That is the "older build updates to it" criterion, unsigned.
+
+## 2026-10-31 · Inventory filters, shop-style
+
+- Instead of upstream's row of hide checkboxes, the inventory has a filter sidebar like a shop's: categories (Status, Game, Your lists, Game account, Progress, Rewards) with an option per value and a count. Nothing ticked in a category means it doesn't filter, so by default every campaign shows. Options in a category combine with "or", categories with "and". Each count is what that option would show given the search and the other categories (`inventory-filters.ts`, unit-tested).
+- Options with nothing to show are greyed out and can't be ticked. The Game category lists games with campaigns, most first, eight at a time with "Show all". There's a search box, a Clear per category, and "Clear all filters".
+- Game account has a "Not needed" option: campaigns with badge or emote rewards claim without a linked account, so they don't count as not linked. The campaign view carries `badgesEmotes` for this, and the card says "No game account needed".
+- "Your lists" (Priority, Excluded, Neither) follows the priority and excluded games in settings, read from the same cache the settings screen updates on save. A game on both counts as excluded, as it does for the miner. Cards also say "Priority #n" or "Excluded".
+- Each card has buttons for its game: "Add to priority" and "Add to excluded" when it's on neither list, otherwise "Remove from" the one it's on. They save straight to settings (a partial `mining` patch with just that list); additions go to the end of the list.
+- The filters stay while switching tabs and start empty after a restart, so nothing stays hidden by a forgotten filter.
+- Upstream's Help/About tab and log console are left out, by the user's choice.

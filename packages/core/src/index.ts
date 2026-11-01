@@ -21,6 +21,7 @@ export {
 export {
   awaitsConnection,
   currentMinutes,
+  hasBadgeOrEmote,
   isActive,
   isUpcoming,
   type EarnContext

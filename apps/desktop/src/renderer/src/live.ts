@@ -5,6 +5,7 @@ import type {
   EventChannel,
   EventPayload,
   MinerView,
+  SettingsView,
   UpdateView
 } from '@tdc/ipc-contract'
 import { invoke } from './ipc'
@@ -46,3 +47,9 @@ export const useAuthState = (): AuthStateView | undefined =>
 
 export const useUpdates = (): UpdateView | undefined =>
   useLive('updates:state', () => invoke('updates:getState'))
+
+/** Settings aren't pushed by main; the settings screen updates this cache when it saves. */
+export const SETTINGS_KEY = ['settings'] as const
+
+export const useSettings = (): SettingsView | undefined =>
+  useQuery({ queryKey: SETTINGS_KEY, queryFn: () => invoke('settings:get') }).data

@@ -41,6 +41,8 @@ export const CampaignView = z.object({
   startsAt: z.string(),
   endsAt: z.string(),
   allowListed: z.boolean(),
+  /** Rewards include a badge or emote; such campaigns never need a linked account. */
+  badgesEmotes: z.boolean(),
   drops: z.array(DropView)
 })
 export type CampaignView = z.infer<typeof CampaignView>
