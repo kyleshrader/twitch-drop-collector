@@ -50,7 +50,7 @@ import { registerInvokeRoute } from './ipc/register'
 import { createInvokeRouter } from './ipc/router'
 import { createCrashReports, watchProcesses } from './diagnostics'
 import { createAppLogger } from './logger'
-import { APP_ORIGIN, isSameOrigin, mainWindowOptions } from './policy'
+import { APP_ORIGIN, invisibleWindowOptions, isSameOrigin, mainWindowOptions } from './policy'
 import { createImageCache } from './images/image-cache'
 import {
   allowNavigation,
@@ -95,7 +95,7 @@ function createWindow(options: { startMinimized?: boolean } = {}): BrowserWindow
   const window = new BrowserWindow({
     ...mainWindowOptions(join(__dirname, '../preload/index.js')),
     ...(process.platform === 'linux' ? { icon } : {}),
-    ...(invisibleForTests ? { opacity: 0, skipTaskbar: true, focusable: false } : {})
+    ...(invisibleForTests ? invisibleWindowOptions(process.platform) : {})
   })
 
   window.on('ready-to-show', () => {

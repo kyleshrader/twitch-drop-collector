@@ -25,9 +25,18 @@ test('test windows stay invisible unless TDC_E2E_SHOW_WINDOWS=1', async () => {
   test.skip(process.env['TDC_E2E_SHOW_WINDOWS'] === '1', 'windows were asked to be shown')
   const state = await app.evaluate(({ BrowserWindow }) => {
     const window = BrowserWindow.getAllWindows()[0]
-    return window && { opacity: window.getOpacity(), focusable: window.isFocusable() }
+    return (
+      window && {
+        opacity: window.getOpacity(),
+        x: window.getBounds().x,
+        focusable: window.isFocusable()
+      }
+    )
   })
-  expect(state).toEqual({ opacity: 0, focusable: false })
+  expect(state?.focusable).toBe(false)
+  // Transparent, or on Linux (where a transparent window gets no frames) far off-screen.
+  if (process.platform === 'linux') expect(state?.x).toBeLessThan(-10_000)
+  else expect(state?.opacity).toBe(0)
 })
 
 test('loads the renderer from app:// rather than file://', async () => {

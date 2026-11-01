@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   APP_ORIGIN,
+  invisibleWindowOptions,
   isSafeExternalUrl,
   isSameOrigin,
   mainWindowOptions,
@@ -22,6 +23,24 @@ describe('mainWindowOptions', () => {
       webviewTag: false,
       preload: '/preload.js'
     })
+  })
+})
+
+describe('invisibleWindowOptions', () => {
+  it('keeps test windows unfocusable and off the taskbar everywhere', () => {
+    for (const platform of ['win32', 'darwin', 'linux'] as const) {
+      expect(invisibleWindowOptions(platform)).toMatchObject({
+        skipTaskbar: true,
+        focusable: false
+      })
+    }
+  })
+
+  it('moves them off-screen on Linux, where a transparent window gets no frames', () => {
+    expect(invisibleWindowOptions('linux')).toMatchObject({ x: -32000, y: -32000 })
+    expect(invisibleWindowOptions('linux')).not.toHaveProperty('opacity')
+    expect(invisibleWindowOptions('win32')).toMatchObject({ opacity: 0 })
+    expect(invisibleWindowOptions('darwin')).toMatchObject({ opacity: 0 })
   })
 })
 

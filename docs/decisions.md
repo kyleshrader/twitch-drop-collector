@@ -453,3 +453,8 @@ One entry per decision: date, decision, alternatives considered, reason. Newest 
 - Each card has buttons for its game: "Add to priority" and "Add to excluded" when it's on neither list, otherwise "Remove from" the one it's on. They save straight to settings (a partial `mining` patch with just that list); additions go to the end of the list.
 - The filters stay while switching tabs and start empty after a restart, so nothing stays hidden by a forgotten filter.
 - Upstream's Help/About tab and log console are left out, by the user's choice.
+
+## 2026-11-01 · Invisible test windows on Linux go off-screen
+
+- E2e runs hid the main window with `opacity: 0`. On Linux a fully transparent window gets no frames, and every Playwright click or check waited about 2 s for one, so the inventory test needed 42 s on Linux (3 s on Windows) and timed out in CI. Found by timing it in a Linux container: a visible window took 3.3 s, and of the invisible options only `opacity` mattered.
+- On Linux the test window is now opaque and placed at (-32000, -32000); elsewhere it stays transparent, since macOS pulls off-screen windows back. Both stay unfocusable and off the taskbar (`invisibleWindowOptions` in `policy.ts`). The Linux e2e suite went from about 1.5 minutes to 46 s, and the mining test no longer needs a longer timeout.

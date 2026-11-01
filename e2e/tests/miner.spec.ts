@@ -70,8 +70,6 @@ test('the miner loads campaigns, claims finished drops and shows it all live', a
 })
 
 test('the miner watches a priority game, follows progress, claims and switches channels', async () => {
-  // A long flow, with a 4 s wait after the claim; slower CI runners need more than 30 s.
-  test.setTimeout(60_000)
   const {
     app,
     window: page,

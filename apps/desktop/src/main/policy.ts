@@ -18,6 +18,16 @@ export const SECURE_WEB_PREFERENCES = {
   webviewTag: false
 } as const satisfies WebPreferences
 
+/**
+ * Keeps end-to-end test windows off the developer's screen (TDC_E2E_INVISIBLE). A fully
+ * transparent window gets no frames on Linux, so every Playwright action there waited about 2 s;
+ * on Linux the window goes off-screen instead. macOS would pull an off-screen window back.
+ */
+export function invisibleWindowOptions(platform: NodeJS.Platform): BrowserWindowConstructorOptions {
+  const hidden = platform === 'linux' ? { x: -32000, y: -32000 } : { opacity: 0 }
+  return { ...hidden, skipTaskbar: true, focusable: false }
+}
+
 export function mainWindowOptions(preload: string): BrowserWindowConstructorOptions {
   return {
     width: 900,
