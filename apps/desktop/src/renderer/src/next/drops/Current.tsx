@@ -8,6 +8,7 @@ import { useSettingsPatch } from '../data'
 import { duration, minutesUntil } from '../format'
 import { icons } from '../icons'
 import { ChannelLink, Cover, Popover } from '../parts'
+import { channelsFor } from './channels'
 import { strings } from '../strings'
 import ui from '../ui.module.css'
 import styles from './Drops.module.css'
@@ -99,13 +100,7 @@ function ChannelPicker(props: { miner: MinerView; campaign: CampaignView }): Rea
     mutationFn: (channelId: string | undefined) =>
       invoke('miner:selectChannel', channelId ? { channelId } : {})
   })
-  const relevant = miner.channels
-    .filter((c) => c.game === campaign.game || c.aclBased || c.id === miner.watching?.id)
-    .sort(
-      (a, b) =>
-        Number(a.unwatchable !== undefined) - Number(b.unwatchable !== undefined) ||
-        (b.viewers ?? -1) - (a.viewers ?? -1)
-    )
+  const relevant = channelsFor(campaign, miner.channels, miner.watching?.id)
   return (
     <Popover
       label={t.changeLabel}
