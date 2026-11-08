@@ -165,3 +165,33 @@ describe('event publisher', () => {
     expect(() => publisher.publish('auth:state', { status: 'signedOut' })).not.toThrow()
   })
 })
+
+describe('history in the view', () => {
+  it('dates claims (the app’s own record first, then Twitch’s) and first sightings', () => {
+    const ours = campaign('ours', -2, 5)
+    const twitchOnly = campaign('twitch', -2, 5)
+    const claimed = (c: Campaign, awardedAt?: Date): Campaign => ({
+      ...c,
+      drops: c.drops.map((d) => ({ ...d, claimed: true, ...(awardedAt ? { awardedAt } : {}) }))
+    })
+    const view = toMinerView(
+      { status: 'idle', wanted: [] } as MinerSnapshot,
+      [claimed(ours, at(-1.5)), claimed(twitchOnly, at(-1)), campaign('open', -2, 5)],
+      [],
+      ctx,
+      {
+        claimedAt: new Map([['ours-d', at(-0.5)]]),
+        firstSeen: new Map([['ours', at(-2)]]),
+        seenByGame: new Map([['g', 7]])
+      }
+    )
+    const byId = new Map(view.campaigns.map((c) => [c.id, c]))
+    expect(byId.get('ours')?.drops[0]?.claimedAt).toBe(at(-0.5).toISOString())
+    expect(byId.get('twitch')?.drops[0]?.claimedAt).toBe(at(-1).toISOString())
+    expect(byId.get('open')?.drops[0]?.claimedAt).toBeUndefined()
+    expect(byId.get('ours')?.firstSeenAt).toBe(at(-2).toISOString())
+    expect(byId.get('open')?.firstSeenAt).toBeUndefined()
+    expect(view.seenByGame).toEqual({ g: 7 })
+    expect(MinerView.safeParse(view).success).toBe(true)
+  })
+})

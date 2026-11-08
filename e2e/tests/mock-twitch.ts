@@ -297,6 +297,12 @@ const details = new Map(
   })
 )
 
+/** Games the search finds besides the ones with campaigns: none of these has drops. */
+export const SEARCHABLE_GAMES = [
+  { id: '900001', name: 'Pebble Dash', displayName: 'Pebble Dash', boxArtURL: null },
+  { id: '900002', name: 'Pebble Quest', displayName: 'Pebble Quest', boxArtURL: null }
+]
+
 /** Answers a GQL operation like Twitch did when the fixtures were captured. */
 function gqlAnswer(
   operation: string,
@@ -332,6 +338,19 @@ function gqlAnswer(
       mock.claims.push(input.dropInstanceID)
       return { claimDropRewards: { status: 'ELIGIBLE_FOR_ALL' } }
     }
+    case 'SearchGames': {
+      const query = String(variables['query']).toLowerCase()
+      const edges = SEARCHABLE_GAMES.filter((g) => g.displayName.toLowerCase().includes(query)).map(
+        (node) => ({ node })
+      )
+      return { searchCategories: { edges } }
+    }
+    case 'GameByName': {
+      const game = SEARCHABLE_GAMES.find((g) => g.name === variables['name'])
+      return { game: game ? { ...game, slug: game.name.toLowerCase().replace(/ /g, '-') } : null }
+    }
+    case 'UserAvatar':
+      return { user: { profileImageURL: null } }
     case 'PlaybackAccessToken':
       return { streamPlaybackAccessToken: { value: '{"channel":"e2e"}', signature: 'e2esig' } }
     default:

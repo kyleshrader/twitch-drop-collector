@@ -45,7 +45,8 @@ function setup(overrides: Partial<InvokeHandlers> = {}): {
       miner: {
         view: () => ({ status: 'stopped', wanted: [], channels: [], campaigns: [] }),
         reload: () => {},
-        selectChannel: () => {}
+        selectChannel: () => {},
+        searchGames: async (query) => [{ id: '1', name: query.toUpperCase() }]
       },
       updates: {
         view: () => UNSUPPORTED,
@@ -93,6 +94,20 @@ describe('invoke router', () => {
     expect(result).toMatchObject({ ok: false, error: { code: 'INVALID_INPUT' } })
     if (!result.ok) expect(result.error.issues).not.toHaveLength(0)
     expect(openExternal).not.toHaveBeenCalled()
+  })
+
+  it('trims a game search and rejects an empty or very long one', async () => {
+    const { route } = setup()
+    expect(await route('games:search', { query: '  rob run ' }, TRUSTED)).toEqual({
+      ok: true,
+      value: [{ id: '1', name: 'ROB RUN' }]
+    })
+    for (const query of ['   ', 'x'.repeat(101)]) {
+      expect(await route('games:search', { query }, TRUSTED)).toMatchObject({
+        ok: false,
+        error: { code: 'INVALID_INPUT' }
+      })
+    }
   })
 
   it('rejects input on a channel that takes none', async () => {

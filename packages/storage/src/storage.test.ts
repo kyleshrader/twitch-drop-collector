@@ -6,6 +6,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 import { openSqlite } from './database'
 import { MIGRATIONS, NewerDatabaseError, runMigrations, schemaVersion } from './migrations'
+import { createGames } from './games'
+import { createSeenCampaigns } from './seen'
 import { openStorage } from './storage'
 
 function testLogger(): Logger {
@@ -47,7 +49,7 @@ describe('migrations', () => {
     const tables = db
       .all("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
       .map((row) => row['name'])
-    expect(tables).toEqual(['cache_entries', 'claims', 'images'])
+    expect(tables).toEqual(['cache_entries', 'campaigns_seen', 'claims', 'games', 'images'])
     db.close()
   })
 
@@ -253,6 +255,9 @@ describe('claim history', () => {
     expect(storage.claims.has('z')).toBe(false)
     expect(storage.claims.recent(2).map((c) => c.dropId)).toEqual(['b', 'c'])
     expect(storage.claims.recent(10)[2]).toEqual(claim('a', '2026-10-01T00:00:00Z'))
+    // The first claim of a drop is the one kept.
+    expect(storage.claims.claimTimes().get('a')).toEqual(new Date('2026-10-01T00:00:00Z'))
+    expect(storage.claims.claimTimes().size).toBe(3)
     storage.close()
   })
 })
@@ -312,6 +317,64 @@ describe('transactions', () => {
     expect(db.all('SELECT x FROM t')).toEqual([])
     db.transaction(() => db.run('INSERT INTO t (x) VALUES (?)', 2))
     expect(db.all('SELECT x FROM t')).toEqual([{ x: 2 }])
+    db.close()
+  })
+})
+
+describe('campaigns seen', () => {
+  it('keeps the first time each campaign was seen and counts them by game', () => {
+    const db = openSqlite(':memory:')
+    runMigrations(db)
+    const seen = createSeenCampaigns({ db })
+    const first = new Date('2026-11-01T10:00:00Z')
+    const later = new Date('2026-11-05T10:00:00Z')
+    const rust = { gameId: 'g1', gameName: 'Rust' }
+    expect(seen.record([{ id: 'a', name: 'A', ...rust }], first)).toBe(1)
+    expect(
+      seen.record(
+        [
+          { id: 'a', name: 'A', ...rust },
+          { id: 'b', name: 'B', ...rust },
+          { id: 'c', name: 'C', gameId: 'g2', gameName: 'Rocket League' }
+        ],
+        later
+      )
+    ).toBe(2)
+    expect(seen.firstSeen()).toEqual(
+      new Map([
+        ['a', first],
+        ['b', later],
+        ['c', later]
+      ])
+    )
+    expect(seen.countByGame()).toEqual(
+      new Map([
+        ['g1', 2],
+        ['g2', 1]
+      ])
+    )
+    db.close()
+  })
+})
+
+describe('games', () => {
+  it('saves what is known about a game and keeps fields a later save lacks', () => {
+    const db = openSqlite(':memory:')
+    runMigrations(db)
+    const games = createGames({ db })
+    const first = new Date('2026-11-01T10:00:00Z')
+    const later = new Date('2026-11-05T10:00:00Z')
+    games.save([{ name: 'ROBLOX', id: '23020', slug: 'roblox', boxArtUrl: 'a.jpg' }], first)
+    games.save([{ name: 'ROBLOX', boxArtUrl: 'b.jpg' }, { name: 'Rob Run' }], later)
+    expect(games.all()).toEqual(
+      new Map([
+        [
+          'ROBLOX',
+          { name: 'ROBLOX', id: '23020', slug: 'roblox', boxArtUrl: 'b.jpg', checkedAt: later }
+        ],
+        ['Rob Run', { name: 'Rob Run', checkedAt: later }]
+      ])
+    )
     db.close()
   })
 })

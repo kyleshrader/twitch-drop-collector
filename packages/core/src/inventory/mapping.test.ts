@@ -119,6 +119,8 @@ describe('buildCampaigns edge cases', () => {
       details: [base]
     })
     expect(campaigns[0]?.drops.find((d) => d.id === drop.id)?.claimed).toBe(true)
+    // The award time dates the claim (shown in the new UI's Completed and Library).
+    expect(campaigns[0]?.drops.find((d) => d.id === drop.id)?.awardedAt).toEqual(new Date(inWindow))
 
     const before = new Date(new Date(drop.startAt).getTime() - 60_000).toISOString()
     const earlier = buildCampaigns({

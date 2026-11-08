@@ -1,7 +1,14 @@
 import type { App, Shell } from 'electron'
 import type { SettingsService } from '@tdc/config'
 import type { AuthService } from '@tdc/core'
-import type { AppInfo, AuthStateView, MinerView, SettingsView, UpdateView } from '@tdc/ipc-contract'
+import type {
+  AppInfo,
+  AuthStateView,
+  GameSearchResult,
+  MinerView,
+  SettingsView,
+  UpdateView
+} from '@tdc/ipc-contract'
 import { isSafeExternalUrl } from '../policy'
 import type { Updater } from '../updates/updater'
 import type { InvokeHandlers } from './router'
@@ -17,6 +24,7 @@ export function createInvokeHandlers(deps: {
     view(): MinerView
     reload(): void
     selectChannel(channelId: string | undefined): void
+    searchGames(query: string): Promise<GameSearchResult[]>
   }
   updates: Pick<Updater, 'view' | 'check' | 'download' | 'install' | 'dismiss' | 'skip'>
 }): InvokeHandlers {
@@ -59,6 +67,7 @@ export function createInvokeHandlers(deps: {
       miner.selectChannel(channelId)
       return { queued: true }
     },
+    'games:search': ({ query }): Promise<GameSearchResult[]> => miner.searchGames(query),
     'updates:getState': (): UpdateView => updates.view(),
     'updates:check': (): Promise<UpdateView> => updates.check({ manual: true }),
     // Returns once the download starts; progress and the ready state arrive as events.

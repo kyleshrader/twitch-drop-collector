@@ -36,6 +36,27 @@ export const MIGRATIONS: readonly string[] = [
     used_at      INTEGER NOT NULL
   ) STRICT;
   CREATE INDEX images_used_at ON images (used_at);
+  `,
+  // 3: when each campaign was first seen (the start of the local history)
+  `
+  CREATE TABLE campaigns_seen (
+    campaign_id   TEXT    NOT NULL PRIMARY KEY,
+    game_id       TEXT    NOT NULL,
+    game_name     TEXT    NOT NULL,
+    campaign_name TEXT    NOT NULL,
+    first_seen_at INTEGER NOT NULL
+  ) STRICT;
+  CREATE INDEX campaigns_seen_game ON campaigns_seen (game_id);
+  `,
+  // 4: what the app knows about games by name (address and box art), refreshed over time
+  `
+  CREATE TABLE games (
+    name        TEXT    NOT NULL PRIMARY KEY,
+    game_id     TEXT,
+    slug        TEXT,
+    box_art_url TEXT,
+    checked_at  INTEGER NOT NULL
+  ) STRICT;
   `
 ]
 

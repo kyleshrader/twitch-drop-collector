@@ -1,0 +1,955 @@
+/* The new UI's look (docs/new-ui/ui-design.md, mockup in docs/new-ui/): colour tokens on the root,
+   dark first, and the shared pieces every page uses. A CSS module, so none of it reaches the
+   classic UI. Theme: data-theme on .app follows settings (system, light or dark). */
+
+.app {
+  --bg: #0c0f13;
+  --win: #1a1e25;
+  --top: #13171d;
+  --surface: #222831;
+  --section: #272f3a;
+  --raised: #2d3641;
+  --hover: #343e4b;
+  --scroll: #3d4857;
+  --line: #313a46;
+  --text: #dde3ea;
+  --muted: #929fae;
+  --faint: #677485;
+  --accent: #4d9be6;
+  --accent-soft: rgba(77, 155, 230, 0.15);
+  --glow: rgba(110, 180, 255, 0.65);
+  --warn: #f1b65a;
+  --warn-bg: rgba(241, 182, 90, 0.1);
+  --warn-line: rgba(241, 182, 90, 0.3);
+  --bad: #ff7d6e;
+  --good: #5fb83a;
+  --tip-bg: #05070a;
+  --tip-text: #e4e9ef;
+  --shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--win);
+  color: var(--text);
+  font-family:
+    'Inter Variable',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  box-sizing: border-box;
+  /* Like an app, not a page: text can't be selected unless it's worth copying (.selectable). */
+  user-select: none;
+}
+.app .selectable,
+.app .selectable * {
+  user-select: text;
+}
+
+.app[data-theme='light'] {
+  --bg: #e9edf2;
+  --win: #f5f7fa;
+  --top: #ffffff;
+  --surface: #ffffff;
+  --section: #e1e6ed;
+  --raised: #edf0f4;
+  --hover: #e4e9ef;
+  --scroll: #c4ccd6;
+  --line: #d3d9e1;
+  --text: #18212d;
+  --muted: #556274;
+  --faint: #8692a2;
+  --accent: #1d6ec2;
+  --accent-soft: rgba(29, 110, 194, 0.11);
+  --glow: rgba(29, 110, 194, 0.5);
+  --warn: #9a5a00;
+  --warn-bg: #fdf0d8;
+  --warn-line: #efd29a;
+  --bad: #b3362b;
+  --good: #4f9d2e;
+  --tip-bg: #1b2430;
+  --tip-text: #eef2f6;
+  --shadow: 0 10px 30px rgba(20, 32, 48, 0.16);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  .app[data-theme='system'] {
+    --bg: #e9edf2;
+    --win: #f5f7fa;
+    --top: #ffffff;
+    --surface: #ffffff;
+    --section: #e1e6ed;
+    --raised: #edf0f4;
+    --hover: #e4e9ef;
+    --scroll: #c4ccd6;
+    --line: #d3d9e1;
+    --text: #18212d;
+    --muted: #556274;
+    --faint: #8692a2;
+    --accent: #1d6ec2;
+    --accent-soft: rgba(29, 110, 194, 0.11);
+    --glow: rgba(29, 110, 194, 0.5);
+    --warn: #9a5a00;
+    --warn-bg: #fdf0d8;
+    --warn-line: #efd29a;
+    --bad: #b3362b;
+    --good: #4f9d2e;
+    --tip-bg: #1b2430;
+    --tip-text: #eef2f6;
+    --shadow: 0 10px 30px rgba(20, 32, 48, 0.16);
+    color-scheme: light;
+  }
+}
+
+.app *,
+.app *::before,
+.app *::after {
+  box-sizing: inherit;
+}
+.app button,
+.app input,
+.app select {
+  font: inherit;
+  color: inherit;
+}
+/* Drawn inside the element, so a scrolling or clipping parent, or the button next to it, can't
+   cut it off or cover it. */
+.app :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+/* A field drawn as a box with icons in it (the Library search) shows focus on the whole box. */
+.app :has(> input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.app :has(> input:focus-visible) > input {
+  outline: none;
+}
+.app svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.app h1,
+.app h2,
+.app h3 {
+  margin: 0;
+}
+
+/* Scrollbars: a slim rounded thumb in the theme's colours on a clear track, no arrow buttons
+   (styling ::-webkit-scrollbar removes them; ::-webkit-scrollbar-button is left unstyled). The
+   standard scrollbar-color isn't set: in Chromium it would override all of this. */
+.app ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.app ::-webkit-scrollbar-track,
+.app ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.app ::-webkit-scrollbar-thumb {
+  min-height: 40px;
+  border: 3px solid transparent;
+  border-radius: 6px;
+  background: var(--scroll) padding-box;
+}
+.app ::-webkit-scrollbar-thumb:hover {
+  background: var(--faint) padding-box;
+}
+.app ::-webkit-scrollbar-thumb:active {
+  background: var(--muted) padding-box;
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+.muted {
+  color: var(--muted);
+}
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Tooltips: data-tip on any element. */
+.app [data-tip] {
+  position: relative;
+}
+.app [data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--tip-bg);
+  color: var(--tip-text);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 8px;
+  border-radius: 4px;
+  width: max-content;
+  max-width: 360px;
+  white-space: normal;
+  z-index: 60;
+  pointer-events: none;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Text cut off with "…" (Truncated in parts.tsx); its tooltip starts where the text does. */
+.truncated {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
+}
+.truncatedText {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.app .truncated[data-tip]:hover::after {
+  left: 0;
+  transform: none;
+  font-weight: 500;
+}
+
+/* ---- top bar ---- */
+.top {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 14px 0 18px;
+  background: var(--top);
+  border-bottom: 1px solid var(--line);
+  gap: 26px;
+}
+.top [data-tip]:hover::after {
+  bottom: auto;
+  top: calc(100% + 7px);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+}
+.mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(140deg, #4d9be6, #6a4fd8);
+}
+.mark svg {
+  width: 14px;
+  height: 14px;
+}
+.nav {
+  display: flex;
+  height: 100%;
+}
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.navLink:hover {
+  color: var(--text);
+}
+.navLink[aria-current='page'] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+.navLink svg {
+  width: 14px;
+  height: 14px;
+  color: var(--warn);
+}
+.topRight {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ---- buttons ---- */
+.iconButton {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  flex: none;
+}
+.iconButton:hover,
+.iconButton[aria-expanded='true'] {
+  background: var(--raised);
+  color: var(--text);
+}
+.iconButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.small {
+  width: 28px;
+  height: 28px;
+}
+.small svg {
+  width: 16px;
+  height: 16px;
+}
+.count {
+  position: absolute;
+  top: 3px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+.pip {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--good);
+  box-shadow: 0 0 0 2px var(--top);
+}
+.account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 8px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 6px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+}
+.account:hover,
+.account[aria-expanded='true'] {
+  background: var(--raised);
+}
+.account svg {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+}
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #8a63f0, #3f8fe0);
+  color: #fff;
+  font-weight: 700;
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  text-transform: uppercase;
+}
+/* The account picture covers the initials once it loads. */
+.avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: var(--raised);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+  text-decoration: none;
+}
+.btn:hover {
+  background: var(--hover);
+}
+.btn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+.btn svg {
+  width: 15px;
+  height: 15px;
+}
+.btnSmall {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12.5px;
+}
+.btnLarge {
+  height: 44px;
+  padding: 0 22px;
+  font-size: 15px;
+}
+.btnLarge svg {
+  width: 18px;
+  height: 18px;
+}
+.ghost {
+  background: none;
+  border-color: transparent;
+  color: var(--muted);
+}
+.ghost:hover {
+  background: var(--raised);
+  color: var(--text);
+}
+.green {
+  background: linear-gradient(180deg, #79b72d, #5a9221);
+  border-color: #55891f;
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+}
+.green:hover {
+  background: linear-gradient(180deg, #86c535, #619c25);
+}
+.blue {
+  background: linear-gradient(180deg, #4f9fea, #2e76c2);
+  border-color: #2c6fb5;
+  color: #fff;
+}
+.blue:hover {
+  background: linear-gradient(180deg, #5eaaf0, #3580cc);
+}
+.claimed {
+  background: var(--raised);
+  color: var(--faint);
+  border-color: var(--line);
+  cursor: default;
+}
+.glass {
+  background: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+.glass:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ---- chips and segmented controls ---- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--raised);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.chip svg {
+  width: 12px;
+  height: 12px;
+}
+.chipAccent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.chipNew {
+  background: var(--good);
+  color: #fff;
+}
+.chipWarn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+  flex: none;
+  background: var(--surface);
+}
+.segmented button {
+  border: 0;
+  background: none;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+.segmented button + button {
+  border-left: 1px solid var(--line);
+}
+.segmented button:hover {
+  color: var(--text);
+  background: var(--raised);
+}
+.segmented button[aria-pressed='true'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---- popovers and menus ---- */
+.popWrap {
+  position: relative;
+  display: inline-flex;
+}
+.pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  z-index: 50;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  min-width: 240px;
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+  padding: 6px;
+  font-size: 13px;
+  color: var(--text);
+  text-shadow: none;
+}
+.popStart {
+  left: 0;
+}
+.popEnd {
+  right: 0;
+}
+.popUp {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+.popHeading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.popHeading .btn {
+  margin-left: auto;
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+}
+.menuItem:hover:not(:disabled) {
+  background: var(--raised);
+}
+.menuItem svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+}
+.menuItem:disabled {
+  color: var(--faint);
+  cursor: default;
+}
+.menuItemEnd {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--faint);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.check {
+  width: 16px;
+  display: inline-grid;
+  color: var(--accent);
+}
+.check svg {
+  color: var(--accent);
+}
+.separator {
+  height: 1px;
+  background: var(--line);
+  margin: 6px 4px;
+  border: 0;
+}
+.note {
+  padding: 6px 10px 8px;
+  font-size: 12px;
+  color: var(--faint);
+  line-height: 1.4;
+}
+.keyValue {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.keyValue span:last-child {
+  color: var(--text);
+}
+
+/* ---- covers (Twitch box art, with a placeholder while it loads or when there's none) ---- */
+.cover {
+  position: relative;
+  flex: none;
+  aspect-ratio: 285 / 380;
+  border-radius: 4px;
+  overflow: hidden;
+  container-type: inline-size;
+  color: #fff;
+  background: linear-gradient(165deg, hsl(var(--h1) 68% 48%), hsl(var(--h2) 62% 16%));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+}
+.cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.coverLetter {
+  position: absolute;
+  top: 6%;
+  left: 7%;
+  font-size: 46cqw;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.22;
+}
+.coverXxs {
+  width: 30px;
+  border-radius: 3px;
+  box-shadow: none;
+}
+.coverXs {
+  width: 42px;
+  box-shadow: none;
+}
+.coverSm {
+  width: 57px;
+}
+.coverMd {
+  width: 120px;
+}
+.coverLg {
+  width: 126px;
+}
+.coverFill {
+  width: 100%;
+}
+
+.empty {
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  color: var(--warn);
+  border-radius: 5px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.alert svg {
+  width: 15px;
+  height: 15px;
+  margin-top: 1px;
+}
+
+/* ---- collapsible section headings ---- */
+.sectionToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px 2px 2px;
+  margin-left: -2px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  font: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+}
+.sectionToggle:hover {
+  background: var(--raised);
+}
+.sectionToggle svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+.sectionToggle[aria-expanded='false'] svg {
+  transform: rotate(-90deg);
+}
+
+/* ---- a campaign's drops, expanded ---- */
+.expandButton {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.expandButton:hover {
+  background: var(--raised);
+  color: var(--text);
+}
+.expandButton svg {
+  width: 16px;
+  height: 16px;
+  transform: rotate(-90deg);
+  transition: transform 0.15s;
+}
+.expandButton[aria-expanded='true'] svg {
+  transform: none;
+}
+.dropList {
+  list-style: none;
+  margin: 4px 0 2px;
+  padding: 4px 0;
+  border-radius: 6px;
+  background: var(--section);
+}
+.dropRow {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 190px 150px;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+}
+.dropRow + .dropRow {
+  border-top: 1px solid var(--line);
+}
+.dropArt {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(145deg, hsl(var(--h1) 58% 44%), hsl(var(--h1) 60% 18%));
+}
+.dropArt img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.dropText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 12.5px;
+}
+.dropName {
+  display: flex;
+  font-weight: 600;
+  font-size: 13px;
+}
+.dropRewards {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+}
+.dropRewards svg {
+  width: 13px;
+  height: 13px;
+}
+.dropProgress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.dropBar {
+  height: 4px;
+  background: var(--raised);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.dropBar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.dropState {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: right;
+}
+.dropState svg {
+  width: 13px;
+  height: 13px;
+}
+.dropDone {
+  color: var(--good);
+}
+.dropWarn {
+  color: var(--warn);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app *,
+  .app *::before,
+  .app *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Middle-click autoscroll's marker. It's added to <body>, outside .app, so it uses no tokens. */
+.autoscrollMarker {
+  position: fixed;
+  z-index: 1000;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  background: rgba(20, 24, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.autoscrollMarker::before,
+.autoscrollMarker::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  margin-left: -4px;
+  border: 4px solid transparent;
+}
+.autoscrollMarker::before {
+  top: 3px;
+  border-bottom: 5px solid #fff;
+}
+.autoscrollMarker::after {
+  bottom: 3px;
+  border-top: 5px solid #fff;
+}
+
+/* The item a notification opened: a brief glow so the eye finds it. */
+.flash {
+  animation: flash 1.6s ease-out;
+}
+@keyframes flash {
+  0%,
+  35% {
+    box-shadow: inset 0 0 0 2px var(--accent);
+    background-color: var(--accent-soft);
+  }
+  100% {
+    box-shadow: inset 0 0 0 2px transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flash {
+    animation: none;
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+}
+
+/* A channel name that opens the channel on Twitch. */
+.channelLink {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-underline-offset: 2px;
+}
+.channelLink:hover {
+  text-decoration-color: currentColor;
+}

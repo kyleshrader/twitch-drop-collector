@@ -57,6 +57,43 @@ export function gamePriority(channel: Channel, wanted: readonly Game[]): number 
   return index === -1 ? Number.POSITIVE_INFINITY : index
 }
 
+/**
+ * The Up next queue's ranking: queue position by campaign ID, lower is better. When given, it
+ * replaces game priority for choosing channels and the campaign shown as progressing.
+ */
+export type CampaignRank = ReadonlyMap<string, number>
+
+/** The best queue position among the campaigns watching this channel would progress. */
+export function queuePriority(
+  channel: Channel,
+  campaigns: readonly Campaign[],
+  rank: CampaignRank,
+  ctx: EarnContext
+): number {
+  let best = Number.POSITIVE_INFINITY
+  for (const c of campaigns) {
+    const position = rank.get(c.id)
+    if (position !== undefined && position < best && canEarnCampaign(c, ctx, channel)) {
+      best = position
+    }
+  }
+  return best
+}
+
+/** Wanted games reordered by their best queue position (games the queue doesn't rank go last). */
+export function orderWantedByQueue(
+  wanted: readonly Game[],
+  campaigns: readonly Campaign[],
+  rank: CampaignRank
+): Game[] {
+  const best = (g: Game): number =>
+    Math.min(
+      Number.POSITIVE_INFINITY,
+      ...campaigns.filter((c) => c.game.id === g.id).map((c) => rank.get(c.id) ?? Infinity)
+    )
+  return [...wanted].sort((a, b) => best(a) - best(b))
+}
+
 /** Watching this channel would progress a drop the user wants. */
 export function canWatch(
   channel: Channel,
@@ -100,23 +137,30 @@ export function shouldSwitch(
   watching: Channel | undefined,
   campaigns: readonly Campaign[],
   wanted: readonly Game[],
-  ctx: EarnContext
+  ctx: EarnContext,
+  rank?: CampaignRank
 ): boolean {
   if (!canWatch(candidate, campaigns, wanted, ctx)) return false
   if (!watching || !canWatch(watching, campaigns, wanted, ctx)) return true
-  const candidateRank = gamePriority(candidate, wanted)
-  const watchingRank = gamePriority(watching, wanted)
+  const priority = (c: Channel): number =>
+    rank ? queuePriority(c, campaigns, rank, ctx) : gamePriority(c, wanted)
+  const candidateRank = priority(candidate)
+  const watchingRank = priority(watching)
   return (
     candidateRank < watchingRank ||
     (candidateRank === watchingRank && candidate.aclBased && !watching.aclBased)
   )
 }
 
-/** Game priority first, then allowed-list channels, then most viewers. */
-export function rankChannels(channels: readonly Channel[], wanted: readonly Game[]): Channel[] {
+/** Game priority (or `priority`) first, then allowed-list channels, then most viewers. */
+export function rankChannels(
+  channels: readonly Channel[],
+  wanted: readonly Game[],
+  priority: (c: Channel) => number = (c) => gamePriority(c, wanted)
+): Channel[] {
   return [...channels].sort(
     (a, b) =>
-      gamePriority(a, wanted) - gamePriority(b, wanted) ||
+      priority(a) - priority(b) ||
       Number(b.aclBased) - Number(a.aclBased) ||
       (b.stream?.viewers ?? -1) - (a.stream?.viewers ?? -1)
   )
@@ -134,13 +178,15 @@ export function pickChannel(input: {
   campaigns: readonly Campaign[]
   wanted: readonly Game[]
   ctx: EarnContext
+  rank?: CampaignRank
 }): { channel?: Channel; reason: PickReason } {
-  const { channels, watching, selected, campaigns, wanted, ctx } = input
+  const { channels, watching, selected, campaigns, wanted, ctx, rank } = input
   if (selected && canWatch(selected, campaigns, wanted, ctx)) {
     return { channel: selected, reason: 'selected' }
   }
-  const better = rankChannels(channels, wanted).find((c) =>
-    shouldSwitch(c, watching, campaigns, wanted, ctx)
+  const priority = rank ? (c: Channel) => queuePriority(c, campaigns, rank, ctx) : undefined
+  const better = rankChannels(channels, wanted, priority).find((c) =>
+    shouldSwitch(c, watching, campaigns, wanted, ctx, rank)
   )
   if (better) return { channel: better, reason: 'better' }
   if (watching && canWatch(watching, campaigns, wanted, ctx)) {
@@ -149,17 +195,26 @@ export function pickChannel(input: {
   return { reason: 'none' }
 }
 
-/** The campaign being progressed on `channel`: the earnable one closest to completion. */
+/**
+ * The campaign being progressed on `channel`: the earnable one closest to completion, or the
+ * one ranked highest in the queue when a ranking is given.
+ */
 export function activeCampaign(
   channel: Channel,
   campaigns: readonly Campaign[],
   wanted: readonly Game[],
-  ctx: EarnContext
+  ctx: EarnContext,
+  rank?: CampaignRank
 ): Campaign | undefined {
   if (wanted.length === 0) return undefined
+  const position = (c: Campaign): number => rank?.get(c.id) ?? Number.POSITIVE_INFINITY
   return campaigns
     .filter((c) => canEarnCampaign(c, ctx, channel))
-    .sort((a, b) => campaignRemainingMinutes(a) - campaignRemainingMinutes(b))[0]
+    .sort(
+      (a, b) =>
+        (rank ? position(a) - position(b) : 0) ||
+        campaignRemainingMinutes(a) - campaignRemainingMinutes(b)
+    )[0]
 }
 
 /** When campaigns or drops start or end within the next hour: times to re-check channels. */

@@ -3,7 +3,7 @@
 export { TWITCH_ENDPOINTS, type TwitchEndpoints } from './endpoints'
 export { GqlError, RequestFailedError, ResponseShapeError } from './errors'
 export { createGqlClient, GQL_BATCH_SIZE, type GqlAuth, type GqlClient } from './gql/client'
-export { defineOperation, type GqlOperation } from './gql/operation'
+export { defineOperation, toPayload, type GqlOperation } from './gql/operation'
 export * as gql from './gql/operations'
 export {
   createHttpClient,

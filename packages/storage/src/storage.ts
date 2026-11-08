@@ -8,6 +8,8 @@ import { existsSync, renameSync } from 'node:fs'
 import { createCache, type Cache } from './cache'
 import { createClaimHistory, type ClaimHistory } from './claims'
 import { createImageIndex, type ImageIndex } from './images'
+import { createGames, type Games } from './games'
+import { createSeenCampaigns, type SeenCampaigns } from './seen'
 import { openSqlite, type Database } from './database'
 import { MIGRATIONS, NewerDatabaseError, runMigrations } from './migrations'
 
@@ -15,6 +17,8 @@ export interface Storage {
   cache: Cache
   claims: ClaimHistory
   images: ImageIndex
+  seen: SeenCampaigns
+  games: Games
   close(): void
 }
 
@@ -62,6 +66,8 @@ export function openStorage(deps: {
     cache: createCache({ db, clock, logger }),
     claims: createClaimHistory({ db }),
     images: createImageIndex({ db }),
+    seen: createSeenCampaigns({ db }),
+    games: createGames({ db }),
     close: () => db.close()
   }
 }

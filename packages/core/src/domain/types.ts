@@ -30,6 +30,8 @@ export interface Drop {
   /** Set once Twitch says the drop can be claimed. */
   claimId?: string
   claimed: boolean
+  /** When Twitch awarded the drop's rewards, if it says (claims made outside this app too). */
+  awardedAt?: Date
   /** Drops in the same campaign that must be claimed first. */
   preconditionIds: string[]
   benefits: Benefit[]

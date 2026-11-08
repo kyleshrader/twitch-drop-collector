@@ -10,7 +10,7 @@ import {
   type MockServer
 } from '../test/mock-server'
 import { createGqlClient, type GqlClient } from './client'
-import { CampaignDetailsQuery, CurrentDrop, StreamInfo } from './operations'
+import { CampaignDetailsQuery, CurrentDrop, SearchGames, StreamInfo } from './operations'
 
 let server: MockServer
 beforeEach(async () => {
@@ -79,6 +79,19 @@ describe('gql client', () => {
       operationName: 'VideoPlayerStreamInfoOverlayChannel',
       extensions: { persistedQuery: { version: 1, sha256Hash: StreamInfo.sha256 } },
       variables: { channel: 'foo' }
+    })
+  })
+
+  it('sends query text for an operation without a persisted hash', async () => {
+    const node = { id: '1', name: 'ROB RUN', displayName: 'ROB RUN', boxArtURL: 'x' }
+    server.handle(() => ({ body: { data: { searchCategories: { edges: [{ node }] } } } }))
+    const result = await client().gql.request(SearchGames, { query: 'rob run', first: 5 })
+
+    expect(result.searchCategories?.edges?.[0]?.node?.name).toBe('ROB RUN')
+    expect(JSON.parse(server.requests[0]!.body)).toEqual({
+      operationName: 'SearchGames',
+      query: SearchGames.query,
+      variables: { query: 'rob run', first: 5 }
     })
   })
 

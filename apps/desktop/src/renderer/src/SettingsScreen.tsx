@@ -17,10 +17,13 @@ function SettingsForm({ initial }: { initial: SettingsView }): ReactNode {
   const save = useMutation({
     mutationFn: () => {
       // The UI choice and the skipped version are set by their own buttons, so the form keeps
-      // whatever is saved for them (a stale draft can't undo them).
+      // whatever is saved for them (a stale draft can't undo them). The new UI's queue isn't on
+      // this form at all, so it isn't sent.
       const saved = queryClient.getQueryData<SettingsView>(SETTINGS_KEY) ?? draft
       return invoke('settings:update', {
-        ...draft,
+        mining: draft.mining,
+        network: draft.network,
+        logging: draft.logging,
         general: { ...draft.general, ui: saved.general.ui },
         updates: { mode: draft.updates.mode, prereleases: draft.updates.prereleases }
       })

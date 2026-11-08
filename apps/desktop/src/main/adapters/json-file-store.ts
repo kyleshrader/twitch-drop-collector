@@ -41,7 +41,28 @@ export function createJsonFileStore(deps: {
       await mkdir(dirname(file), { recursive: true })
       const temp = `${file}.tmp`
       await writeFile(temp, `${JSON.stringify(data, null, 2)}\n`, 'utf8')
-      await rename(temp, file)
+      await renameWithRetry(temp, file)
+    }
+  }
+}
+
+/** Windows refuses a rename for a moment while another process (a virus scanner, the indexer,
+ * a reader) has the file open. Those errors pass quickly, so retry briefly before failing. */
+const BUSY = new Set(['EPERM', 'EACCES', 'EBUSY'])
+export async function renameWithRetry(
+  from: string,
+  to: string,
+  options: { attempts?: number; delayMs?: number; rename?: typeof rename } = {}
+): Promise<void> {
+  const { attempts = 6, delayMs = 25, rename: move = rename } = options
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await move(from, to)
+      return
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException | undefined)?.code
+      if (attempt >= attempts || !code || !BUSY.has(code)) throw error
+      await new Promise((resolve) => setTimeout(resolve, delayMs * attempt))
     }
   }
 }

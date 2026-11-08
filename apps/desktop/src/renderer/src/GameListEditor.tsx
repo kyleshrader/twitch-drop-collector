@@ -1,7 +1,7 @@
 // A list of game names edited through a search box: typing filters the games that have current
 // campaigns, and any other name can be added as typed. Used for the priority and exclude lists.
 import type { CampaignView } from '@tdc/ipc-contract'
-import { useEffect, useId, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import { useMiner } from './live'
 import { RemoteImage } from './RemoteImage'
 import { strings } from './strings'
@@ -30,6 +30,26 @@ function gameSuggestions(campaigns: readonly CampaignView[]): GameSuggestion[] {
   return [...games.values()].sort((a, b) => a.name.localeCompare(b.name))
 }
 
+/** Whether a mouse button or touch is down right now, anywhere in the window. */
+function usePointerPressed(): { readonly current: boolean } {
+  const pressed = useRef(false)
+  useEffect(() => {
+    const down = (): void => {
+      pressed.current = true
+    }
+    const up = (): void => {
+      pressed.current = false
+    }
+    document.addEventListener('pointerdown', down, true)
+    document.addEventListener('pointerup', up, true)
+    return () => {
+      document.removeEventListener('pointerdown', down, true)
+      document.removeEventListener('pointerup', up, true)
+    }
+  }, [])
+  return pressed
+}
+
 const same = (a: string, b: string): boolean => a.toLowerCase() === b.toLowerCase()
 
 type Option = { kind: 'game'; game: GameSuggestion } | { kind: 'typed'; name: string }
@@ -49,6 +69,7 @@ export function GameListEditor(props: {
   const [text, setText] = useState('')
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(-1)
+  const pressing = usePointerPressed()
 
   /** On this list already, or on the other one. */
   const unavailable = (name: string): boolean =>
@@ -170,8 +191,18 @@ export function GameListEditor(props: {
           onFocus={() => setOpen(true)}
           onClick={() => setOpen(true)}
           onBlur={() => {
-            setOpen(false)
-            setActive(-1)
+            const close = (): void => {
+              setOpen(false)
+              setActive(-1)
+            }
+            // The suggestions push what follows down. Closing them in the middle of a click
+            // elsewhere would move its target before the button is released, and the click would
+            // be lost, so wait until the press is over.
+            if (pressing.current) {
+              document.addEventListener('pointerup', () => setTimeout(close), { once: true })
+            } else {
+              close()
+            }
           }}
           onKeyDown={onKeyDown}
         />

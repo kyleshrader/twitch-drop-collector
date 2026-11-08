@@ -476,6 +476,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource-variable/inter@npm:5.3.0":
+  version: 5.3.0
+  resolution: "@fontsource-variable/inter@npm:5.3.0"
+  checksum: 10c0/46fbe41e8482a718f99634c8254346c6081d615415059be12e177224c903d688199125967825e75d4b8122668fd83f70880e11d4e02d08c20b503c65fe2a96d1
+  languageName: node
+  linkType: hard
+
 "@humanfs/core@npm:^0.19.2":
   version: 0.19.2
   resolution: "@humanfs/core@npm:0.19.2"
@@ -889,6 +896,7 @@ __metadata:
   dependencies:
     "@electron-toolkit/utils": "npm:^4.0.0"
     "@electron/fuses": "npm:^1.8.0"
+    "@fontsource-variable/inter": "npm:5.3.0"
     "@tanstack/react-query": "npm:^5.105.0"
     "@tdc/api": "workspace:^"
     "@tdc/config": "workspace:^"
@@ -906,6 +914,7 @@ __metadata:
     electron-log: "npm:^5.4.4"
     electron-updater: "npm:^6.8.11"
     electron-vite: "npm:^6.0.0"
+    lucide-react: "npm:1.60.0"
     react: "catalog:"
     react-dom: "catalog:"
     typescript: "catalog:"
@@ -3632,6 +3641,19 @@ __metadata:
   dependencies:
     yallist: "npm:^4.0.0"
   checksum: 10c0/cb53e582785c48187d7a188d3379c181b5ca2a9c78d2bce3e7dee36f32761d1c42983da3fe12b55cb74e1779fa94cdc2e5367c028a9b35317184ede0c07a30a9
+  languageName: node
+  linkType: hard
+
+"lucide-react@npm:1.60.0":
+  version: 1.60.0
+  resolution: "lucide-react@npm:1.60.0"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/710404ff9d6f29829866e369533c80a0163797412bd0f0af8595956f99544198e4a26800c93f5b1d8203aeb25fc2df7fddf583f7851fe40d697676f14aef5d39
   languageName: node
   linkType: hard
 

@@ -4,4 +4,6 @@ export { createClaimHistory, type ClaimHistory, type ClaimRecord } from './claim
 export { createImageIndex, type ImageEntry, type ImageIndex } from './images'
 export { openSqlite, type Database, type Row, type SqlValue } from './database'
 export { MIGRATIONS, NewerDatabaseError, runMigrations, schemaVersion } from './migrations'
+export { createGames, type GameInfo, type Games } from './games'
+export { createSeenCampaigns, type SeenCampaign, type SeenCampaigns } from './seen'
 export { openStorage, type Storage } from './storage'

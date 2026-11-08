@@ -1,7 +1,7 @@
 // Dev-only: runs the read-only GQL queries the miner needs against the signed-in session, saves
 // the raw responses under userData/gql-probe/, and checks each against our response schemas.
 // Used to verify the M6 schemas on live data. Never runs in packaged builds (see index.ts).
-import { gql, type GqlOperation, type HttpClient } from '@tdc/api'
+import { gql, toPayload, type GqlOperation, type HttpClient } from '@tdc/api'
 import type { AuthService } from '@tdc/core'
 import type { Logger } from '@tdc/kernel'
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -53,11 +53,7 @@ export async function runGqlProbe(deps: {
     inputs: V[],
     file: string
   ): Promise<unknown[]> => {
-    const payload = inputs.map((input) => ({
-      operationName: operation.name,
-      extensions: { persistedQuery: { version: 1, sha256Hash: operation.sha256 } },
-      variables: operation.variables(input)
-    }))
+    const payload = inputs.map((input) => toPayload(operation, input))
     const response = await http.request({
       method: 'POST',
       url: gqlUrl,

@@ -1,41 +1,66 @@
-// The new UI, in preview: built here screen by screen while the classic UI stays available.
-// It reads the same live state and calls the same IPC as the classic UI; only the view differs.
-// Styles are CSS modules, so nothing here leaks into the classic UI or the other way round.
+// The new UI (docs/new-ui/ui-design.md), in preview beside the classic UI. It reads the same live
+// state and calls the same IPC; only the view differs. Styles are CSS modules, so nothing here
+// leaks into the classic UI or the other way round.
+import '@fontsource-variable/inter'
 import type { ReactNode } from 'react'
-import { useAuthState, useMiner } from '../live'
-import { useUiChoice } from '../ui-choice'
-import styles from './NextApp.module.css'
-import { strings as t } from './strings'
+import { useAuthState, useMiner, useSettings, useUpdates } from '../live'
+import { useMiddleClickScroll } from './autoscroll'
+import { useKeyboard } from './keyboard'
+import { useNow } from './data'
+import { DropsPage } from './drops/DropsPage'
+import { LibraryPage } from './pages/LibraryPage'
+import { SettingsPage } from './pages/SettingsPage'
+import { SignedOut } from './pages/SignedOut'
+import { UpdatesPage } from './pages/UpdatesPage'
+import { useHistoryKeys, useRoute, type Route } from './router'
+import { strings } from './strings'
+import { TopBar } from './TopBar'
+import ui from './ui.module.css'
 
-// Destructured: the strict TS config doesn't allow dot access on a CSS module's class map.
-const { app, header, title, badge, back, main } = styles
+const { app, main, autoscrollMarker } = ui
 
 export function NextApp(): ReactNode {
   const auth = useAuthState()
   const miner = useMiner()
-  const { switchTo, switching, failed } = useUiChoice()
+  const settings = useSettings()
+  const updates = useUpdates()
+  const route = useRoute()
+  const now = useNow()
+  useHistoryKeys()
+  useKeyboard()
+  useMiddleClickScroll(autoscrollMarker)
+
+  const signedIn = auth?.status === 'signedIn'
+  const page = (r: Route): ReactNode => {
+    if (!settings) return null
+    if (r.page === 'settings') return <SettingsPage settings={settings} />
+    if (r.page === 'updates') return <UpdatesPage updates={updates} />
+    if (!signedIn) return <SignedOut auth={auth} />
+    if (r.page === 'library') {
+      return (
+        <LibraryPage
+          campaigns={miner?.campaigns ?? []}
+          seenByGame={miner?.seenByGame}
+          games={miner?.games}
+          gameId={r.gameId}
+          group={r.group}
+        />
+      )
+    }
+    return (
+      <DropsPage
+        miner={miner}
+        settings={settings}
+        target={r.page === 'drops' ? r.target : undefined}
+      />
+    )
+  }
 
   return (
-    <div className={app} data-testid="next-ui">
-      <header className={header}>
-        <h1 className={title}>{t.title}</h1>
-        <span className={badge}>{t.preview}</span>
-        <button
-          type="button"
-          className={back}
-          disabled={switching}
-          onClick={() => switchTo('classic')}
-        >
-          {switching ? t.switching : t.backToClassic}
-        </button>
-      </header>
-      {failed && <p role="alert">{t.switchFailed}</p>}
-      <main className={main}>
-        <p>{t.intro}</p>
-        <p role="status">
-          {auth?.status === 'signedIn' ? t.status.signedIn(auth.user.login) : t.status.signedOut}
-          {miner && <> · {t.miner(miner.status)}</>}
-        </p>
+    <div className={app} data-testid="next-ui" data-theme={settings?.general.theme ?? 'system'}>
+      <TopBar route={route} auth={auth} miner={miner} updates={updates} now={now} />
+      <main className={main} aria-label={strings.title}>
+        {page(route)}
       </main>
     </div>
   )

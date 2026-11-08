@@ -29,11 +29,13 @@ const campaign = (id: string, overrides: Partial<CampaignView> = {}): CampaignVi
   id,
   name: `Campaign ${id}`,
   game: 'Rust',
+  gameId: '263490',
   state: 'active',
   linked: true,
   startsAt: '2026-10-30T00:00:00.000Z',
   endsAt: '2026-11-30T00:00:00.000Z',
   allowListed: false,
+  allowedChannels: [],
   badgesEmotes: false,
   drops: [drop(false)],
   ...overrides

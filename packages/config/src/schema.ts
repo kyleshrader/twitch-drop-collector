@@ -65,12 +65,59 @@ export const UpdateSettings = z.object({
   skippedVersion: z.union([z.literal(''), Version])
 })
 
+/** How the new UI's Drops page groups Up next into cards (docs/new-ui/queue-rules.md). */
+export const QUEUE_LAYOUTS = ['games', 'channels', 'campaigns'] as const
+export const QUEUE_SORTS = ['priority', 'ending', 'spare', 'custom'] as const
+export const QUEUE_AUTO_SORTS = ['priority', 'ending', 'spare'] as const
+export const QUEUE_SPLIT_RULES = ['free', 'byChannels', 'never'] as const
+export const DROP_PROGRESS_RULES = ['together', 'oneAtATime'] as const
+export const CAMPAIGN_PROGRESS_RULES = ['separate', 'together'] as const
+export const NEW_IN_CUSTOM_RULES = ['byTimeRemaining', 'end'] as const
+
+const CampaignId = z.string().min(1).max(100)
+
+/**
+ * The Up next queue: how it's shown and sorted, the user's own order, and the rules for what
+ * Twitch is assumed to do. Rules are separate fields so one bad value resets only that rule.
+ */
+export const QueueSettings = z.object({
+  layout: z.enum(QUEUE_LAYOUTS),
+  sort: z.enum(QUEUE_SORTS),
+  /** The automatic sort a custom order started from ("Reset to …"). */
+  baseSort: z.enum(QUEUE_AUTO_SORTS),
+  /** Campaign IDs in the user's order; used when sort is custom. */
+  order: z.array(CampaignId).max(2000),
+  /** Collect now in an automatic sort: this campaign goes first until it's done. Empty: none. */
+  focus: z.union([z.literal(''), CampaignId]),
+  /** Mining paused by the user (survives restarts). */
+  paused: z.boolean(),
+  split: z.enum(QUEUE_SPLIT_RULES),
+  dropProgress: z.enum(DROP_PROGRESS_RULES),
+  campaignProgress: z.enum(CAMPAIGN_PROGRESS_RULES),
+  linkedFirst: z.boolean(),
+  newInCustom: z.enum(NEW_IN_CUSTOM_RULES)
+})
+export type QueueSettings = z.infer<typeof QueueSettings>
+
+/**
+ * The rules that describe what Twitch does, at the values Twitch's Drops campaign guide gives:
+ * a campaign's drops progress together, and every campaign live on a channel gets the watch
+ * time. With that, splitting campaigns that accept the same channels can't hold one back, so
+ * splits follow channel lists. These are the defaults (docs/new-ui/queue-rules.md).
+ */
+export const RECOMMENDED_QUEUE_RULES = {
+  split: 'byChannels',
+  dropProgress: 'together',
+  campaignProgress: 'together'
+} as const satisfies Partial<QueueSettings>
+
 export const Settings = z.object({
   general: GeneralSettings,
   mining: MiningSettings,
   network: NetworkSettings,
   logging: LoggingSettings,
-  updates: UpdateSettings
+  updates: UpdateSettings,
+  queue: QueueSettings
 })
 export type Settings = z.infer<typeof Settings>
 export type SettingsSection = keyof Settings
@@ -103,6 +150,17 @@ export const DEFAULT_SETTINGS: Settings = {
     mode: 'notify',
     prereleases: false,
     skippedVersion: ''
+  },
+  queue: {
+    layout: 'games',
+    sort: 'priority',
+    baseSort: 'priority',
+    order: [],
+    focus: '',
+    paused: false,
+    ...RECOMMENDED_QUEUE_RULES,
+    linkedFirst: true,
+    newInCustom: 'byTimeRemaining'
   }
 }
 
@@ -112,6 +170,7 @@ export const SettingsPatch = z.strictObject({
   mining: z.strictObject(MiningSettings.partial().shape).optional(),
   network: z.strictObject(NetworkSettings.partial().shape).optional(),
   logging: z.strictObject(LoggingSettings.partial().shape).optional(),
-  updates: z.strictObject(UpdateSettings.partial().shape).optional()
+  updates: z.strictObject(UpdateSettings.partial().shape).optional(),
+  queue: z.strictObject(QueueSettings.partial().shape).optional()
 })
 export type SettingsPatch = z.infer<typeof SettingsPatch>

@@ -1,0 +1,540 @@
+/* The Drops page: Current, Up next, Upcoming and Completed (docs/new-ui/ui-design.md). */
+
+/* ---- Current ---- */
+.current {
+  position: relative;
+  background: var(--section);
+  border-bottom: 1px solid var(--line);
+}
+/* The banner itself doesn't clip, so menus opened from it (Change channel) can extend over
+   the drops below; only its blurred background is clipped, by .artClip. */
+.banner {
+  position: relative;
+  height: 138px;
+  color: #fff;
+  display: flex;
+  align-items: flex-start;
+  padding: 18px 28px 0 176px;
+}
+.artClip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.art {
+  position: absolute;
+  inset: -40px;
+  background: linear-gradient(165deg, hsl(var(--h1) 68% 48%), hsl(var(--h2) 62% 16%));
+  filter: blur(30px) brightness(0.62) saturate(1.25);
+  transform: scale(1.25);
+}
+.art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(8, 10, 14, 0.55), rgba(8, 10, 14, 0.12) 70%),
+    linear-gradient(180deg, transparent 55%, rgba(8, 10, 14, 0.35));
+}
+.bannerText {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.78);
+}
+.kicker svg {
+  width: 13px;
+  height: 13px;
+}
+.live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #79d652;
+  box-shadow: 0 0 0 3px rgba(121, 214, 82, 0.25);
+}
+.title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-top: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.subtitle {
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.82);
+  margin-top: 2px;
+}
+.watching {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+.watching b {
+  color: #fff;
+  font-weight: 600;
+}
+.watching button {
+  height: 26px;
+  padding: 0 9px;
+  font-size: 12px;
+}
+.bannerActions {
+  position: relative;
+  align-self: center;
+  margin-top: -6px;
+}
+.floatingCover {
+  position: absolute;
+  left: 28px;
+  top: 24px;
+  z-index: 2;
+}
+.currentBody {
+  padding: 16px 28px 22px 176px;
+  min-height: 118px;
+}
+.idle {
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.drops {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+.join {
+  width: 22px;
+  height: 2px;
+  background: var(--line);
+  flex: none;
+}
+.joinLit {
+  background: var(--good);
+}
+.reward {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 7px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  padding: 0;
+  cursor: default;
+  background: linear-gradient(145deg, hsl(var(--h1) 58% 44%), hsl(var(--h1) 60% 18%));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.15s;
+}
+.reward img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+.reward:hover,
+.reward:focus-visible {
+  transform: translateY(-2px);
+}
+.rewardSmall {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+}
+.done .tick {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--good);
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--section);
+}
+.done .tick svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 3;
+}
+.future {
+  opacity: 0.42;
+  filter: saturate(0.35);
+}
+.now {
+  box-shadow:
+    0 0 0 2px var(--accent),
+    0 0 22px 5px var(--glow);
+  animation: glow 2.6s ease-in-out infinite;
+}
+.paused .now {
+  animation: none;
+  box-shadow: 0 0 0 2px var(--faint);
+}
+@keyframes glow {
+  50% {
+    box-shadow:
+      0 0 0 2px var(--accent),
+      0 0 30px 9px var(--glow);
+  }
+}
+.names {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 12px 0 8px;
+  min-height: 21px;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+.names b {
+  font-weight: 700;
+}
+.rewardName {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+}
+.rewardName svg {
+  width: 14px;
+  height: 14px;
+}
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 640px;
+}
+.bar {
+  flex: 1;
+  height: 8px;
+  background: var(--raised);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #3586dc, #62b6ff);
+}
+.paused .bar i {
+  background: var(--faint);
+}
+.left {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.left b {
+  color: var(--text);
+  font-weight: 700;
+}
+.channelOffline {
+  color: var(--faint);
+}
+
+/* ---- sections ---- */
+.section {
+  padding: 0 28px 8px;
+}
+.sectionLast {
+  padding-bottom: 30px;
+}
+.sectionHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 22px 0 10px;
+}
+.sectionHead h2 {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--raised);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+.spacer {
+  flex: 1;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.excludedHead {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 14px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.excludedHead svg {
+  width: 14px;
+  height: 14px;
+}
+.notice {
+  margin-bottom: 10px;
+}
+.notice button {
+  margin-left: auto;
+}
+
+/* ---- Up next cards ---- */
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px 57px 1fr;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px 6px 8px;
+}
+.cardFlat {
+  grid-template-columns: 18px 42px 1fr;
+  padding-bottom: 10px;
+}
+.dragging {
+  opacity: 0.45;
+}
+.dropBefore::before,
+.dropAfter::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.dropBefore::before {
+  top: -6px;
+}
+.dropAfter::after {
+  bottom: -6px;
+}
+.grip {
+  color: var(--faint);
+  cursor: grab;
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+}
+.grip svg {
+  width: 16px;
+  height: 16px;
+}
+.cardHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 28px;
+}
+.gameName {
+  font-weight: 700;
+  font-size: 15px;
+}
+.channels {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.campaign {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 128px 190px auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.cardHead + .campaign {
+  margin-top: 6px;
+}
+.campaignFlat {
+  grid-template-columns: minmax(0, 1fr) 128px 190px auto;
+  border-top: 0;
+  padding: 2px 0 0;
+}
+.campaignGrip {
+  color: var(--faint);
+  cursor: grab;
+  display: grid;
+  place-items: center;
+}
+.campaignGrip svg {
+  width: 14px;
+  height: 14px;
+}
+/* The chevron and name stay on one line; chips go below when there's no room beside the
+   name, and the name ends in "…" only when it alone is too wide. */
+.campaignName {
+  font-weight: 600;
+  font-size: 13.5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 7px;
+  min-width: 0;
+}
+.campaignName > * {
+  flex: none;
+}
+.campaignName > .nameLine {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+.campaignDrops {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.mini {
+  height: 4px;
+  background: var(--raised);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.mini i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.campaignTime {
+  display: flex;
+  flex-direction: column;
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+.campaignTime .muted {
+  font-size: 12px;
+  color: var(--muted);
+}
+.campaignActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.warning {
+  grid-column: 2 / -1;
+}
+.campaignFlat .warning {
+  grid-column: 1 / -1;
+}
+.estimate {
+  color: var(--muted);
+  font-weight: 400;
+}
+.dropsPanel {
+  grid-column: 2 / -1;
+}
+.campaignFlat .dropsPanel {
+  grid-column: 1 / -1;
+}
+.hint {
+  grid-column: 2 / -1;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---- rows (Upcoming, Completed, excluded) ---- */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.rowWrap {
+  display: flex;
+  flex-direction: column;
+}
+.rowDrops {
+  padding: 0 12px 0 48px;
+}
+.rowExcluded {
+  background: transparent;
+  border-style: dashed;
+}
+/* Row text is Truncated (inline): each part on its own line, cut off with "…". */
+.rowTitle {
+  display: flex;
+  font-weight: 600;
+  font-size: 14px;
+}
+.rowSub {
+  display: flex;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.starts {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: default;
+}
+.starts b {
+  color: var(--text);
+}
+.starts svg {
+  width: 14px;
+  height: 14px;
+}
+.when {
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  min-width: 90px;
+  text-align: right;
+}
+.hiddenNote {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

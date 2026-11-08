@@ -1,5 +1,5 @@
 // The window can show the classic UI or the new one (in preview), switched from either and kept
-// across restarts. Everything else in the e2e suite runs on the classic UI.
+// across restarts. next-ui.spec.ts covers the new UI's screens; the rest runs on the classic UI.
 import { expect, test } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'

@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Drops miner: new UI mockups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e9edf2; --win:#f5f7fa; --top:#ffffff; --surface:#ffffff; --section:#e1e6ed; --raised:#edf0f4; --hover:#e4e9ef;
+  --line:#d3d9e1; --text:#18212d; --muted:#556274; --faint:#8692a2;
+  --accent:#1d6ec2; --accent-soft:rgba(29,110,194,.11); --glow:rgba(29,110,194,.5);
+  --warn:#9a5a00; --warn-bg:#fdf0d8; --warn-line:#efd29a; --bad:#b3362b;
+  --tip-bg:#1b2430; --tip-text:#eef2f6; --shadow:0 10px 30px rgba(20,32,48,.16);
+  color-scheme:light;
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c0f13; --win:#1a1e25; --top:#13171d; --surface:#222831; --section:#272f3a; --raised:#2d3641; --hover:#343e4b;
+    --line:#313a46; --text:#dde3ea; --muted:#929fae; --faint:#677485;
+    --accent:#4d9be6; --accent-soft:rgba(77,155,230,.15); --glow:rgba(110,180,255,.65);
+    --warn:#f1b65a; --warn-bg:rgba(241,182,90,.1); --warn-line:rgba(241,182,90,.3); --bad:#ff7d6e;
+    --tip-bg:#05070a; --tip-text:#e4e9ef; --shadow:0 14px 40px rgba(0,0,0,.55);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c0f13; --win:#1a1e25; --top:#13171d; --surface:#222831; --section:#272f3a; --raised:#2d3641; --hover:#343e4b;
+  --line:#313a46; --text:#dde3ea; --muted:#929fae; --faint:#677485;
+  --accent:#4d9be6; --accent-soft:rgba(77,155,230,.15); --glow:rgba(110,180,255,.65);
+  --warn:#f1b65a; --warn-bg:rgba(241,182,90,.1); --warn-line:rgba(241,182,90,.3); --bad:#ff7d6e;
+  --tip-bg:#05070a; --tip-text:#e4e9ef; --shadow:0 14px 40px rgba(0,0,0,.55);
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}
+.grow{flex:1;min-width:0}
+svg.lucide{width:18px;height:18px;flex:none;stroke-width:2}
+
+/* presentation chrome around the mock window */
+.deck{max-width:1260px;margin:0 auto;padding:20px 20px 14px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;justify-content:space-between}
+.deck h1{font-size:18px;margin:0;font-weight:700;letter-spacing:-.01em}
+.deck p{margin:3px 0 0;color:var(--muted);font-size:13px;max-width:62ch}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+.tab:hover{color:var(--text)}
+.tab.on{background:var(--text);color:var(--win);border-color:var(--text)}
+.stage{max-width:1260px;margin:0 auto;padding:0 20px 40px;overflow-x:auto}
+
+/* app window */
+.win{position:relative;min-width:1060px;height:820px;background:var(--win);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.top{flex:none;display:flex;align-items:center;height:56px;padding:0 14px 0 18px;background:var(--top);border-bottom:1px solid var(--line);gap:26px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:15px;color:var(--text)}
+.brand .mark{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:#fff;background:linear-gradient(140deg,#4d9be6,#6a4fd8)}
+.brand .mark svg{width:16px;height:16px}
+.nav{display:flex;height:100%}
+.nav a{display:flex;align-items:center;gap:6px;padding:0 14px;color:var(--muted);text-decoration:none;font-weight:700;font-size:13px;letter-spacing:.07em;text-transform:uppercase;border-bottom:2px solid transparent;margin-bottom:-1px}
+.nav a:hover{color:var(--text)}
+.nav a.on{color:var(--text);border-bottom-color:var(--accent)}
+.nav a svg{width:14px;height:14px;color:var(--warn)}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:2px}
+.ib{position:relative;width:36px;height:36px;border-radius:6px;display:inline-grid;place-items:center;color:var(--muted);background:none;border:0;cursor:pointer;flex:none}
+.ib:hover,.ib.open{background:var(--raised);color:var(--text)}
+.ib.sm{width:28px;height:28px}
+.ib.sm svg{width:16px;height:16px}
+.badge{position:absolute;top:3px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px;line-height:1}
+.pip{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:#5fb83a;box-shadow:0 0 0 2px var(--top)}
+.acct{display:flex;align-items:center;gap:8px;margin-left:8px;padding:4px 8px 4px 4px;border-radius:6px;background:none;border:0;cursor:pointer;font-weight:600;font-size:13px}
+.acct:hover,.acct.open{background:var(--raised)}
+.acct svg{width:14px;height:14px;color:var(--muted)}
+.avatar{width:28px;height:28px;border-radius:5px;background:linear-gradient(135deg,#8a63f0,#3f8fe0);color:#fff;font-weight:700;font-size:11px;display:grid;place-items:center;flex:none}
+.avatar.lg{width:40px;height:40px;font-size:14px;border-radius:7px}
+main{flex:1;overflow-y:auto;position:relative}
+
+/* buttons */
+.btn{height:32px;padding:0 12px;border-radius:4px;border:1px solid var(--line);background:var(--raised);color:var(--text);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;cursor:pointer;white-space:nowrap;flex:none}
+.btn:hover{background:var(--hover)}
+.btn svg{width:15px;height:15px}
+.btn.sm{height:28px;padding:0 10px;font-size:12.5px}
+.btn.lg{height:44px;padding:0 22px;font-size:15px}
+.btn.lg svg{width:18px;height:18px}
+.btn.ghost{background:none;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--raised);color:var(--text)}
+.btn.green{background:linear-gradient(180deg,#79b72d,#5a9221);border-color:#55891f;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.15)}
+.btn.green:hover{background:linear-gradient(180deg,#86c535,#619c25)}
+.btn.blue{background:linear-gradient(180deg,#4f9fea,#2e76c2);border-color:#2c6fb5;color:#fff}
+.btn.blue:hover{background:linear-gradient(180deg,#5eaaf0,#3580cc)}
+.btn.claimed{background:var(--raised);color:var(--faint);border-color:var(--line);cursor:default}
+.btn.glass{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.22);color:#fff;backdrop-filter:blur(8px)}
+.btn.glass:hover{background:rgba(255,255,255,.22)}
+.btn[disabled]{cursor:default}
+
+/* chips & segmented */
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--raised);color:var(--muted);white-space:nowrap}
+.chip svg{width:12px;height:12px}
+.chip.pri{background:var(--accent-soft);color:var(--accent)}
+.chip.new{background:#5fb83a;color:#fff}
+.chip.warnc{background:var(--warn-bg);color:var(--warn)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;flex:none;background:var(--surface)}
+.seg button{border:0;background:none;padding:5px 10px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button:hover{color:var(--text);background:var(--raised)}
+.seg button.on{background:var(--accent-soft);color:var(--accent)}
+.seg button.on.x{background:var(--raised);color:var(--text)}
+
+/* covers & reward art (placeholders standing in for Twitch box art) */
+.cover{position:relative;flex:none;aspect-ratio:285/380;border-radius:4px;overflow:hidden;container-type:inline-size;color:#fff;
+  background:linear-gradient(165deg,hsl(var(--h1) 68% 48%),hsl(var(--h2) 62% 16%));box-shadow:0 4px 14px rgba(0,0,0,.28)}
+.cover::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 22%,rgba(255,255,255,.38),transparent 46%),repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 11px)}
+.cover .mk{position:absolute;top:6%;left:7%;font-size:46cqw;font-weight:800;line-height:1;opacity:.22}
+.cover .ct{position:absolute;left:8%;right:8%;bottom:8%;font-weight:800;line-height:1.02;text-transform:uppercase;font-size:14cqw;letter-spacing:.01em;text-shadow:0 2px 8px rgba(0,0,0,.35)}
+.cover.xxs{width:30px;border-radius:3px;box-shadow:none}.cover.xxs .ct{display:none}
+.cover.xs{width:42px;box-shadow:none}.cover.xs .ct{display:none}
+.cover.sm{width:57px}
+.cover.md{width:120px}
+.cover.lg{width:126px}
+.rw{position:relative;width:64px;height:64px;border-radius:7px;flex:none;display:grid;place-items:center;color:#fff;cursor:default;
+  background:linear-gradient(145deg,hsl(var(--h) 58% 44%),hsl(var(--h) 60% 18%));border:1px solid rgba(255,255,255,.08);transition:transform .15s}
+.rw svg{width:26px;height:26px}
+.rw.done .ok{position:absolute;right:-5px;bottom:-5px;width:20px;height:20px;border-radius:50%;background:#5fb83a;display:grid;place-items:center;border:2px solid var(--section)}
+.rw.done .ok svg{width:11px;height:11px;stroke-width:3}
+.rw.future{opacity:.42;filter:saturate(.35)}
+.rw.cur{box-shadow:0 0 0 2px var(--accent),0 0 22px 5px var(--glow);animation:glow 2.6s ease-in-out infinite}
+.rw:hover{transform:translateY(-2px)}
+.paused .rw.cur{animation:none;box-shadow:0 0 0 2px var(--faint)}
+.rw.sm{width:40px;height:40px;border-radius:6px}.rw.sm svg{width:18px;height:18px}
+@keyframes glow{50%{box-shadow:0 0 0 2px var(--accent),0 0 30px 9px var(--glow)}}
+
+/* Current */
+.current{position:relative;background:var(--section);border-bottom:1px solid var(--line)}
+.banner{position:relative;height:138px;overflow:hidden;color:#fff;display:flex;align-items:flex-start;padding:18px 28px 0 176px}
+.art{position:absolute;inset:-40px;background:linear-gradient(165deg,hsl(var(--h1) 68% 48%),hsl(var(--h2) 62% 16%));filter:blur(30px) brightness(.62) saturate(1.25);transform:scale(1.25)}
+.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,10,14,.55),rgba(8,10,14,.12) 70%),linear-gradient(180deg,transparent 55%,rgba(8,10,14,.35))}
+.ban-in{position:relative;flex:1;min-width:0}
+.kicker{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:rgba(255,255,255,.78)}
+.kicker svg{width:13px;height:13px}
+.live{width:8px;height:8px;border-radius:50%;background:#79d652;box-shadow:0 0 0 3px rgba(121,214,82,.25)}
+.ttl{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.15;margin-top:4px}
+.ban-sub{font-size:13.5px;color:rgba(255,255,255,.82);margin-top:2px}
+.watch{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:13px;color:rgba(255,255,255,.85)}
+.watch b{color:#fff;font-weight:600}
+.watch .btn{height:26px;padding:0 9px;font-size:12px}
+.ban-act{position:relative;align-self:center;margin-top:-6px}
+.cover-float{position:absolute;left:28px;top:24px;z-index:2}
+.cur-body{padding:16px 28px 22px 176px;min-height:118px}
+.drops{display:flex;align-items:center;gap:0}
+.drops .join{width:22px;height:2px;background:var(--line);flex:none}
+.drops .join.lit{background:#5fb83a}
+.names{display:flex;align-items:baseline;gap:12px;margin:12px 0 8px;min-height:21px;font-size:14px;flex-wrap:wrap}
+.names b{font-weight:700}
+.names .rwn{display:inline-flex;align-items:center;gap:5px;color:var(--muted)}
+.names .rwn svg{width:14px;height:14px}
+.prog{display:flex;align-items:center;gap:14px;max-width:640px}
+.bar{flex:1;height:8px;background:var(--raised);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#3586dc,#62b6ff)}
+.paused .bar i{background:var(--faint)}
+.left{font-size:13px;color:var(--muted);white-space:nowrap}
+.left b{color:var(--text);font-weight:700}
+
+/* sections */
+.sec{padding:0 28px 8px}
+.sec-h{display:flex;align-items:center;gap:10px;padding:22px 0 10px}
+.sec-h h2{font-size:16px;margin:0;font-weight:700;letter-spacing:-.01em}
+.cnt{font-size:12px;font-weight:600;color:var(--muted);background:var(--raised);border-radius:10px;padding:1px 8px}
+.sec-h .sp{flex:1}
+.list{display:flex;flex-direction:column;gap:8px}
+.ex-h{font-size:12.5px;font-weight:600;color:var(--muted);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.ex-h svg{width:14px;height:14px}
+.empty{padding:16px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);font-size:13px}
+
+/* Up next cards */
+.card{display:grid;grid-template-columns:18px 57px 1fr;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 12px 6px 8px}
+.grip{color:var(--faint);cursor:grab;display:grid;place-items:center;align-self:stretch}
+.grip svg{width:16px;height:16px}
+.card-h{display:flex;align-items:center;gap:8px;min-height:28px}
+.gname{font-weight:700;font-size:15px}
+.camp{display:grid;grid-template-columns:16px minmax(0,1fr) 128px 168px auto;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.card-h+.camp{margin-top:6px}
+.camp .cg{color:var(--faint);cursor:grab;display:grid;place-items:center}
+.camp .cg svg{width:14px;height:14px}
+.cname{font-weight:600;font-size:13.5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.cdrops{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.mini{height:4px;background:var(--raised);border-radius:2px;overflow:hidden}
+.mini i{display:block;height:100%;background:var(--accent)}
+.ctime{display:flex;flex-direction:column;font-size:12.5px;line-height:1.35}
+.ctime .muted{font-size:12px}
+.cact{display:flex;align-items:center;gap:4px}
+.warn{grid-column:2/-1;display:flex;align-items:flex-start;gap:8px;background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn);border-radius:5px;padding:7px 10px;font-size:12.5px;font-weight:500}
+.warn svg{width:15px;height:15px;margin-top:1px}
+.warn .est{color:var(--muted);font-weight:400}
+.card.bumped{border-style:dashed}
+
+/* generic rows (Upcoming / Completed / excluded) */
+.row{display:flex;align-items:center;gap:14px;padding:9px 12px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.row .rt{font-weight:600;font-size:14px}
+.row .rs{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.ex{background:transparent;border-style:dashed}
+.starts{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:default}
+.starts b{color:var(--text)}
+.starts svg{width:14px;height:14px}
+.when{font-size:12.5px;color:var(--muted);white-space:nowrap;width:110px;text-align:right}
+.claim-note{font-size:12px;color:var(--bad);white-space:nowrap}
+.hidden-note{font-size:12.5px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:8px}
+
+/* popovers */
+.pop{position:absolute;z-index:50;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);min-width:230px;padding:6px;font-size:13px}
+.pop-h{display:flex;align-items:center;gap:8px;padding:8px 10px 6px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.pop-h .btn{margin-left:auto}
+.mi{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:5px;cursor:pointer;background:none;border:0;width:100%;text-align:left;color:var(--text)}
+.mi:hover{background:var(--raised)}
+.mi svg{width:16px;height:16px;color:var(--muted)}
+.mi .r{margin-left:auto;font-size:12px;color:var(--faint);display:inline-flex;align-items:center;gap:6px}
+.mi.dis{color:var(--faint);cursor:default}
+.mi.dis:hover{background:none}
+.mi .chk{width:16px;color:var(--accent)}
+.sep{height:1px;background:var(--line);margin:6px 4px}
+.kv{display:flex;justify-content:space-between;gap:16px;padding:3px 10px;font-size:12.5px;color:var(--muted)}
+.kv span:last-child{color:var(--text)}
+.acct-h{display:flex;gap:10px;align-items:center;padding:8px 10px}
+.note{padding:6px 10px 8px;font-size:12px;color:var(--faint);line-height:1.4}
+.ng{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 10px;border-radius:5px}
+.ng:hover{background:var(--raised)}
+.ng b{font-weight:600}
+.ng .muted{font-size:12px}
+.nt{display:flex;gap:10px;padding:9px 10px;border-radius:5px;cursor:pointer;align-items:flex-start}
+.nt:hover{background:var(--raised)}
+.nt>svg{margin-top:2px}
+.nt .s{font-size:12px;color:var(--muted)}
+.nt.unread .t{font-weight:600}
+.ic-warn{color:var(--warn)}.ic-bad{color:var(--bad)}.ic-new{color:#5fb83a}
+
+/* tooltips */
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:var(--tip-bg);color:var(--tip-text);font-size:12px;font-weight:500;padding:5px 8px;border-radius:4px;white-space:nowrap;z-index:60;pointer-events:none;letter-spacing:0;text-transform:none}
+
+.toast{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:var(--tip-bg);color:var(--tip-text);padding:10px 16px;border-radius:6px;font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:70;display:flex;align-items:center;gap:8px}
+.toast svg{width:16px;height:16px;color:#79d652}
+
+/* Library */
+.lib{display:grid;grid-template-columns:248px 1fr;height:100%}
+.side{background:var(--top);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.side-top{padding:12px 12px 8px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
+.side-home{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:5px;background:none;border:0;cursor:pointer;font-weight:600;font-size:13.5px;width:100%;text-align:left}
+.side-home:hover{background:var(--raised)}
+.side-home.on{background:var(--accent-soft);color:var(--accent)}
+.side-row{display:flex;gap:6px}
+.side-row .btn{flex:1;justify-content:space-between}
+.search{flex:1;display:flex;align-items:center;gap:6px;height:30px;padding:0 9px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--muted)}
+.search svg{width:15px;height:15px}
+.search input{flex:1;min-width:0;border:0;background:none;outline:none;font:inherit;font-size:13px;color:var(--text)}
+.side-list{flex:1;overflow-y:auto;padding:6px 8px 12px}
+.grp-h{font-size:12px;font-weight:700;color:var(--muted);padding:10px 6px 4px}
+.grp-h span{font-weight:500;color:var(--faint)}
+.side-game{display:flex;align-items:center;gap:9px;width:100%;padding:4px 6px;border-radius:4px;background:none;border:0;cursor:pointer;font-size:13px;text-align:left}
+.side-game:hover{background:var(--raised)}
+.side-game.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.side-game .cover{width:22px;box-shadow:none}.side-game .cover .ct,.side-game .cover .mk{display:none}
+.top [data-tip]:hover::after{bottom:auto;top:calc(100% + 7px)}
+.side-game .act{margin-left:auto;font-size:11px;color:var(--accent);font-weight:700}
+.lib-main{overflow-y:auto;min-height:0}
+.lib-home{padding:6px 28px 28px}
+.shelf-h{display:flex;align-items:baseline;gap:8px;margin:20px 0 12px;font-size:15px;font-weight:700}
+.shelf-h span{font-size:12.5px;color:var(--muted);font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:18px 16px}
+.tile{background:none;border:0;padding:0;cursor:pointer;text-align:left}
+.tile .cover{width:100%;transition:transform .15s,box-shadow .15s}
+.tile:hover .cover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(0,0,0,.35)}
+.tile .tn{font-size:13px;font-weight:600;margin-top:8px}
+.tile .ts{font-size:12px;color:var(--muted)}
+.tile.dim .cover{filter:grayscale(.7) brightness(.8)}
+
+/* Game page */
+.gd-ban{position:relative;height:190px;overflow:hidden;color:#fff}
+.gd-ban .btn.back{position:absolute;left:24px;top:16px;z-index:2}
+.gd-head{position:absolute;left:28px;right:28px;bottom:18px;display:flex;align-items:flex-end;gap:20px}
+.gd-head .ttl{font-size:30px}
+.gd-head .ban-sub{margin-top:4px}
+.gd-bar{display:flex;align-items:center;gap:16px;padding:14px 28px;background:var(--section);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.gd-bar .lbl{font-size:12.5px;color:var(--muted);margin-right:-8px}
+.gd-body{padding:4px 28px 28px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-size:12px;font-weight:600;color:var(--muted);padding:6px 10px;border-bottom:1px solid var(--line)}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tblw{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.st{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px}
+.st.active{background:var(--accent-soft);color:var(--accent)}
+.st.upcoming{background:var(--raised);color:var(--muted)}
+.st.unclaimed{background:var(--warn-bg);color:var(--warn)}
+.st.completed{background:rgba(95,184,58,.14);color:#4f9d2e}
+.st.missed{background:rgba(179,54,43,.1);color:var(--bad)}
+
+/* Plain pages */
+.page{max-width:760px;margin:0 auto;padding:30px 28px}
+.page h2{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
+.page .lead{color:var(--muted);margin:0 0 22px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.prow{display:flex;align-items:center;gap:16px;padding:14px 16px}
+.prow+.prow{border-top:1px solid var(--line)}
+.prow .d{font-size:12.5px;color:var(--muted)}
+.tgl{width:38px;height:22px;border-radius:11px;background:var(--raised);border:1px solid var(--line);position:relative;cursor:pointer;flex:none;padding:0}
+.tgl::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
+.tgl.on{background:var(--accent);border-color:var(--accent)}
+.tgl.on::after{left:18px}
+.log td:first-child{color:var(--muted);white-space:nowrap;width:120px}
+.log td:nth-child(2){width:28px}
+.log svg{width:15px;height:15px}
+.upd{display:flex;gap:18px;align-items:flex-start;padding:20px}
+.upd .big{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;background:rgba(95,184,58,.14);color:#4f9d2e;flex:none}
+.upd ul{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:13px}
+.upd li{margin:3px 0}
+
+/* Signed out */
+.so{height:100%;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 30%,var(--section),var(--win) 70%)}
+.so-box{width:380px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:30px 30px 26px;text-align:center;box-shadow:var(--shadow)}
+.so-box .mark{width:52px;height:52px;border-radius:13px;margin:0 auto 14px;display:grid;place-items:center;color:#fff;background:linear-gradient(140deg,#4d9be6,#6a4fd8)}
+.so-box .mark svg{width:26px;height:26px}
+.so-box h2{font-size:20px;margin:0 0 6px}
+.so-box p{color:var(--muted);font-size:13.5px;margin:0 0 22px}
+.so-box .btn.lg{width:100%;justify-content:center;height:50px;font-size:16px}
+.so-box.wait .mark{filter:grayscale(1);opacity:.55}
+.so-box.wait h2,.so-box.wait p{opacity:.6}
+.waitbtn{width:100%;height:50px;border-radius:4px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:15px;font-weight:600;color:var(--muted);background:repeating-linear-gradient(110deg,var(--raised) 0 14px,var(--hover) 14px 28px);background-size:200% 100%;animation:slide 1.6s linear infinite;border:1px solid var(--line)}
+.waitbtn svg{animation:spin 1s linear infinite}
+@keyframes slide{to{background-position:-60px 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.so-box .btn.ghost{margin-top:10px}
+
+@media (prefers-reduced-motion: reduce){
+  .rw.cur,.waitbtn,.waitbtn svg{animation:none}
+  .tile .cover,.rw{transition:none}
+}
+@media (max-width:640px){
+  .deck{padding:16px 14px 12px}
+  .stage{padding:0 14px 30px}
+}
+</style>
+</head>
+<body>
+<header class="deck">
+  <div>
+    <h1>New UI mockups</h1>
+    <p>Clickable mockups of the agreed design. Game names and cover art are placeholders.</p>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</header>
+<div class="stage"><div class="win" id="win"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<script>
+/* ---------- icon mapping (stands in for next/icons) ---------- */
+const ICONS={brand:'pickaxe',pause:'pause',play:'play',bell:'bell',newg:'sparkles',update:'circle-arrow-down',down:'chevron-down',
+ change:'repeat-2',users:'users',grip:'grip-vertical',more:'ellipsis',x:'x',check:'check',ext:'external-link',search:'search',
+ filter:'sliders-horizontal',home:'home',back:'arrow-left',info:'info',warn:'triangle-alert',link:'link',zap:'zap',clock:'clock',
+ shield:'shield',flag:'flag',crown:'crown',swords:'swords',star:'star',gift:'gift',gem:'gem',settings:'settings',logout:'log-out',
+ loader:'loader-circle',up:'arrow-up',dn:'arrow-down',sort:'arrow-down-up',eyeoff:'eye-off',undo:'undo-2',err:'circle-x',
+ hist:'history',pkg:'package',radio:'radio',alert:'circle-alert'};
+const ic=(k,c='')=>`<i data-lucide="${ICONS[k]||k}"${c?` class="${c}"`:''}></i>`;
+const paint=()=>{try{window.lucide&&lucide.createIcons()}catch(e){}};
+
+/* ---------- data ---------- */
+const G={
+ ironvale:{name:'Ironvale Tactics',h:[18,350],state:'priority',link:'linked',seen:'earlier',first:'12 Mar 2026'},
+ starfall:{name:'Starfall Arena',h:[208,262],state:'priority',link:'linked',seen:'earlier',first:'2 Jun 2026'},
+ hollow:{name:'Hollow Drift',h:[165,205],state:'priority',link:'linked',seen:'earlier',first:'19 Sep 2026'},
+ glacier:{name:'Glacier Run',h:[192,224],state:'priority',link:'linked',seen:'earlier',first:'7 Aug 2026'},
+ quarry:{name:'Quarry Kings',h:[38,12],state:'notset',link:'notlinked',seen:'earlier',first:'30 Oct 2026'},
+ lantern:{name:'Lantern Coast',h:[282,318],state:'notset',link:'notneeded',seen:'earlier',first:'21 Oct 2026'},
+ cinder:{name:'Cinder Wastes',h:[10,40],state:'notset',link:'notneeded',seen:'week',first:'5 Nov 2026'},
+ moon:{name:'Moonbrook Farm',h:[95,140],state:'notset',link:'notneeded',seen:'week',first:'4 Nov 2026'},
+ drift:{name:'Driftwood Isles',h:[176,230],state:'notset',link:'notlinked',seen:'week',first:'6 Nov 2026'},
+ pixel:{name:'Pixel Fable',h:[300,182],state:'excluded',link:'notneeded',seen:'earlier',first:'3 Nov 2026'},
+ turbo:{name:'Turbo Gridiron',h:[122,92],state:'excluded',link:'notlinked',seen:'earlier',first:'28 Oct 2026'}
+};
+const CUR={game:'ironvale',camp:'Season 5 Midseason',ends:'6 d 3 h',watched:578,drops:[
+ {name:'Season 5 Sigil',reward:'Sigil Spray',min:60,state:'done',icon:'flag',h:24},
+ {name:'Ember Crest Banner',reward:'Ember Crest Player Banner',min:240,state:'done',icon:'shield',h:8},
+ {name:'Warden Charm',reward:'Warden Weapon Charm',min:720,state:'cur',icon:'gem',h:200},
+ {name:'Talon Mask',reward:'Talon Mask Skin',min:1200,state:'future',icon:'crown',h:280},
+ {name:'Midseason Legend',reward:'Ashen Warden Legendary Skin',min:1800,state:'future',icon:'swords',h:40}]};
+const CUR_LEFT=(720-578)/60;
+const CHANNELS=[
+ {n:'ironvale_official',v:'4,212'},{n:'kestrel_plays',v:'1,880'},{n:'marrowgg',v:'912'},
+ {n:'ironvale_league',why:'Offline'},{n:'duskfox',why:'Drops not enabled on stream'},{n:'nimbus_tv',why:'Playing another game'}];
+let uid=0;const P=(game,camps,x={})=>({id:'p'+(++uid),game,camps,...x});
+const S={
+ paused:false,sort:'priority',base:'priority',channel:'ironvale_official',open:null,toast:null,
+ showEx:{up:false,upc:false,done:false},hidden:new Set(),notifRead:false,newGames:['cinder','moon','drift'],
+ group:'state',libQ:'',filters:{active:false,unclaimed:false,hideEx:false},signing:false,
+ prefs:{autoclaim:true,tray:true,startup:false},
+ pieces:[
+  P('starfall',[{id:'c1',name:'Creator Week',need:2,ends:5,done:1,total:3},{id:'c2',name:'Winter Clash',need:4,ends:74,done:0,total:5}]),
+  P('hollow',[{id:'c3',name:'Founders Pack',need:5,ends:8,done:0,total:4}]),
+  P('ironvale',[{id:'c4',name:'League Playoffs',need:3,ends:48,done:2,total:4,allow:'ironvale_league'}]),
+  P('quarry',[{id:'c5',name:'Spring Dig',need:1,ends:96,done:0,total:2}]),
+  P('lantern',[{id:'c6',name:'Weekly Rewards',need:6,ends:20,done:1,total:4}]),
+  P('cinder',[{id:'c7',name:'Launch Week',need:2,ends:98,done:0,total:3,isNew:true}]),
+  P('pixel',[{id:'c8',name:'Gem Hunt',need:2,ends:30,done:0,total:3,first:'3 Nov, 18:20'}]),
+  P('turbo',[{id:'c9',name:'Rookie Rewards',need:4,ends:60,done:0,total:4,first:'28 Oct, 09:05'}])
+ ],
+ upcoming:[
+  {game:'moon',camp:'Harvest Festival',in:'18 h 40 m',date:'Saturday 7 November 2026, 10:00'},
+  {game:'starfall',camp:'Spring Showdown',in:'2 d 5 h',date:'Sunday 8 November 2026, 17:00'},
+  {game:'ironvale',camp:'Season 6 Launch',in:'5 d 11 h',date:'Wednesday 11 November 2026, 23:00'},
+  {game:'turbo',camp:'Kickoff Week',in:'9 d 2 h',date:'Sunday 15 November 2026, 14:00',first:'2 Nov, 08:14'}],
+ done:[
+  {id:'d1',drop:'Ember Crest Banner',reward:'Ember Crest Player Banner',game:'ironvale',camp:'Season 5 Midseason',when:'Today, 13:42',st:'claimed',icon:'shield',h:8},
+  {id:'d2',drop:'Glacier Emote',reward:'Frostbite Emote',game:'glacier',camp:'Cold Open',when:'Today, 09:10',st:'failed',icon:'star',h:196},
+  {id:'d3',drop:'Season 5 Sigil',reward:'Sigil Spray',game:'ironvale',camp:'Season 5 Midseason',when:'Yesterday, 22:05',st:'claimed',icon:'flag',h:24},
+  {id:'d4',drop:'Quarry Pick',reward:'Gilded Pickaxe',game:'quarry',camp:'Autumn Dig',when:'4 Nov, 17:30',st:'unlinked',icon:'gift',h:40},
+  {id:'d5',drop:'Arena Title',reward:'Title: First Light',game:'starfall',camp:'Creator Week',when:'4 Nov, 11:02',st:'claimed',icon:'star',h:220},
+  {id:'d6',drop:'Rookie Jersey',reward:'Rookie Jersey',game:'turbo',camp:'Preseason',when:'1 Nov, 19:48',st:'claimed',icon:'gift',h:122,first:'28 Oct, 09:05'}]
+};
+const SORTS={priority:'Priority, then time remaining',ending:'Ending soonest',spare:'Least time to spare'};
+
+/* ---------- helpers ---------- */
+function fh(h){const m=Math.round(h*60);if(m<60)return m+' m';const d=Math.floor(m/1440),hh=Math.floor(m%1440/60),mm=m%60;
+ if(d)return hh?`${d} d ${hh} h`:`${d} d`;return mm?`${hh} h ${mm} m`:`${hh} h`}
+const cover=(k,c='')=>{const g=G[k];return `<div class="cover ${c}" style="--h1:${g.h[0]};--h2:${g.h[1]}"><span class="mk">${g.name[0]}</span><span class="ct">${g.name}</span></div>`};
+const artVars=k=>`--h1:${G[k].h[0]};--h2:${G[k].h[1]}`;
+const camps=p=>[...p.camps].sort((a,b)=>a.ends-b.ends);
+const isEx=p=>G[p.game].state==='excluded'&&!p.bumped;
+const tier=p=>G[p.game].state==='priority'?0:1;
+const linkRank=p=>G[p.game].link==='notlinked'?1:0;
+const keyOf={priority:p=>Math.min(...p.camps.map(c=>c.need)),ending:p=>Math.min(...p.camps.map(c=>c.ends)),spare:p=>Math.min(...p.camps.map(c=>c.ends-c.need))};
+function queue(){const live=S.pieces.filter(p=>!isEx(p));if(S.sort==='custom')return live;const k=keyOf[S.sort];
+ return [...live].sort((a,b)=>tier(a)-tier(b)||linkRank(a)-linkRank(b)||k(a)-k(b))}
+function sim(q){let t=CUR_LEFT;const r={};for(const p of q)for(const c of camps(p)){const s=t;t+=c.need;
+ r[c.id]={start:s,warn:t>c.ends,save:t>c.ends&&CUR_LEFT+c.need<=c.ends}}return r}
+function toCustom(){if(S.sort!=='custom'){S.base=S.sort;S.pieces=[...queue(),...S.pieces.filter(isEx)];S.sort='custom'}}
+function movePiece(id,dir){toCustom();const q=queue();const i=q.findIndex(p=>p.id===id),j=i+dir;if(i<0||j<0||j>=q.length)return;
+ const a=q[i],b=q[j],ia=S.pieces.indexOf(a),ib=S.pieces.indexOf(b);S.pieces[ia]=b;S.pieces[ib]=a}
+function splitMove(pid,cid,dir){toCustom();const p=S.pieces.find(x=>x.id===pid),cs=camps(p),k=cs.findIndex(c=>c.id===cid);
+ const take=dir<0?cs.slice(0,k+1):cs.slice(k),keep=dir<0?cs.slice(k+1):cs.slice(0,k);
+ if(!keep.length){movePiece(pid,dir);return}
+ const np=P(p.game,take);p.camps=keep;const idx=S.pieces.indexOf(p);S.pieces.splice(dir<0?idx:idx+1,0,np);movePiece(np.id,dir)}
+function toast(msg){S.toast=msg;render();clearTimeout(toast.t);toast.t=setTimeout(()=>{S.toast=null;render()},2600)}
+function route(){const h=location.hash.slice(1);if(h.startsWith('game-')&&G[h.slice(5)])return{v:'library',game:h.slice(5)};
+ return{v:['drops','library','history','updates','prefs','signed-out'].includes(h)?h:'drops'}}
+const segState=k=>{const s=G[k].state;return `<div class="seg" role="group" aria-label="List">
+ <button class="${s==='priority'?'on':''}" data-act="setstate" data-g="${k}" data-s="priority">Priority</button>
+ <button class="${s==='notset'?'on':''}" data-act="setstate" data-g="${k}" data-s="notset">Not set</button>
+ <button class="${s==='excluded'?'on x':''}" data-act="setstate" data-g="${k}" data-s="excluded">Excluded</button></div>`};
+const stateChip=g=>g.state==='priority'?`<span class="chip pri">Priority</span>`:g.state==='notset'?`<span class="chip">Not set</span>`:`<span class="chip">${ic('eyeoff')}Excluded</span>`;
+const linkChip=g=>g.link==='linked'?`<span class="chip" data-tip="Twitch account linked to this game">${ic('link')}Linked</span>`:g.link==='notlinked'?`<span class="chip warnc" data-tip="Rewards need a linked account">${ic('link')}Not linked</span>`:'';
+
+/* ---------- top bar ---------- */
+function topbar(r){
+ if(r.v==='signed-out')return `<div class="top"><div class="brand"><span class="mark">${ic('brand')}</span>Drops miner</div></div>`;
+ const q=queue(),sm=sim(q),warns=q.flatMap(p=>camps(p).filter(c=>sm[c.id].warn)).length;
+ const nb=S.notifRead?0:warns+2;
+ const on=v=>r.v===v?'on':'';
+ return `<div class="top">
+  <div class="brand"><span class="mark">${ic('brand')}</span>Drops miner</div>
+  <nav class="nav">
+   <a href="#drops" class="${on('drops')}">Drops${S.paused?`<span data-tip="Mining is paused">${ic('pause')}</span>`:''}</a>
+   <a href="#library" class="${on('library')}">Library</a>
+   <a href="#history" class="${on('history')}">History</a>
+  </nav>
+  <div class="top-r">
+   <button class="ib ${S.open==='newg'?'open':''}" data-act="pop" data-pop="newg" aria-label="New games">${ic('newg')}${S.newGames.length?`<span class="badge">${S.newGames.length}</span>`:''}</button>
+   <button class="ib" data-go="updates" aria-label="App update available" data-tip="Update available">${ic('update')}<span class="pip"></span></button>
+   <button class="ib ${S.open==='notif'?'open':''}" data-act="pop" data-pop="notif" aria-label="Notifications">${ic('bell')}${nb?`<span class="badge">${nb}</span>`:''}</button>
+   <button class="acct ${S.open==='acct'?'open':''}" data-act="pop" data-pop="acct"><span class="avatar">MK</span>mkdrops${ic('down')}</button>
+  </div></div>`}
+
+/* ---------- Drops page ---------- */
+function namesHTML(d){const left=(d.min-CUR.watched)/60;
+ const tail=d.state==='done'?`<span class="muted">Claimed</span>`:d.state==='cur'?`<span class="muted">${CUR.watched} / ${d.min} min</span>`:`<span class="muted">Unlocks at ${fh(d.min/60)} watched, ${fh(left)} to go</span>`;
+ return `<b>${d.name}</b><span class="rwn">${ic('gift')}${d.reward}</span>${tail}`}
+function current(){
+ const g=G[CUR.game],cur=CUR.drops.find(d=>d.state==='cur'),pct=CUR.watched/cur.min*100,ch=CHANNELS.find(c=>c.n===S.channel);
+ const tiles=CUR.drops.map((d,i)=>(i?`<span class="join ${d.state!=='future'?'lit':''}"></span>`:'')+`<div class="rw ${d.state}" data-i="${i}" style="--h:${d.h}">${ic(d.icon)}${d.state==='done'?`<span class="ok">${ic('check')}</span>`:''}</div>`).join('');
+ return `<section class="current ${S.paused?'paused':''}" aria-label="Current">
+  <div class="banner" style="${artVars(CUR.game)}"><div class="art"></div><div class="shade"></div>
+   <div class="ban-in">
+    <div class="kicker">${S.paused?ic('pause')+'Paused':'<span class="live"></span>Mining now'}</div>
+    <div class="ttl">${g.name}</div>
+    <div class="ban-sub">${CUR.camp}, ends in ${CUR.ends}</div>
+    <div class="watch">${S.paused?'Not watching while paused':`Watching <b>${S.channel}</b> · ${ch.v} viewers`}
+     <button class="btn glass" data-act="pop" data-pop="chan">${ic('change')}Change</button></div>
+   </div>
+   <div class="ban-act">${S.paused?`<button class="btn green lg" data-act="pause">${ic('play')}Continue</button>`:`<button class="btn glass lg" data-act="pause">${ic('pause')}Pause</button>`}</div>
+  </div>
+  <div class="cover-float">${cover(CUR.game,'lg')}</div>
+  <div class="cur-body">
+   <div class="drops" id="drops">${tiles}</div>
+   <div class="names" id="names">${namesHTML(cur)}</div>
+   <div class="prog"><div class="bar"><i style="width:${pct}%"></i></div><span class="left"><b>${fh(CUR_LEFT)}</b> remaining</span></div>
+  </div></section>`}
+function exToggle(sec,n){return n?`<button class="btn ghost sm" data-act="ex" data-sec="${sec}">${S.showEx[sec]?'Hide':'Show'} excluded (${n})</button>`:''}
+function campRow(p,c,r){
+ const pct=c.total?c.done/c.total*100:0,newTag=S.sort==='custom'&&c.isNew?`<span class="chip new">New</span>`:'';
+ const allow=c.allow?`<span class="chip" data-tip="Only ${c.allow} counts for this campaign">${ic('radio')}1 channel</span>`:'';
+ const w=r.warn?`<div class="warn">${ic('warn')}<div>Won’t finish in time: needs ${fh(c.need)}, ends in ${fh(c.ends)}. ${r.save?'Moving it to the top would save it.':'It won’t finish even at the top.'}
+   <span class="est">Estimate, assuming a watchable channel is always available.</span></div></div>`:'';
+ return `<div class="camp">
+  <span class="cg" data-tip="Drag up or down to split the game here">${ic('grip')}</span>
+  <div class="cname">${c.name}${allow}${newTag}</div>
+  <div class="cdrops"><div class="mini"><i style="width:${pct}%"></i></div>${c.done} of ${c.total} drops</div>
+  <div class="ctime"><span>Needs ${fh(c.need)}</span><span class="muted">Ends in ${fh(c.ends)}, starts in about ${fh(r.start)}</span></div>
+  <div class="cact"><button class="btn sm" data-act="collect" data-p="${p.id}" data-c="${c.id}">${ic('zap')}Collect now</button>
+   <button class="ib sm" data-act="pop" data-pop="camp:${p.id}:${c.id}" aria-label="Campaign actions">${ic('more')}</button></div>
+  ${w}</div>`}
+function card(p,sm){const g=G[p.game],also=p.game===CUR.game?`<span class="chip" data-tip="Another campaign of this game is in Current">Also in Current</span>`:'';
+ const sib=S.pieces.filter(x=>x.game===p.game&&!isEx(x)).length>1?`<span class="chip" data-tip="This game is split into several pieces in the queue">Split</span>`:'';
+ return `<div class="card ${p.bumped?'bumped':''}">
+  <div class="grip" data-tip="Drag to reorder">${ic('grip')}</div>
+  <div>${cover(p.game,'sm')}</div>
+  <div><div class="card-h"><span class="gname">${g.name}</span>${stateChip(g)}${linkChip(g)}${also}${sib}${p.bumped?`<span class="chip">Bumped</span>`:''}
+   <span class="grow"></span><button class="ib sm" data-act="pop" data-pop="card:${p.id}" aria-label="Game actions">${ic('more')}</button></div>
+   ${camps(p).map(c=>campRow(p,c,sm[c.id])).join('')}</div></div>`}
+function exRow(k,camp,first,acts){return `<div class="row ex">${cover(k,'xs')}<div class="grow"><div class="rt">${G[k].name}</div><div class="rs">${camp}, first seen ${first}</div></div>${acts}</div>`}
+function upNext(){const q=queue(),sm=sim(q),ex=S.pieces.filter(isEx);
+ const sortBtn=`<button class="btn sm" data-act="pop" data-pop="sort">${ic('sort')}${S.sort==='custom'?'Custom':SORTS[S.sort]}${ic('down')}</button>`;
+ const reset=S.sort==='custom'?`<button class="btn ghost sm" data-act="reset">${ic('undo')}Reset to ${SORTS[S.base]}</button>`:'';
+ return `<section class="sec" aria-label="Up next"><div class="sec-h"><h2>Up next</h2><span class="cnt">${q.reduce((n,p)=>n+p.camps.length,0)}</span><span class="sp"></span>${reset}${sortBtn}${exToggle('up',ex.length)}</div>
+  <div class="list">${q.map(p=>card(p,sm)).join('')||'<div class="empty">Nothing queued. Campaigns for Priority and Not set games show up here.</div>'}</div>
+  ${S.showEx.up&&ex.length?`<div class="ex-h">${ic('eyeoff')}Excluded</div><div class="list">${ex.map(p=>exRow(p.game,camps(p).map(c=>c.name).join(', '),p.camps[0].first,
+   `<button class="btn sm" data-act="bump" data-p="${p.id}">${ic('up')}Bump to Up next</button><button class="btn ghost sm" data-act="setstate" data-g="${p.game}" data-s="notset">Remove from excluded</button>`)).join('')}</div>`:''}
+ </section>`}
+function upcoming(){const list=S.upcoming.filter(u=>G[u.game].state!=='excluded'),ex=S.upcoming.filter(u=>G[u.game].state==='excluded');
+ const row=u=>`<div class="row">${cover(u.game,'xs')}<div class="grow"><div class="rt">${G[u.game].name}</div><div class="rs">${u.camp}</div></div>
+  <span class="starts" data-tip="${u.date}">${ic('clock')}Starts in <b>${u.in}</b></span>${segState(u.game)}</div>`;
+ return `<section class="sec" aria-label="Upcoming"><div class="sec-h"><h2>Upcoming</h2><span class="cnt">${list.length}</span><span class="sp"></span>${exToggle('upc',ex.length)}</div>
+  <div class="list">${list.map(row).join('')}</div>
+  ${S.showEx.upc&&ex.length?`<div class="ex-h">${ic('eyeoff')}Excluded</div><div class="list">${ex.map(u=>exRow(u.game,u.camp+', starts in '+u.in,u.first,
+   `<button class="btn sm" data-act="setstate" data-g="${u.game}" data-s="notset">Remove from excluded</button>`)).join('')}</div>`:''}</section>`}
+function claimBtn(d){if(d.st==='claimed')return `<button class="btn claimed" disabled>${ic('check')}Claimed</button>`;
+ if(d.st==='failed')return `<span class="claim-note">Auto-claim failed</span><button class="btn green" data-act="claim" data-id="${d.id}">Claim</button>`;
+ return `<button class="btn blue" data-act="linkacct" data-g="${d.game}">${ic('link')}Link account to claim</button>`}
+function completed(){const vis=S.done.filter(d=>!S.hidden.has(d.id)),list=vis.filter(d=>G[d.game].state!=='excluded'),ex=vis.filter(d=>G[d.game].state==='excluded');
+ const row=d=>`<div class="row"><div class="rw sm" style="--h:${d.h}">${ic(d.icon)}</div><div class="grow"><div class="rt">${d.drop}</div><div class="rs">${d.reward}, ${G[d.game].name} ${d.camp}</div></div>
+  <span class="when">${d.when}</span>${claimBtn(d)}<button class="ib sm" data-act="hide" data-id="${d.id}" aria-label="Hide entry" data-tip="Hide">${ic('x')}</button></div>`;
+ return `<section class="sec" aria-label="Completed" style="padding-bottom:30px"><div class="sec-h"><h2>Completed</h2><span class="cnt">${list.length}</span><span class="sp"></span>
+  ${list.length?`<button class="btn ghost sm" data-act="clearall">Clear all</button>`:''}${exToggle('done',ex.length)}</div>
+  <div class="list">${list.map(row).join('')||'<div class="empty">No completed drops to show.</div>'}</div>
+  ${S.hidden.size?`<div class="hidden-note">${S.hidden.size} hidden on this device. Nothing was deleted.<button class="btn ghost sm" data-act="unhide">${ic('undo')}Undo</button></div>`:''}
+  ${S.showEx.done&&ex.length?`<div class="ex-h">${ic('eyeoff')}Excluded</div><div class="list">${ex.map(d=>exRow(d.game,d.drop+', claimed '+d.when,d.first,
+   `<button class="btn ghost sm" data-act="setstate" data-g="${d.game}" data-s="notset">Remove from excluded</button>`)).join('')}</div>`:''}</section>`}
+const viewDrops=()=>current()+upNext()+upcoming()+completed();
+
+/* ---------- Library ---------- */
+const HIST={
+ ironvale:[['active','Season 5 Midseason','1 Nov – 12 Nov','2 of 5','1 Nov'],['active','League Playoffs','4 Nov – 8 Nov','2 of 4','4 Nov'],['upcoming','Season 6 Launch','11 Nov – 25 Nov','0 of 6','5 Nov'],
+  ['completed','Season 4 Finale','2 Oct – 16 Oct','5 of 5','2 Oct'],['missed','Season 4 Midseason','14 Sep – 28 Sep','2 of 5','14 Sep']],
+ glacier:[['unclaimed','Cold Open','30 Oct – 9 Nov','3 of 3','30 Oct'],['completed','Summer Sprint','7 Aug – 21 Aug','4 of 4','7 Aug']],
+ quarry:[['active','Spring Dig','5 Nov – 10 Nov','0 of 2','5 Nov'],['unclaimed','Autumn Dig','30 Oct – 5 Nov','2 of 2','30 Oct']]};
+function hist(k){if(HIST[k])return HIST[k];const a=S.pieces.filter(p=>p.game===k).flatMap(p=>p.camps).map(c=>[G[k].state==='excluded'?'missed':'active',c.name,'4 Nov – 12 Nov',`${c.done} of ${c.total}`,'4 Nov']);
+ const u=S.upcoming.filter(x=>x.game===k).map(x=>['upcoming',x.camp,'Starts in '+x.in,'0 of 4','5 Nov']);
+ const d=S.done.filter(x=>x.game===k).map(x=>['completed',x.camp,'Ended','All','Oct']);return [...a,...u,...d]}
+function libGames(){const q=S.libQ.trim().toLowerCase();return Object.keys(G).filter(k=>!q||G[k].name.toLowerCase().includes(q))
+ .filter(k=>!S.filters.hideEx||G[k].state!=='excluded').filter(k=>!S.filters.active||hist(k).some(h=>h[0]==='active'))
+ .filter(k=>!S.filters.unclaimed||hist(k).some(h=>h[0]==='unclaimed'))}
+const GROUPS={recent:{label:'Recent',groups:[['week','Seen this week'],['earlier','Earlier']],key:k=>G[k].seen},
+ state:{label:'Priority / Not set / Excluded',groups:[['priority','Priority'],['notset','Not set'],['excluded','Excluded']],key:k=>G[k].state},
+ link:{label:'Linked / Not linked / Not needed',groups:[['linked','Linked'],['notlinked','Not linked'],['notneeded','Not needed']],key:k=>G[k].link}};
+function grouped(){const gs=GROUPS[S.group],ks=libGames().sort((a,b)=>G[a].name.localeCompare(G[b].name));
+ return gs.groups.map(([id,label])=>({label,items:ks.filter(k=>gs.key(k)===id)})).filter(g=>g.items.length)}
+function sideList(sel){return grouped().map(g=>`<div class="grp-h">${g.label} <span>(${g.items.length})</span></div>`+g.items.map(k=>{const n=hist(k).filter(h=>h[0]==='active').length;
+ return `<button class="side-game ${sel===k?'on':''}" data-go="game-${k}">${cover(k)}<span>${G[k].name}</span>${n?`<span class="act">${n}</span>`:''}</button>`}).join('')).join('')||'<div class="note">No games match.</div>'}
+function libHome(){return `<div class="lib-home">${grouped().map(g=>`<div class="shelf-h">${g.label}<span>${g.items.length} games</span></div><div class="grid">${g.items.map(k=>{const h=hist(k),a=h.filter(x=>x[0]==='active').length,u=h.filter(x=>x[0]==='unclaimed').length;
+ return `<button class="tile ${G[k].state==='excluded'?'dim':''}" data-go="game-${k}">${cover(k)}<div class="tn">${G[k].name}</div><div class="ts">${a?a+' active':'No active campaigns'}${u?`, ${u} unclaimed`:''}</div></button>`}).join('')}</div>`).join('')}</div>`}
+function gameDetail(k){const g=G[k],h=hist(k),labels={active:'Active',upcoming:'Upcoming',unclaimed:'Unclaimed',completed:'Completed',missed:'Missed'};
+ const rows=h.map(x=>`<tr><td><span class="st ${x[0]}">${labels[x[0]]}</span></td><td><b style="font-weight:600">${x[1]}</b></td><td class="muted">${x[2]}</td><td>${x[3]}</td><td class="muted">${x[4]}</td>
+  <td style="text-align:right">${x[0]==='unclaimed'?(g.link==='notlinked'?`<button class="btn blue sm" data-act="linkacct" data-g="${k}">${ic('link')}Link account to claim</button>`:`<button class="btn green sm" data-act="toast" data-msg="Claimed">Claim</button>`):''}</td></tr>`).join('');
+ const linkUI=g.link==='linked'?`<span class="chip">${ic('check')}Account linked</span>`:g.link==='notlinked'?`<button class="btn sm" data-act="linkacct" data-g="${k}">${ic('ext')}Link account on Twitch</button>`:`<span class="chip">No account link needed</span>`;
+ return `<div class="gd-ban" style="${artVars(k)}"><div class="art"></div><div class="shade"></div>
+  <button class="btn glass sm back" data-go="library">${ic('back')}Library</button>
+  <div class="gd-head">${cover(k,'md')}<div><div class="ttl">${g.name}</div><div class="ban-sub">First seen ${g.first}, ${h.length} campaigns recorded</div></div></div></div>
+ <div class="gd-bar"><span class="lbl">List</span>${segState(k)}<span class="lbl" style="margin-left:12px">Twitch account</span>${linkUI}</div>
+ <div class="gd-body"><div class="sec-h"><h2>Every campaign recorded</h2><span class="cnt">${h.length}</span></div>
+  <div class="tblw"><table class="tbl"><thead><tr><th style="width:110px">Status</th><th>Campaign</th><th>Dates</th><th>Drops</th><th>First seen</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
+function viewLibrary(sel){return `<div class="lib"><aside class="side"><div class="side-top">
+  <button class="side-home ${!sel?'on':''}" data-go="library">${ic('home')}Home</button>
+  <div class="side-row"><button class="btn sm" data-act="pop" data-pop="libtype">Games${ic('down')}</button><button class="btn sm" data-act="pop" data-pop="group" style="flex:1.6">${GROUPS[S.group].label.split(' / ')[0]}${ic('down')}</button></div>
+  <div class="side-row"><label class="search">${ic('search')}<input id="libq" placeholder="Search games" value="${S.libQ}" aria-label="Search games"></label>
+   <button class="ib sm" data-act="pop" data-pop="filter" aria-label="More filters" style="border:1px solid var(--line);width:30px;height:30px">${ic('filter')}</button></div></div>
+  <div class="side-list" id="sidelist">${sideList(sel)}</div></aside>
+  <div class="lib-main">${sel?gameDetail(sel):libHome()}</div></div>`}
+
+/* ---------- other pages ---------- */
+function viewHistory(){const L=[['Today 14:21','zap','Started Season 5 Midseason on ironvale_official'],['Today 13:42','check','Claimed Ember Crest Banner (Ironvale Tactics)'],
+ ['Today 09:10','err','Auto-claim failed for Glacier Emote: Twitch returned an error, retry from Completed'],['Today 08:55','newg','New game seen: Driftwood Isles'],
+ ['Yesterday 22:05','check','Claimed Season 5 Sigil (Ironvale Tactics)'],['Yesterday 21:30','change','Switched channel: marrowgg went offline'],['4 Nov 17:30','link','Quarry Pick needs a linked account to claim']];
+ return `<div class="page"><h2>History</h2><p class="lead">What the miner did, newest first. Whether this page keeps a top-level slot is still open.</p>
+ <div class="panel"><table class="tbl log"><tbody>${L.map(l=>`<tr><td>${l[0]}</td><td>${ic(l[1],l[1]==='err'?'ic-bad':'')}</td><td>${l[2]}</td></tr>`).join('')}</tbody></table></div></div>`}
+function viewUpdates(){return `<div class="page"><h2>App updates</h2><p class="lead">You’re on version 2.4.3. Last checked 10 minutes ago.</p>
+ <div class="panel"><div class="upd"><div class="big">${ic('update')}</div><div class="grow"><b style="font-size:15px">Version 2.5.0 is ready to install</b>
+  <div class="muted" style="font-size:13px">Downloaded in the background. Mining resumes after the restart.</div>
+  <ul><li>New Drops and Library pages</li><li>Pause and Collect now</li><li>Warnings for campaigns that won’t finish in time</li></ul></div>
+  <button class="btn green" data-act="toast" data-msg="Restarting to update">Restart and update</button></div></div></div>`}
+function viewPrefs(){const t=document.documentElement.dataset.theme||'system',tg=(k,l,d)=>`<div class="prow"><div class="grow"><div>${l}</div><div class="d">${d}</div></div><button class="tgl ${S.prefs[k]?'on':''}" data-act="pref" data-k="${k}" role="switch" aria-checked="${S.prefs[k]}" aria-label="${l}"></button></div>`;
+ return `<div class="page"><h2>Settings</h2><p class="lead">Most settings live on the pages they affect. This page holds the rest for now.</p>
+ <div class="panel"><div class="prow"><div class="grow"><div>Theme</div><div class="d">Dark is the main theme.</div></div>
+  <div class="seg">${['system','dark','light'].map(x=>`<button class="${t===x?'on':''}" data-act="theme" data-t="${x}">${x[0].toUpperCase()+x.slice(1)}</button>`).join('')}</div></div>
+  ${tg('autoclaim','Claim rewards automatically','Unclaimed rewards show a Claim button in Completed.')}
+  ${tg('tray','Keep running in the tray when closed','The tray icon shows when mining is paused.')}
+  ${tg('startup','Start with Windows','Opens minimised to the tray.')}</div></div>`}
+function viewSignedOut(){return `<div class="so"><div class="so-box ${S.signing?'wait':''}"><div class="mark">${ic('brand')}</div>
+ <h2>Sign in to start mining</h2><p>Drops miner watches streams for you and claims the rewards. Sign in with your Twitch account to begin.</p>
+ ${S.signing?`<div class="waitbtn">${ic('loader')}Waiting for the login window</div><button class="btn ghost sm" data-act="cancelsign">Cancel</button>`
+ :`<button class="btn green lg" data-act="signin">Sign in with Twitch</button>`}</div></div>`}
+
+/* ---------- popovers ---------- */
+function popHTML(name){const [kind,a,b]=name.split(':');
+ if(kind==='acct')return `<div class="acct-h"><span class="avatar lg">MK</span><div><b>mkdrops</b><div class="muted" style="font-size:12px">Last sync 2 min ago</div></div></div>
+  <div class="kv"><span>Session</span><span>Valid, renews in 41 d</span></div><div class="kv"><span>Signed in</span><span>14 Oct 2026</span></div>
+  <div class="sep"></div><button class="mi" data-go="prefs">${ic('settings')}Settings</button>
+  <button class="mi" data-act="toast" data-msg="Opens Twitch inventory in the browser">${ic('pkg')}Twitch inventory<span class="r">${ic('ext')}</span></button>
+  <button class="mi" data-act="toast" data-msg="Opens Twitch drops page in the browser">${ic('gift')}Twitch drops page<span class="r">${ic('ext')}</span></button>
+  <div class="sep"></div><button class="mi" data-go="signed-out">${ic('logout')}Sign out</button>`;
+ if(kind==='notif'){const q=queue(),sm=sim(q),w=q.flatMap(p=>camps(p).filter(c=>sm[c.id].warn).map(c=>({p,c})));const u=S.notifRead?'':'unread';
+  return `<div class="pop-h">Notifications<button class="btn ghost sm" data-act="readall">Mark all read</button></div>
+  ${w.map(({p,c})=>`<div class="nt ${u}" data-go="drops">${ic('warn','ic-warn')}<div><div class="t">${c.name} won’t finish in time</div><div class="s">${G[p.game].name}: needs ${fh(c.need)}, ends in ${fh(c.ends)}</div></div></div>`).join('')}
+  <div class="nt ${u}" data-act="pop" data-pop="newg">${ic('newg','ic-new')}<div><div class="t">New game: Driftwood Isles</div><div class="s">1 campaign, ends in 4 d</div></div></div>
+  <div class="nt ${u}" data-go="drops">${ic('err','ic-bad')}<div><div class="t">Couldn’t claim Glacier Emote</div><div class="s">Claim it from Completed</div></div></div>`}
+ if(kind==='newg')return `<div class="pop-h">New games</div>${S.newGames.map(k=>`<div class="ng">${cover(k,'xxs')}<div class="grow"><b>${G[k].name}</b><div class="muted">First seen ${G[k].first}</div></div>
+   <button class="btn sm" data-act="ngset" data-g="${k}" data-s="priority">Priority</button><button class="btn ghost sm" data-act="ngset" data-g="${k}" data-s="excluded">Exclude</button>
+   <button class="ib sm" data-go="game-${k}" data-tip="See campaigns">${ic('ext')}</button><button class="ib sm" data-act="ngdismiss" data-g="${k}" aria-label="Dismiss">${ic('x')}</button></div>`).join('')||'<div class="note">No new games.</div>'}`;
+ if(kind==='chan')return `<div class="pop-h">Channels for ${CUR.camp}</div>${CHANNELS.map(c=>c.why?`<div class="mi dis">${ic('radio')}${c.n}<span class="r">${c.why}</span></div>`
+  :`<button class="mi" data-act="chan" data-n="${c.n}"><span class="chk">${S.channel===c.n?ic('check'):''}</span>${c.n}<span class="r">${ic('users')}${c.v}</span></button>`).join('')}<div class="note">Greyed channels don’t count for this campaign right now.</div>`;
+ if(kind==='sort')return `<div class="pop-h">Sort Up next</div>${Object.entries(SORTS).map(([k,l])=>`<button class="mi" data-act="sort" data-s="${k}"><span class="chk">${S.sort===k?ic('check'):''}</span>${l}</button>`).join('')}
+  <div class="mi dis"><span class="chk">${S.sort==='custom'?ic('check'):''}</span>Custom<span class="r">Drag or use Move up/down</span></div><div class="note">Priority games come first and linked games are favoured in every order.</div>`;
+ if(kind==='card'){const p=S.pieces.find(x=>x.id===a),s=G[p.game].state,q=queue(),i=q.indexOf(p);
+  const st=(v,l)=>`<button class="mi" data-act="setstate" data-g="${p.game}" data-s="${v}"><span class="chk">${s===v?ic('check'):''}</span>${l}</button>`;
+  return `<div class="pop-h">${G[p.game].name}</div>${st('priority','Priority')}${st('notset','Not set')}${st('excluded','Excluded')}<div class="sep"></div>
+  <button class="mi ${i<=0?'dis':''}" ${i<=0?'':`data-act="move" data-p="${p.id}" data-d="-1"`}>${ic('up')}Move up</button>
+  <button class="mi ${i>=q.length-1?'dis':''}" ${i>=q.length-1?'':`data-act="move" data-p="${p.id}" data-d="1"`}>${ic('dn')}Move down</button>
+  <div class="sep"></div><button class="mi" data-go="game-${p.game}">${ic('ext')}Open in Library</button>`}
+ if(kind==='camp'){const p=S.pieces.find(x=>x.id===a),cs=camps(p),k=cs.findIndex(c=>c.id===b),multi=cs.length>1;
+  const upL=multi&&k<cs.length-1?'Move up, splitting off this and the ones above':'Move up';
+  const dnL=multi&&k>0?'Move down, splitting off this and the ones below':'Move down';
+  return `<div class="pop-h">${cs[k].name}</div><button class="mi" data-act="split" data-p="${a}" data-c="${b}" data-d="-1">${ic('up')}${upL}</button>
+  <button class="mi" data-act="split" data-p="${a}" data-c="${b}" data-d="1">${ic('dn')}${dnL}</button><div class="sep"></div>
+  <button class="mi" data-act="collect" data-p="${a}" data-c="${b}">${ic('zap')}Collect now</button>`}
+ if(kind==='group')return `<div class="pop-h">Group and sort by</div>${Object.entries(GROUPS).map(([k,g])=>`<button class="mi" data-act="group" data-g="${k}"><span class="chk">${S.group===k?ic('check'):''}</span>${g.label}</button>`).join('')}`;
+ if(kind==='libtype')return `<button class="mi"><span class="chk">${ic('check')}</span>Games</button><div class="note">More collections can go here later.</div>`;
+ if(kind==='filter'){const f=(k,l)=>`<button class="mi" data-act="filt" data-k="${k}"><span class="chk">${S.filters[k]?ic('check'):''}</span>${l}</button>`;
+  return `<div class="pop-h">Filters</div>${f('active','Has active campaigns')}${f('unclaimed','Has unclaimed rewards')}${f('hideEx','Hide excluded games')}`}
+ return ''}
+
+/* ---------- render ---------- */
+const TABS=[['drops','Drops'],['library','Library'],['game-ironvale','Game page'],['history','History'],['updates','Updates'],['prefs','Settings'],['signed-out','Signed out']];
+function render(){
+ const r=route(),win=document.getElementById('win'),m=win.querySelector('main'),st=m?m.scrollTop:0,lm=win.querySelector('.lib-main'),lst=lm?lm.scrollTop:0;
+ const body=r.v==='drops'?viewDrops():r.v==='library'?viewLibrary(r.game):r.v==='history'?viewHistory():r.v==='updates'?viewUpdates():r.v==='prefs'?viewPrefs():viewSignedOut();
+ win.innerHTML=topbar(r)+`<main>${body}</main>`+(S.open?`<div class="pop" id="pop" style="min-width:${S.open==='newg'?420:S.open==='chan'?330:240}px">${popHTML(S.open)}</div>`:'')+(S.toast?`<div class="toast" role="status">${ic('check')}${S.toast}</div>`:'');
+ const nm=win.querySelector('main');nm.scrollTop=st;const nl=win.querySelector('.lib-main');if(nl)nl.scrollTop=lst;
+ const cur=location.hash.slice(1)||'drops',dark=effTheme()==='dark';
+ document.getElementById('tabs').innerHTML=TABS.map(([h,l])=>`<button class="tab ${cur===h?'on':''}" data-go="${h}">${l}</button>`).join('')+
+  `<button class="tab" data-act="flip">${dark?'Show light mode':'Show dark mode'}</button>`;
+ paint();placePop()}
+function placePop(){const pop=document.getElementById('pop');if(!pop)return;const win=document.getElementById('win');
+ const anc=[...win.querySelectorAll('[data-pop]')].find(e=>e.dataset.pop===S.open&&!e.closest('.pop'));if(!anc){S.open=null;pop.remove();return}
+ const w=win.getBoundingClientRect(),a=anc.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight;
+ let left=a.left-w.left;if(left+pw>w.width-10)left=a.right-w.left-pw;let top=a.bottom-w.top+6;if(top+ph>w.height-10)top=Math.max(10,a.top-w.top-ph-6);
+ pop.style.left=Math.max(10,left)+'px';pop.style.top=top+'px'}
+function effTheme(){return document.documentElement.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+ const go=e.target.closest('[data-go]'),el=e.target.closest('[data-act]');
+ if(go&&!el){S.open=null;if(location.hash==='#'+go.dataset.go)render();else location.hash=go.dataset.go;return}
+ if(!el){if(S.open&&!e.target.closest('.pop')){S.open=null;render()}return}
+ const d=el.dataset,act=d.act;
+ if(act==='pop'){S.open=S.open===d.pop?null:d.pop;render();return}
+ const keep=['ex','filt'].includes(act);if(!keep)S.open=null;
+ switch(act){
+  case 'pause':S.paused=!S.paused;break;
+  case 'chan':S.channel=d.n;toast('Now watching '+d.n);return;
+  case 'sort':S.sort=d.s;break;
+  case 'reset':S.sort=S.base;break;
+  case 'ex':S.showEx[d.sec]=!S.showEx[d.sec];break;
+  case 'move':movePiece(d.p,+d.d);break;
+  case 'split':splitMove(d.p,d.c,+d.d);break;
+  case 'setstate':G[d.g].state=d.s;S.pieces.forEach(p=>{if(p.game===d.g)p.bumped=false});break;
+  case 'bump':{const p=S.pieces.find(x=>x.id===d.p);p.bumped=true;toast(G[p.game].name+' bumped to Up next, still excluded for later campaigns');return}
+  case 'collect':{const p=S.pieces.find(x=>x.id===d.p),c=p.camps.find(x=>x.id===d.c);if(S.sort==='custom'){const i=S.pieces.indexOf(p);S.pieces.splice(i,1);S.pieces.unshift(p)}toast(c.name+' moves to Current');return}
+  case 'claim':S.done.find(x=>x.id===d.id).st='claimed';toast('Claimed');return;
+  case 'linkacct':toast('Opens Twitch’s account link page for '+G[d.g].name);return;
+  case 'hide':S.hidden.add(d.id);break;
+  case 'clearall':S.done.filter(x=>G[x.game].state!=='excluded').forEach(x=>S.hidden.add(x.id));break;
+  case 'unhide':S.hidden.clear();break;
+  case 'readall':S.notifRead=true;break;
+  case 'ngset':G[d.g].state=d.s;S.newGames=S.newGames.filter(k=>k!==d.g);S.open=S.newGames.length?'newg':null;break;
+  case 'ngdismiss':S.newGames=S.newGames.filter(k=>k!==d.g);S.open=S.newGames.length?'newg':null;break;
+  case 'group':S.group=d.g;break;
+  case 'filt':S.filters[d.k]=!S.filters[d.k];break;
+  case 'pref':S.prefs[d.k]=!S.prefs[d.k];break;
+  case 'theme':if(d.t==='system')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=d.t;break;
+  case 'flip':document.documentElement.dataset.theme=effTheme()==='dark'?'light':'dark';break;
+  case 'signin':S.signing=true;break;
+  case 'cancelsign':S.signing=false;break;
+  case 'toast':toast(d.msg);return;
+ }
+ render()});
+document.addEventListener('mouseover',e=>{const t=e.target.closest('.rw[data-i]');if(!t)return;const n=document.getElementById('names');if(n){n.innerHTML=namesHTML(CUR.drops[+t.dataset.i]);paint()}});
+document.addEventListener('mouseout',e=>{const ds=document.getElementById('drops');if(!ds||!e.target.closest('#drops'))return;if(e.relatedTarget&&ds.contains(e.relatedTarget))return;
+ document.getElementById('names').innerHTML=namesHTML(CUR.drops.find(x=>x.state==='cur'));paint()});
+document.addEventListener('input',e=>{if(e.target.id!=='libq')return;S.libQ=e.target.value;const r=route();document.getElementById('sidelist').innerHTML=sideList(r.game);
+ if(!r.game){document.querySelector('.lib-main').innerHTML=libHome()}paint()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.open){S.open=null;render()}
+ if(e.altKey&&e.key==='ArrowLeft'){history.back()}});
+window.addEventListener('hashchange',()=>{S.open=null;const m=document.querySelector('#win main');render();const nm=document.querySelector('#win main');if(nm)nm.scrollTop=0});
+window.addEventListener('resize',placePop);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
+render();
+</script>
+</body>
+</html>

@@ -28,10 +28,15 @@ export function invisibleWindowOptions(platform: NodeJS.Platform): BrowserWindow
   return { ...hidden, skipTaskbar: true, focusable: false }
 }
 
+/** The main window's smallest size, frame and title bar included (Electron's default). */
+export const MIN_WINDOW_SIZE = { width: 920, height: 400 } as const
+
 export function mainWindowOptions(preload: string): BrowserWindowConstructorOptions {
   return {
-    width: 900,
-    height: 670,
+    width: 1100,
+    height: 720,
+    minWidth: MIN_WINDOW_SIZE.width,
+    minHeight: MIN_WINDOW_SIZE.height,
     show: false,
     autoHideMenuBar: true,
     webPreferences: { ...SECURE_WEB_PREFERENCES, preload }
@@ -88,4 +93,21 @@ export function resolveRendererPath(rendererDir: string, pathname: string): stri
   const rel = relative(rendererDir, file)
   if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) return null
   return file
+}
+
+/**
+ * Ctrl+R (Cmd+R on macOS) and F5: refresh the miner's campaigns. They'd reload the window in a
+ * browser; here they never do (Ctrl+Shift+R still reloads it in development).
+ */
+export function isRefreshKey(input: {
+  type: string
+  key: string
+  control: boolean
+  meta: boolean
+  alt: boolean
+  shift: boolean
+}): boolean {
+  if (input.type !== 'keyDown' || input.alt || input.shift) return false
+  if (input.key === 'F5') return !input.control && !input.meta
+  return input.key.toLowerCase() === 'r' && input.control !== input.meta
 }

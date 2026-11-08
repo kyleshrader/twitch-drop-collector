@@ -10,9 +10,11 @@ import {
   activeCampaign,
   canWatch,
   maintenanceTriggers,
+  orderWantedByQueue,
   pickChannel,
   selectWantedGames,
-  shouldSwitch
+  shouldSwitch,
+  type CampaignRank
 } from '../domain/selection'
 import type { Campaign, Channel, Drop, Game, MiningPreferences, Stream } from '../domain/types'
 import type { InventoryService } from '../inventory/inventory-service'
@@ -85,6 +87,8 @@ export function createMiner(deps: {
   gql: GqlClient
   userId: () => string
   preferences: () => MiningPreferences
+  /** The Up next queue's ranking, when the queue drives mining (undefined: classic rules). */
+  queueRank?: () => CampaignRank | undefined
   clock: Clock
   scheduler: Scheduler
   logger: Logger
@@ -109,6 +113,7 @@ export function createMiner(deps: {
   const unsubscribeUser: (() => void)[] = []
 
   const ctx = (): EarnContext => ({ now: clock.now(), preferences: deps.preferences() })
+  const rank = (): CampaignRank | undefined => deps.queueRank?.()
   const watching = (): Channel | undefined => {
     const current = watch.watching()
     return current ? (channels.get(current.id) ?? current) : undefined
@@ -118,7 +123,7 @@ export function createMiner(deps: {
     const channel = watching()
     const context = ctx()
     const campaign = channel
-      ? activeCampaign(channel, inventory.campaigns(), wanted, context)
+      ? activeCampaign(channel, inventory.campaigns(), wanted, context, rank())
       : undefined
     const drop = campaign ? firstEarnableDrop(campaign, context, channel) : undefined
     return {
@@ -176,7 +181,8 @@ export function createMiner(deps: {
       ...(selected ? { selected } : {}),
       campaigns: inventory.campaigns(),
       wanted,
-      ctx: ctx()
+      ctx: ctx(),
+      ...(rank() ? { rank: rank()! } : {})
     })
     if (pick.channel) {
       if (pick.channel.id !== current?.id) lastProgressAt = clock.now().getTime()
@@ -240,6 +246,8 @@ export function createMiner(deps: {
   const gamesUpdate = async (): Promise<void> => {
     const campaigns = inventory.campaigns()
     wanted = selectWantedGames(campaigns, deps.preferences(), clock.now())
+    const queueRank = rank()
+    if (queueRank) wanted = orderWantedByQueue(wanted, campaigns, queueRank)
     await channels.refresh({ campaigns, wanted, ctx: ctx() }, running?.signal)
     syncChannelTopics()
     switchChannel()
@@ -264,7 +272,7 @@ export function createMiner(deps: {
     if (current?.id === channelId && !canWatch(channel, campaigns, wanted, ctx())) {
       logger.info('Watched channel no longer qualifies; switching', { channel: channel.login })
       switchChannel()
-    } else if (shouldSwitch(channel, current, campaigns, wanted, ctx())) {
+    } else if (shouldSwitch(channel, current, campaigns, wanted, ctx(), rank())) {
       switchChannel()
     } else {
       publish()
@@ -404,7 +412,7 @@ export function createMiner(deps: {
         publish()
         return
       }
-      const campaign = activeCampaign(channel, inventory.campaigns(), wanted, ctx())
+      const campaign = activeCampaign(channel, inventory.campaigns(), wanted, ctx(), rank())
       if (!campaign) return
       const { reachedCap } = inventory.bumpEstimatedMinutes(campaign.id, ctx(), channel)
       lastProgressAt = clock.now().getTime()

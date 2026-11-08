@@ -26,7 +26,20 @@ export {
   isUpcoming,
   type EarnContext
 } from './domain/rules'
-export { watchBlocker, type WatchBlocker } from './domain/selection'
+export { watchBlocker, type CampaignRank, type WatchBlocker } from './domain/selection'
+export {
+  buildQueue,
+  channelKey,
+  neededMinutes,
+  normaliseOrder,
+  queueOptions,
+  type ListState,
+  type NotMinedReason,
+  type Queue,
+  type QueueEntry,
+  type QueueOptions,
+  type QueuePiece
+} from './queue/queue'
 export type {
   Benefit,
   Campaign,
@@ -37,6 +50,7 @@ export type {
   Stream
 } from './domain/types'
 export { createInventoryService, type InventoryService } from './inventory/inventory-service'
+export { withoutImageSize } from './inventory/mapping'
 export {
   createMiner,
   type ClaimNotice,

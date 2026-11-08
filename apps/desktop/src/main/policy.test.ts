@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   APP_ORIGIN,
   invisibleWindowOptions,
+  isRefreshKey,
   isSafeExternalUrl,
   isSameOrigin,
   mainWindowOptions,
@@ -11,6 +12,14 @@ import {
 } from './policy'
 
 describe('mainWindowOptions', () => {
+  it('opens larger than the minimum size, which counts the frame and title bar', () => {
+    const options = mainWindowOptions('/preload.js')
+    expect(options).toMatchObject({ minWidth: 920, minHeight: 400 })
+    expect(options.useContentSize).toBeUndefined()
+    expect(options.width).toBeGreaterThanOrEqual(920)
+    expect(options.height).toBeGreaterThanOrEqual(400)
+  })
+
   it('keeps the fixed security settings', () => {
     expect(mainWindowOptions('/preload.js').webPreferences).toMatchObject({
       contextIsolation: true,
@@ -125,5 +134,31 @@ describe('remoteImageUrl', () => {
     expect(remoteImageUrl(`tdc-image://cache/x?url=${remote}`, origin)).toBeNull()
     expect(remoteImageUrl(`app://cache/?url=${remote}`, origin)).toBeNull()
     expect(remoteImageUrl(`${origin}/`, origin)).toBeNull()
+  })
+})
+
+describe('isRefreshKey', () => {
+  const key = (
+    key: string,
+    mods: Partial<Record<'control' | 'meta' | 'alt' | 'shift', boolean>> = {}
+  ) => ({
+    type: 'keyDown',
+    key,
+    control: false,
+    meta: false,
+    alt: false,
+    shift: false,
+    ...mods
+  })
+  it('takes Ctrl+R, Cmd+R and F5', () => {
+    expect(isRefreshKey(key('r', { control: true }))).toBe(true)
+    expect(isRefreshKey(key('R', { meta: true }))).toBe(true)
+    expect(isRefreshKey(key('F5'))).toBe(true)
+  })
+  it('leaves other keys, key-ups and Ctrl+Shift+R alone', () => {
+    expect(isRefreshKey(key('r'))).toBe(false)
+    expect(isRefreshKey(key('r', { control: true, shift: true }))).toBe(false)
+    expect(isRefreshKey(key('F5', { control: true }))).toBe(false)
+    expect(isRefreshKey({ ...key('F5'), type: 'keyUp' })).toBe(false)
   })
 })

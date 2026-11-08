@@ -50,7 +50,13 @@ import { registerInvokeRoute } from './ipc/register'
 import { createInvokeRouter } from './ipc/router'
 import { createCrashReports, watchProcesses } from './diagnostics'
 import { createAppLogger } from './logger'
-import { APP_ORIGIN, invisibleWindowOptions, isSameOrigin, mainWindowOptions } from './policy'
+import {
+  APP_ORIGIN,
+  invisibleWindowOptions,
+  isRefreshKey,
+  isSameOrigin,
+  mainWindowOptions
+} from './policy'
 import { createImageCache } from './images/image-cache'
 import {
   allowNavigation,
@@ -90,11 +96,15 @@ let quitting = false
 let hideOnClose = (): boolean => false
 /** Called when the window is shown or hidden, so the tray menu can follow. */
 let onWindowVisibility = (): void => {}
+/** Set once the miner exists: Ctrl+R and F5 refresh its campaigns. */
+let onRefreshKey = (): void => {}
 
 function createWindow(options: { startMinimized?: boolean } = {}): BrowserWindow {
   const window = new BrowserWindow({
     ...mainWindowOptions(join(__dirname, '../preload/index.js')),
-    ...(process.platform === 'linux' ? { icon } : {}),
+    // Linux and Windows take the window icon from here (Windows uses it in dev builds, where the
+    // executable is Electron's); macOS uses the app bundle's.
+    ...(process.platform !== 'darwin' ? { icon } : {}),
     ...(invisibleForTests ? invisibleWindowOptions(process.platform) : {})
   })
 
@@ -113,6 +123,11 @@ function createWindow(options: { startMinimized?: boolean } = {}): BrowserWindow
     if (quitting || !hideOnClose()) return
     event.preventDefault()
     window.hide()
+  })
+  window.webContents.on('before-input-event', (event, input) => {
+    if (!isRefreshKey(input)) return
+    event.preventDefault()
+    onRefreshKey()
   })
   window.on('show', () => onWindowVisibility())
   window.on('hide', () => onWindowVisibility())
@@ -414,6 +429,7 @@ if (!app.requestSingleInstanceLock()) {
           }
         })
     tray?.update(minerView())
+    onRefreshKey = () => mining?.reload()
     hideOnClose = () =>
       settings.get().general.closeToTray && (tray !== undefined || invisibleForTests)
     onWindowVisibility = () => tray?.refresh()
@@ -476,7 +492,8 @@ if (!app.requestSingleInstanceLock()) {
           miner: {
             view: minerView,
             reload: () => mining?.reload(),
-            selectChannel: (channelId) => mining?.selectChannel(channelId)
+            selectChannel: (channelId) => mining?.selectChannel(channelId),
+            searchGames: async (query) => (mining ? mining.searchGames(query) : [])
           },
           updates: updater
         }),

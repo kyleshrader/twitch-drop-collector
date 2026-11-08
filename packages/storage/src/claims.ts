@@ -16,6 +16,8 @@ export interface ClaimHistory {
   has(dropId: string): boolean
   /** Most recent first. */
   recent(limit: number): ClaimRecord[]
+  /** When each recorded drop was claimed, by drop ID. */
+  claimTimes(): Map<string, Date>
 }
 
 function toRecord(row: Row): ClaimRecord {
@@ -49,6 +51,13 @@ export function createClaimHistory(deps: { db: Database }): ClaimHistory {
     },
     has(dropId): boolean {
       return db.get('SELECT 1 AS found FROM claims WHERE drop_id = ?', dropId) !== undefined
+    },
+    claimTimes(): Map<string, Date> {
+      return new Map(
+        db
+          .all('SELECT drop_id, claimed_at FROM claims')
+          .map((row) => [String(row['drop_id']), new Date(Number(row['claimed_at']))])
+      )
     },
     recent(limit): ClaimRecord[] {
       return db

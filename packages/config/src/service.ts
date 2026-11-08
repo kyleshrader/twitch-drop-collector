@@ -24,7 +24,8 @@ function applyPatch(current: Settings, patch: SettingsPatch): Settings {
     mining: { ...current.mining, ...patch.mining },
     network: { ...current.network, ...patch.network },
     logging: { ...current.logging, ...patch.logging },
-    updates: { ...current.updates, ...patch.updates }
+    updates: { ...current.updates, ...patch.updates },
+    queue: { ...current.queue, ...patch.queue }
   }
 }
 

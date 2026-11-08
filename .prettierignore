@@ -3,3 +3,6 @@ out
 dist
 .turbo
 yarn.lock
+
+# Design reference from Claude Design, kept as delivered.
+docs/new-ui/sample-ui-mockup.html

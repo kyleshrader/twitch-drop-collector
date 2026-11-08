@@ -256,3 +256,41 @@ export const DeleteNotification = defineOperation({
   variables: (input: { notificationId: string }) => ({ input: { id: input.notificationId } }),
   data: z.looseObject({})
 })
+
+/**
+ * Twitch categories (games) whose name matches a search, best match first, as in the site's
+ * search box. Sent as query text: we know no persisted hash for it (checked live 2026-11-07).
+ */
+export const SearchGames = defineOperation({
+  name: 'SearchGames',
+  query:
+    'query SearchGames($query: String!, $first: Int!) { searchCategories(query: $query, first: $first) { edges { node { id name displayName slug boxArtURL(width: 285, height: 380) } } } }',
+  variables: (input: { query: string; first: number }) => ({
+    query: input.query,
+    first: input.first
+  }),
+  data: z.looseObject({
+    searchCategories: z
+      .looseObject({ edges: z.array(z.looseObject({ node: Game.nullable() })).nullish() })
+      .nullable()
+  })
+})
+
+/** One game by its name: its ID, address (slug) and box art. Query text, as SearchGames. */
+export const GameByName = defineOperation({
+  name: 'GameByName',
+  query:
+    'query GameByName($name: String!) { game(name: $name) { id name displayName slug boxArtURL(width: 285, height: 380) } }',
+  variables: (input: { name: string }) => ({ name: input.name }),
+  data: z.looseObject({ game: Game.nullable() })
+})
+
+/** A user's profile picture (70 px), for the account menu. Query text, as SearchGames. */
+export const UserAvatar = defineOperation({
+  name: 'UserAvatar',
+  query: 'query UserAvatar($id: ID!) { user(id: $id) { profileImageURL(width: 70) } }',
+  variables: (input: { userId: string }) => ({ id: input.userId }),
+  data: z.looseObject({
+    user: z.looseObject({ profileImageURL: z.string().nullish() }).nullable()
+  })
+})

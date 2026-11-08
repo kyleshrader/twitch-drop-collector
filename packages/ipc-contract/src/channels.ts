@@ -2,6 +2,7 @@
 // Main validates input before calling a handler and validates output before replying.
 import { z } from 'zod'
 import { AuthStateView, SignInMethod } from './auth'
+import { GameSearchResult, SearchGamesInput } from './games'
 import { MinerView, SelectChannelInput } from './miner'
 import { SettingsPatchInput, SettingsView } from './settings'
 import { UpdateView } from './updates'
@@ -40,6 +41,8 @@ export const invokeChannels = {
     input: SelectChannelInput,
     output: z.object({ queued: z.literal(true) })
   },
+  /** Twitch games whose name matches, best match first. Empty while signed out. */
+  'games:search': { input: SearchGamesInput, output: z.array(GameSearchResult) },
   'updates:getState': { input: z.undefined(), output: UpdateView },
   /** Checks now, whatever the update mode; offers a skipped version too. */
   'updates:check': { input: z.undefined(), output: UpdateView },

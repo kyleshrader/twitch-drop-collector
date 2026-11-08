@@ -52,6 +52,11 @@ function toDrop(raw: RawDrop, claimedRewards: ReadonlyMap<string, Date>): Drop {
     ? raw.self.isClaimed
     : awarded.length > 0 && awarded.every((at) => startsAt <= at && at < endsAt)
   const requiredMinutes = raw.requiredMinutesWatched
+  // Twitch keeps only the last award of each reward, so it dates this drop only if it falls in
+  // the drop's window.
+  const inWindow = awarded.filter((at) => startsAt <= at && at < endsAt)
+  const awardedAt =
+    claimed && inWindow.length > 0 ? new Date(Math.max(...inWindow.map(Number))) : undefined
   return {
     id: raw.id,
     name: raw.name,
@@ -63,6 +68,7 @@ function toDrop(raw: RawDrop, claimedRewards: ReadonlyMap<string, Date>): Drop {
     extraMinutes: 0,
     ...(raw.self?.dropInstanceID ? { claimId: raw.self.dropInstanceID } : {}),
     claimed,
+    ...(awardedAt ? { awardedAt } : {}),
     preconditionIds: (raw.preconditionDrops ?? []).map((p) => p.id),
     benefits
   }

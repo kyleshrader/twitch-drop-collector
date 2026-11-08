@@ -1,6 +1,6 @@
 # New UI design
 
-Agreed with the user, 2026-11-04. The new UI is built in `apps/desktop/src/renderer/src/next/`, beside the classic UI, which stays until the switch-over (see docs/decisions.md, 2026-11-01). Open points are listed at the end.
+Agreed with the user, 2026-11-04. The new UI is built in `apps/desktop/src/renderer/src/next/`, beside the classic UI, which stays until the switch-over (see docs/decisions.md, 2026-11-01). Open points are listed at the end. The clickable mockup is [sample-ui-mockup.html](sample-ui-mockup.html); how Up next works, and the rules it can be set to while Twitch's behaviour is unconfirmed, are in [queue-rules.md](queue-rules.md). What is built so far, and what isn't yet, is in docs/decisions.md (2026-11-07).
 
 ## Look
 
@@ -92,7 +92,7 @@ The app only knows what Twitch reports right now, so a local history is added to
 
 ## Open
 
-- **Do two campaigns of the same game progress at once while one stream is watched?** A maintained TwitchDropsMiner fork's docs say Twitch may progress several rewards at the same time, and captured data shows all unfinished drops of one campaign moving together. Across campaigns of one game is unconfirmed. If they do progress together, splitting a game can't hold one campaign back while the game is watched; it still matters when the pieces need different channels (allow-lists). To check live before building the split behaviour.
+- **Do two campaigns of the same game progress at once while one stream is watched?** A maintained TwitchDropsMiner fork's docs say Twitch may progress several rewards at the same time, and captured data shows all unfinished drops of one campaign moving together. Across campaigns of one game is unconfirmed. If they do progress together, splitting a game can't hold one campaign back while the game is watched; it still matters when the pieces need different channels (allow-lists). To check live before building the split behaviour. Built meanwhile as the `campaignProgress` rule (queue-rules.md), so the estimates follow whichever answer is set. Answered 2026-11-07 by Twitch's developer guide: every campaign live on a channel gets the watch time, so `together` is the recommended default (queue-rules.md, "What Twitch says"); the viewer Help Center disagrees, so the other choice stays.
   - Live check, 2026-11-05: 15 minutes on an Overwatch channel open to any channel moved Reign of Talon S5 Mid from 565 to 578 minutes. OWCS Stage 3 Playoffs stayed at 296, but its allow-list is a single channel (ow_esports_th), so that stream didn't count for it. Inconclusive. To settle it, watch a channel two campaigns both accept; ow_esports_th is the only one that works for those two. What the check does show: allow-lists split same-game campaigns in practice, so the queue has to treat them as separate pieces whatever the answer.
 - Does pause survive a restart? (Suggested: yes.)
 - Completed: one entry per drop (reward), or per campaign?
