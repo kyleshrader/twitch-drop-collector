@@ -68,7 +68,7 @@ describe('library games', () => {
   it('counts every campaign seen, with what each listed one is now', () => {
     const [marvel, rocket, rust] = gamesOf(campaigns, { 'g-Rust': 5 })
     expect(rust).toMatchObject({ seen: 5, lastSeenAt: day(18), lastClaimedAt: day(17) })
-    expect(breakdown(rust!)).toEqual({ counts: { active: 1, missed: 1 }, unlisted: 3 })
+    expect(breakdown(rust!)).toEqual({ counts: { completed: 1, missed: 1 }, unlisted: 3 })
     // Never fewer than Twitch lists, even before the history has them.
     expect(rocket!.seen).toBe(1)
     expect(breakdown(marvel!).counts).toEqual({ unclaimed: 1 })
@@ -157,6 +157,17 @@ describe('campaign status', () => {
     expect(statusOf(ended([true, true, true]))).toBe('completed')
     expect(statusOf(ended([true, true, true, false]))).toBe('partial')
     expect(statusOf(ended([false, false]))).toBe('missed')
+  })
+
+  it('calls a running campaign with every drop claimed completed', () => {
+    const running = (claimed: boolean[]): CampaignView =>
+      campaign('c', 'Rust', {
+        state: 'active',
+        drops: claimed.map((c, i) => drop({ id: `d${i}`, claimed: c }))
+      })
+    expect(statusOf(running([true, true]))).toBe('completed')
+    expect(statusOf(running([true, false]))).toBe('active')
+    expect(statusOf(running([]))).toBe('active')
   })
 })
 

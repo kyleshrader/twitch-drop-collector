@@ -133,11 +133,12 @@ export function gamesOf(
 
 export function statusOf(c: CampaignView): CampaignStatus {
   if (c.drops.some((d) => d.awaitsConnection)) return 'unclaimed'
+  // Every drop claimed: completed, even while the campaign still runs.
+  const claimed = c.drops.filter((d) => d.claimed).length
+  if (c.drops.length > 0 && claimed === c.drops.length) return 'completed'
   if (c.state === 'active') return 'active'
   if (c.state === 'upcoming') return 'upcoming'
-  // Ended: every drop claimed, some of them, or none.
-  const claimed = c.drops.filter((d) => d.claimed).length
-  if (claimed === c.drops.length) return 'completed'
+  // Ended with some drops claimed, or none.
   return claimed > 0 ? 'partial' : 'missed'
 }
 
@@ -172,7 +173,7 @@ export function applyFilters(
   return games.filter(
     (g) =>
       (!filters.has('hideExcluded') || listOf(g.name) !== 'excluded') &&
-      (!filters.has('active') || countStatus(g, 'active') > 0) &&
+      (!filters.has('active') || g.campaigns.some((c) => c.state === 'active')) &&
       (!filters.has('unclaimed') || countStatus(g, 'unclaimed') > 0) &&
       (!filters.has('recentlyClaimed') ||
         (g.lastClaimedAt !== undefined && Date.parse(g.lastClaimedAt) >= recent))
