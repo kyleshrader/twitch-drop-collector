@@ -137,7 +137,8 @@ export function createInventoryService(deps: {
       gameName: campaign.game.name,
       dropName: drop.name,
       rewards: drop.benefits.map((b) => b.name),
-      claimedAt: clock.now()
+      claimedAt: clock.now(),
+      ...(drop.benefits[0]?.imageUrl ? { imageUrl: drop.benefits[0].imageUrl } : {})
     })
     logger.info('Claimed a drop', { game: campaign.game.name, drop: drop.name, status })
     return true

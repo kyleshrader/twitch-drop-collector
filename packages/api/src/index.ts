@@ -2,6 +2,17 @@
 // or react imports; fetch and WebSocket are injected by the app.
 export { TWITCH_ENDPOINTS, type TwitchEndpoints } from './endpoints'
 export { GqlError, RequestFailedError, ResponseShapeError } from './errors'
+export {
+  checkShape,
+  ignoreApiIssues,
+  shapeChecks,
+  type ApiCheck,
+  type ApiIssue,
+  type ApiIssueKind,
+  type ApiIssueSeverity,
+  type ApiMonitor,
+  type ApiSource
+} from './monitor'
 export { createGqlClient, GQL_BATCH_SIZE, type GqlAuth, type GqlClient } from './gql/client'
 export { defineOperation, toPayload, type GqlOperation } from './gql/operation'
 export * as gql from './gql/operations'

@@ -1,6 +1,7 @@
 import { createRateLimiter, systemClock } from '@tdc/kernel'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { GqlError, ResponseShapeError } from '../errors'
+import type { ApiIssue } from '../monitor'
 import { createHttpClient } from '../http'
 import { CLIENT_PROFILES } from '../profiles'
 import {
@@ -20,7 +21,10 @@ afterEach(async () => {
   await server.close()
 })
 
-function client(): { gql: GqlClient; scheduler: ReturnType<typeof recordingScheduler> } {
+function client(issues?: ApiIssue[]): {
+  gql: GqlClient
+  scheduler: ReturnType<typeof recordingScheduler>
+} {
   const scheduler = recordingScheduler()
   const logger = testLogger()
   const http = createHttpClient({
@@ -48,7 +52,8 @@ function client(): { gql: GqlClient; scheduler: ReturnType<typeof recordingSched
     }),
     scheduler,
     logger,
-    random: () => 0.5
+    random: () => 0.5,
+    ...(issues ? { monitor: { report: (issue: ApiIssue) => issues.push(issue) } } : {})
   })
   return { gql, scheduler }
 }
@@ -179,5 +184,119 @@ describe('gql client', () => {
   it('reports HTTP errors such as an expired token', async () => {
     server.handle(() => ({ status: 401, body: { error: 'Unauthorized' } }))
     await expect(client().gql.request(StreamInfo, { login: 'x' })).rejects.toThrow(/HTTP 401/)
+  })
+})
+
+describe('watching for API changes', () => {
+  it('reports a changed response with what was expected and what came back', async () => {
+    server.handle(() => ({
+      body: {
+        data: { currentUser: { dropCurrentSession: { dropID: 1, currentMinutesWatched: 3 } } }
+      }
+    }))
+    const issues: ApiIssue[] = []
+    await client(issues)
+      .gql.request(CurrentDrop, { channelId: '1' })
+      .catch(() => {})
+
+    expect(issues).toHaveLength(1)
+    const [issue] = issues
+    expect(issue).toMatchObject({
+      severity: 'error',
+      source: 'gql',
+      endpoint: 'DropCurrentSessionContext',
+      kind: 'shape'
+    })
+    expect(issue!.checks).toEqual([
+      expect.objectContaining({
+        path: 'currentUser.dropCurrentSession.dropID',
+        expected: expect.objectContaining({ type: 'string' }),
+        actual: 1
+      })
+    ])
+  })
+
+  it('says when a field we read is missing', async () => {
+    server.handle(() => ({ body: { data: { user: { login: 'foo' } } } }))
+    const issues: ApiIssue[] = []
+    await client(issues)
+      .gql.request(StreamInfo, { login: 'foo' })
+      .catch(() => {})
+    expect(issues[0]!.checks).toContainEqual(
+      expect.objectContaining({ path: 'user.id', missing: true })
+    )
+  })
+
+  it('warns when Twitch no longer knows a persisted query, and errors when it stays that way', async () => {
+    server.handle(() => ({ body: { errors: [{ message: 'PersistedQueryNotFound' }] } }))
+    const issues: ApiIssue[] = []
+    await client(issues)
+      .gql.request(StreamInfo, { login: 'foo' })
+      .catch(() => {})
+    expect(issues.map((i) => [i.severity, i.kind])).toEqual([
+      ['warning', 'retried'],
+      ['error', 'retried']
+    ])
+  })
+
+  it('reports unknown errors and failed fields, but not an expired session', async () => {
+    const issues: ApiIssue[] = []
+    server.handle(() => ({ body: { errors: [{ message: 'forbidden' }] } }))
+    await client(issues)
+      .gql.request(StreamInfo, { login: 'x' })
+      .catch(() => {})
+    server.handle(() => ({
+      body: {
+        errors: [{ message: 'server error', path: ['user', 'dropCampaign'] }],
+        data: { user: { dropCampaign: { broken: true } } }
+      }
+    }))
+    await client(issues).gql.request(CampaignDetailsQuery, { campaignId: 'c1', userId: '1' })
+    server.handle(() => ({ status: 401, body: { error: 'Unauthorized' } }))
+    await client(issues)
+      .gql.request(StreamInfo, { login: 'x' })
+      .catch(() => {})
+
+    expect(issues.map((i) => [i.severity, i.kind, i.summary])).toEqual([
+      ['error', 'error', expect.stringMatching(/forbidden/)],
+      ['warning', 'partial', expect.stringMatching(/user\.dropCampaign/)]
+    ])
+  })
+
+  it('reports nothing for a matching response, and a failing report never breaks a request', async () => {
+    server.handle(() => ({ body: liveStream('foo') }))
+    const issues: ApiIssue[] = []
+    await client(issues).gql.request(StreamInfo, { login: 'foo' })
+    expect(issues).toEqual([])
+
+    server.handle(() => ({ body: { data: { user: { login: 'foo' } } } }))
+    // A monitor that throws: the request still fails with the shape error, not the monitor's.
+    const gql = createGqlClient({
+      http: createHttpClient({
+        fetch: (url, init) => fetch(url, init),
+        userAgent: 'tdc-test',
+        timeoutMs: () => 2000,
+        scheduler: recordingScheduler(),
+        logger: testLogger()
+      }),
+      auth: { headers: async () => ({}) },
+      url: `${server.url}/gql`,
+      limiter: createRateLimiter({
+        capacity: 5,
+        windowMs: 1000,
+        clock: systemClock,
+        scheduler: { sleep: (ms) => new Promise((r) => setTimeout(r, ms)) }
+      }),
+      scheduler: recordingScheduler(),
+      logger: testLogger(),
+      monitor: {
+        report: () => {
+          throw new Error('monitor broke')
+        }
+      }
+    })
+    await expect(gql.request(StreamInfo, { login: 'foo' })).rejects.toBeInstanceOf(
+      ResponseShapeError
+    )
   })
 })

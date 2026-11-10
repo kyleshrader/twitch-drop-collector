@@ -1,6 +1,7 @@
 // Twitch identity endpoints (id.twitch.tv): token validation and the OAuth device-code flow.
 import { z } from 'zod'
 import { ResponseShapeError } from './errors'
+import { checkShape, safely, type ApiMonitor } from './monitor'
 import type { HttpClient } from './http'
 import { pickUserAgent, type ClientProfile } from './profiles'
 
@@ -43,14 +44,14 @@ export interface IdentityClient {
   pollDeviceCode(deviceCode: string, signal?: AbortSignal): Promise<DevicePoll>
 }
 
-function parse<T>(schema: z.ZodType<T>, operation: string, text: string): T {
+function parse<T>(schema: z.ZodType<T>, operation: string, text: string, monitor?: ApiMonitor): T {
   let json: unknown
   try {
     json = JSON.parse(text)
   } catch {
     throw new ResponseShapeError(operation, ['response is not JSON'])
   }
-  const result = schema.safeParse(json)
+  const result = checkShape(monitor, 'identity', operation, schema, json)
   if (!result.success) {
     throw new ResponseShapeError(
       operation,
@@ -66,8 +67,11 @@ export function createIdentityClient(deps: {
   /** Base URL, normally https://id.twitch.tv. */
   url: string
   deviceId: () => string
+  /** Told about responses that suggest Twitch changed its API. */
+  monitor?: ApiMonitor
 }): IdentityClient {
   const { http, profile, url, deviceId } = deps
+  const monitor = safely(deps.monitor)
   const userAgent = pickUserAgent(profile)
   const headers = (): Record<string, string> => ({
     Accept: 'application/json',
@@ -90,7 +94,7 @@ export function createIdentityClient(deps: {
       if (response.status !== 200) {
         throw new ResponseShapeError('validate', [`HTTP ${response.status}`])
       }
-      return parse(TokenInfo, 'validate', response.text)
+      return parse(TokenInfo, 'validate', response.text, monitor)
     },
 
     async requestDeviceCode(signal) {
@@ -104,7 +108,7 @@ export function createIdentityClient(deps: {
       if (response.status !== 200) {
         throw new ResponseShapeError('device code', [`HTTP ${response.status}: ${response.text}`])
       }
-      return parse(DeviceCode, 'device code', response.text)
+      return parse(DeviceCode, 'device code', response.text, monitor)
     },
 
     async pollDeviceCode(deviceCode, signal) {
@@ -120,7 +124,7 @@ export function createIdentityClient(deps: {
         signal
       })
       if (response.status === 200) {
-        const grant = parse(TokenGrant, 'device token', response.text)
+        const grant = parse(TokenGrant, 'device token', response.text, monitor)
         return {
           status: 'granted',
           accessToken: grant.access_token,

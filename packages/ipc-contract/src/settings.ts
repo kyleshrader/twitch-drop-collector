@@ -40,27 +40,13 @@ const Updates = z.object({
 
 const CampaignId = z.string().min(1).max(100)
 
-/**
- * The queue rules that describe what Twitch does, at the values Twitch's Drops campaign guide
- * gives (docs/new-ui/queue-rules.md). They're also the defaults; the new UI's Settings page can
- * reset to them. @tdc/config has the same values (checked by settings-contract.test.ts).
- */
-export const RECOMMENDED_QUEUE_RULES = {
-  split: 'byChannels',
-  dropProgress: 'together',
-  campaignProgress: 'together'
-} as const
-
 const Queue = z.object({
-  layout: z.enum(['games', 'channels', 'campaigns']),
+  layout: z.enum(['games', 'campaigns']),
   sort: z.enum(['priority', 'ending', 'spare', 'custom']),
   baseSort: z.enum(['priority', 'ending', 'spare']),
   order: z.array(CampaignId).max(2000),
   focus: z.union([z.literal(''), CampaignId]),
   paused: z.boolean(),
-  split: z.enum(['free', 'byChannels', 'never']),
-  dropProgress: z.enum(['together', 'oneAtATime']),
-  campaignProgress: z.enum(['separate', 'together']),
   linkedFirst: z.boolean(),
   newInCustom: z.enum(['byTimeRemaining', 'end'])
 })

@@ -538,3 +538,60 @@
   align-items: center;
   gap: 8px;
 }
+
+/* ---- Up next toolbar: Group by and the sort menu ---- */
+.groupBy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.cardHead .channels {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.channels svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.campaignName > .channels {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 400;
+}
+.sortOption {
+  align-items: flex-start;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+.sortOption > :first-child {
+  margin-top: 1px;
+}
+.sortText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.sortDesc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.sortStatic {
+  cursor: default;
+}
+.sortStatic:hover {
+  background: none;
+}
+.sortSetting {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  padding: 6px 10px 8px 36px;
+  font-size: 13px;
+}

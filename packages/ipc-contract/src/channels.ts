@@ -1,8 +1,16 @@
 // Every renderer → main request channel, defined once with its input and output schemas.
 // Main validates input before calling a handler and validates output before replying.
 import { z } from 'zod'
+import {
+  ApiCheckInput,
+  ApiCheckResult,
+  ApiIssuesView,
+  DismissApiIssueInput,
+  ReportApiIssueInput
+} from './api-issues'
 import { AuthStateView, SignInMethod } from './auth'
 import { GameSearchResult, SearchGamesInput } from './games'
+import { HistoryView } from './history'
 import { MinerView, SelectChannelInput } from './miner'
 import { SettingsPatchInput, SettingsView } from './settings'
 import { UpdateView } from './updates'
@@ -43,6 +51,19 @@ export const invokeChannels = {
   },
   /** Twitch games whose name matches, best match first. Empty while signed out. */
   'games:search': { input: SearchGamesInput, output: z.array(GameSearchResult) },
+  'apiIssues:getState': { input: z.undefined(), output: ApiIssuesView },
+  /** Hides an issue (or all of them) until it happens again a day or more later. */
+  'apiIssues:dismiss': { input: DismissApiIssueInput, output: ApiIssuesView },
+  /** Opens a new GitHub issue in the browser, filled in with the redacted details. */
+  'apiIssues:report': { input: ReportApiIssueInput, output: z.object({ opened: z.boolean() }) },
+  /** Runs the read-only Twitch requests now; mismatches are recorded as issues. */
+  'apiIssues:check': { input: ApiCheckInput, output: ApiCheckResult },
+  /** The read-only requests Test calls can run (empty while signed out). */
+  'apiIssues:calls': { input: z.undefined(), output: z.array(z.string()) },
+  /** Records a made-up mismatch, as Twitch changing a response would, to try the page. */
+  'apiIssues:demo': { input: z.undefined(), output: ApiIssuesView },
+  /** The History page's timeline, from the local database. */
+  'history:get': { input: z.undefined(), output: HistoryView },
   'updates:getState': { input: z.undefined(), output: UpdateView },
   /** Checks now, whatever the update mode; offers a skipped version too. */
   'updates:check': { input: z.undefined(), output: UpdateView },

@@ -69,7 +69,13 @@ const {
   row,
   rowExcluded,
   rowTitle,
-  rowSub
+  rowSub,
+  groupBy: groupByClass,
+  sortOption,
+  sortText,
+  sortDesc,
+  sortStatic,
+  sortSetting
 } = styles
 const {
   btn,
@@ -83,7 +89,6 @@ const {
   chipWarn,
   segmented,
   menuItem,
-  menuItemEnd,
   check,
   popHeading,
   separator,
@@ -99,7 +104,11 @@ const {
 
 type Layout = SettingsView['queue']['layout']
 type Direction = -1 | 1
-const LAYOUTS: readonly Layout[] = ['games', 'channels', 'campaigns']
+const LAYOUTS: readonly Layout[] = ['games', 'campaigns']
+const NEW_IN_CUSTOM = ['byTimeRemaining', 'end'] as const
+
+/** Which channels count for a campaign: the same key for the same allow-list. */
+const channelsKey = (c: CampaignView): string => [...c.allowedChannels].sort().join('\n')
 const AUTO_SORTS = ['priority', 'ending', 'spare'] as const
 
 interface Moves {
@@ -149,6 +158,8 @@ function CampaignRow(props: {
   campaign: CampaignView
   layout: Layout
   canSplit: boolean
+  /** The card's campaigns accept different channels, so each row says which. */
+  showChannels: boolean
   first: boolean
   last: boolean
   now: number
@@ -203,13 +214,8 @@ function CampaignRow(props: {
           />
           <Truncated text={c.name} selectable />
         </span>
-        {c.allowedChannels.length > 0 && layout !== 'channels' && (
-          <span className={chip} data-tip={t.channelTip(c.allowedChannels)}>
-            <Icon.channel />
-            {t.channelCount(c.allowedChannels.length)}
-          </span>
-        )}
         {entry.isNew && <span className={`${chip} ${chipNew}`}>{t.newTag}</span>}
+        {props.showChannels && <ChannelList campaign={c} />}
       </div>
       <div className={campaignDrops}>
         <div className={mini}>
@@ -348,6 +354,28 @@ function ChannelNames(props: { campaign: CampaignView }): ReactNode {
   )
 }
 
+/** Which channels count: "Only on …" for a creator campaign, else "Any channel". */
+function ChannelList(props: { campaign: CampaignView }): ReactNode {
+  const c = props.campaign
+  const limited = c.allowedChannels.length > 0
+  return (
+    <span
+      className={`${channelsClass} ${selectable}`}
+      data-testid="queue-channels"
+      data-tip={
+        !limited
+          ? t.anyChannelTip
+          : c.allowedChannels.length > t.onlyOnShown
+            ? t.channelTip(c.allowedChannels)
+            : undefined
+      }
+    >
+      <Icon.channel />
+      <span>{limited ? <ChannelNames campaign={c} /> : t.anyChannel}</span>
+    </span>
+  )
+}
+
 function QueueCard(props: {
   piece: QueuePieceView
   byId: ReadonlyMap<string, CampaignView>
@@ -368,6 +396,9 @@ function QueueCard(props: {
   const { listOf, setList } = useGameList()
   const flat = layout === 'campaigns'
   const first = byId.get(piece.entries[0]!.campaignId)
+  const campaigns = piece.entries.flatMap((e) => byId.get(e.campaignId) ?? [])
+  // One channel list for the whole card goes in its header; different ones go on each row.
+  const sameChannels = campaigns.every((c) => first && channelsKey(c) === channelsKey(first))
   const choice = listOf(piece.game)
   const names = (ids: readonly string[]): string[] => ids.map((id) => byId.get(id)?.name ?? id)
   const isTarget = props.target?.key === piece.key
@@ -439,16 +470,7 @@ function QueueCard(props: {
               {t.split}
             </span>
           )}
-          {layout === 'channels' && first && (
-            <span
-              className={`${channelsClass} ${selectable}`}
-              data-tip={
-                first.allowedChannels.length > 3 ? t.channelTip(first.allowedChannels) : undefined
-              }
-            >
-              {first.allowedChannels.length > 0 ? <ChannelNames campaign={first} /> : t.anyChannel}
-            </span>
-          )}
+          {sameChannels && first && <ChannelList campaign={first} />}
           <span className={grow} />
           <Popover
             label={t.gameActions(piece.game)}
@@ -525,6 +547,7 @@ function QueueCard(props: {
               campaign={c}
               layout={layout}
               canSplit={canSplit}
+              showChannels={!sameChannels}
               first={index === 0 && i === 0}
               last={index === total - 1 && i === piece.entries.length - 1}
               now={now}
@@ -545,11 +568,51 @@ function QueueCard(props: {
   )
 }
 
+function SortChoice(props: {
+  checked: boolean
+  name: string
+  note: string
+  onPick?: () => void
+}): ReactNode {
+  const body = (
+    <>
+      <span className={check}>{props.checked && <Icon.check />}</span>
+      <span className={sortText}>
+        <span>{props.name}</span>
+        <span className={sortDesc}>{props.note}</span>
+      </span>
+    </>
+  )
+  // Custom can't be picked: it starts when the user moves something.
+  return props.onPick ? (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={props.checked}
+      className={`${menuItem} ${sortOption}`}
+      onClick={props.onPick}
+    >
+      {body}
+    </button>
+  ) : (
+    <div
+      role="radio"
+      aria-checked={props.checked}
+      aria-disabled
+      className={`${menuItem} ${sortOption} ${sortStatic}`}
+    >
+      {body}
+    </div>
+  )
+}
+
+/** How Up next is sorted, and the two preferences that shape the sorts. */
 function SortMenu(props: {
   settings: SettingsView
   onSave: (patch: SettingsPatchInput) => void
 }): ReactNode {
-  const { sort } = props.settings.queue
+  const { sort, baseSort, linkedFirst, newInCustom } = props.settings.queue
+  const save = props.onSave
   return (
     <Popover
       label={t.sortLabel}
@@ -557,35 +620,65 @@ function SortMenu(props: {
       button={
         <>
           <Icon.sort />
-          {t.sorts[sort]}
+          {t.sortButton(t.sorts[sort])}
           <Icon.down />
         </>
       }
       align="end"
-      width={260}
+      width={340}
     >
       {(close) => (
         <>
           <div className={popHeading}>{t.sortLabel}</div>
-          {AUTO_SORTS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              className={menuItem}
-              onClick={() => {
-                props.onSave({ queue: { sort: value, baseSort: value, focus: '' } })
-                close()
-              }}
-            >
-              <span className={check}>{sort === value && <Icon.check />}</span>
-              {t.sorts[value]}
-            </button>
-          ))}
-          <button type="button" className={menuItem} disabled>
-            <span className={check}>{sort === 'custom' && <Icon.check />}</span>
-            {t.sorts.custom}
-            <span className={menuItemEnd}>{t.customNote}</span>
+          <div role="radiogroup" aria-label={t.sortLabel}>
+            {AUTO_SORTS.map((value) => (
+              <SortChoice
+                key={value}
+                checked={sort === value}
+                name={t.sorts[value]}
+                note={t.sortNotes[value]}
+                onPick={() => {
+                  save({ queue: { sort: value, baseSort: value, focus: '' } })
+                  close()
+                }}
+              />
+            ))}
+            <SortChoice
+              checked={sort === 'custom'}
+              name={t.sorts.custom}
+              note={sort === 'custom' ? t.customFrom(t.sorts[baseSort]) : t.customHow}
+            />
+          </div>
+          <hr className={separator} />
+          <div className={popHeading}>{t.sortOptions}</div>
+          <button
+            type="button"
+            role="checkbox"
+            aria-checked={linkedFirst}
+            className={`${menuItem} ${sortOption}`}
+            onClick={() => save({ queue: { linkedFirst: !linkedFirst } })}
+          >
+            <span className={check}>{linkedFirst && <Icon.check />}</span>
+            <span className={sortText}>
+              <span>{t.linkedFirst}</span>
+              <span className={sortDesc}>{t.linkedFirstNote}</span>
+            </span>
           </button>
+          <div className={sortSetting}>
+            <span>{t.newInCustom}</span>
+            <div className={segmented} role="group" aria-label={t.newInCustom} data-keys="row">
+              {NEW_IN_CUSTOM.map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={newInCustom === value}
+                  onClick={() => save({ queue: { newInCustom: value } })}
+                >
+                  {t.newInCustomOptions[value]}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className={note}>{t.sortNote}</div>
         </>
       )}
@@ -646,7 +739,7 @@ export function UpNext(props: {
   if (!queue) return null
 
   const byId = new Map(miner.campaigns.map((c) => [c.id, c]))
-  const { layout, sort, baseSort, split } = settings.queue
+  const { layout, sort, baseSort } = settings.queue
   const pieces = queue.pieces.map(idsOf)
   const currentGame = miner.campaigns.find((c) => c.id === miner.active?.campaignId)?.game
   const entries = queue.pieces.reduce((n, p) => n + p.entries.length, 0)
@@ -693,18 +786,21 @@ export function UpNext(props: {
         <span className={spacer} />
         {!collapsed && (
           <>
-            <div className={segmented} role="group" aria-label={t.groupBy} data-keys="row">
-              {LAYOUTS.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={layout === value}
-                  data-tip={t.layoutTips[value]}
-                  onClick={() => save({ queue: { layout: value } })}
-                >
-                  {t.layouts[value]}
-                </button>
-              ))}
+            <div className={groupByClass}>
+              <span aria-hidden>{t.groupBy}</span>
+              <div className={segmented} role="group" aria-label={t.groupByLabel} data-keys="row">
+                {LAYOUTS.map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={layout === value}
+                    data-tip={t.layoutTips[value]}
+                    onClick={() => save({ queue: { layout: value } })}
+                  >
+                    {t.layouts[value]}
+                  </button>
+                ))}
+              </div>
             </div>
             {sort === 'custom' && (
               <button
@@ -754,7 +850,7 @@ export function UpNext(props: {
               piece={piece}
               byId={byId}
               layout={layout}
-              canSplit={split !== 'never' && layout !== 'campaigns'}
+              canSplit={layout !== 'campaigns'}
               index={index}
               total={queue.pieces.length}
               currentGame={currentGame}

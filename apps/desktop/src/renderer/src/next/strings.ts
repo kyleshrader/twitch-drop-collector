@@ -16,6 +16,7 @@ export const strings = {
     label: 'Pages',
     drops: 'Drops',
     library: 'Library',
+    history: 'History',
     pausedTip: 'Mining is paused'
   },
 
@@ -98,22 +99,35 @@ export const strings = {
 
   upNext: {
     label: 'Up next',
-    groupBy: 'Group Up next by',
-    layouts: { games: 'Games', channels: 'Channels', campaigns: 'Campaigns' },
+    groupBy: 'Group by',
+    groupByLabel: 'Group Up next by',
+    layouts: { games: 'Game', campaigns: 'Campaign' },
     layoutTips: {
-      games: 'One card per game',
-      channels: 'One card per game and channel list',
-      campaigns: 'Every campaign on its own'
+      games: 'One card per game, with its campaigns inside',
+      campaigns: 'One card per campaign'
     },
     sortLabel: 'Sort Up next',
+    sortButton: (sort: string): string => `Sort: ${sort}`,
     sorts: {
-      priority: 'Priority, then time remaining',
+      priority: 'Priority',
       ending: 'Ending soonest',
       spare: 'Least time to spare',
       custom: 'Custom'
     },
-    customNote: 'Drag, or use Move up / Move down',
-    sortNote: 'Priority games come first in every order.',
+    sortNotes: {
+      priority: 'Priority games in your list’s order, then the least time needed',
+      ending: 'The campaigns that end first go first',
+      spare: 'The campaigns closest to running out of time go first',
+      custom: 'Your own order: drag cards, or use Move up and Move down'
+    },
+    customFrom: (sort: string): string => `Started from ${sort}. Picking a sort above replaces it.`,
+    customHow: 'Drag a card or use Move up / Move down to start one.',
+    sortOptions: 'Options',
+    linkedFirst: 'Linked games first',
+    linkedFirstNote: 'Games that need an account linked go after, in the automatic sorts',
+    newInCustom: 'New campaigns in a custom order',
+    newInCustomOptions: { byTimeRemaining: 'By time remaining', end: 'At the bottom' },
+    sortNote: 'Priority games come before Not set games in every order.',
     reset: (sort: string): string => `Reset to ${sort}`,
     showExcluded: (n: number): string => `Show excluded (${n})`,
     hideExcluded: (n: number): string => `Hide excluded (${n})`,
@@ -147,8 +161,8 @@ export const strings = {
     /** How many names "Only on" shows before "and N more". */
     onlyOnShown: 3,
     andMore: (n: number): string => ` and ${n} more`,
-    channelCount: (n: number): string => plural(n, 'channel', 'channels'),
     channelTip: (names: readonly string[]): string => `Only ${names.join(', ')} count`,
+    anyChannelTip: 'Any channel streaming the game with drops on counts',
     drops: (done: number, total: number): string => `${done} of ${total} drops`,
     needs: (minutes: number): string => `Needs ${duration(minutes)}`,
     endsStarts: (endsIn: number, startsIn: number | undefined): string =>
@@ -345,31 +359,6 @@ export const strings = {
         note: 'After Priority games. Off: only Priority games are mined.'
       }
     },
-    rules: 'Queue rules',
-    rulesLead:
-      'What the queue assumes about Twitch. They change the estimates and what can be reordered. The recommended values follow Twitch’s Drops campaign guide.',
-    resetRecommended: 'Reset to recommended',
-    onRecommended: 'Using the recommended rules',
-    recommended: (label: string): string => `${label} (recommended)`,
-    ruleNames: {
-      split: { name: 'Splitting a game', note: 'Can a game’s campaigns be reordered apart?' },
-      dropProgress: {
-        name: 'Drops in a campaign',
-        note: 'Do they progress together or one after another?'
-      },
-      campaignProgress: {
-        name: 'Campaigns of one game',
-        note: 'Does watching one progress the others on a shared channel?'
-      },
-      newInCustom: { name: 'New campaigns in a custom order', note: 'Where do they go?' },
-      linkedFirst: { name: 'Favour linked games', note: 'In the automatic sorts.' }
-    },
-    ruleOptions: {
-      split: { free: 'Freely', byChannels: 'Only by channel list', never: 'Never' },
-      dropProgress: { together: 'Together', oneAtATime: 'One at a time' },
-      campaignProgress: { separate: 'Separately', together: 'Together' },
-      newInCustom: { byTimeRemaining: 'By time remaining', end: 'At the bottom' }
-    },
     interface: 'Interface',
     interfaceNote: 'The new UI is in preview. The classic UI is a click away.',
     logs: 'Open the logs folder'
@@ -392,5 +381,181 @@ export const strings = {
     download: 'Download',
     install: 'Restart and update',
     skip: 'Skip this version'
+  },
+
+  history: {
+    heading: 'History',
+    lead: (since: string | undefined): string =>
+      since
+        ? `What Drop Collector has done on this computer since ${since}: what it watched, what it claimed, and how each campaign ended.`
+        : 'What Drop Collector watches and claims, and how each campaign ends, shows up here as it runs.',
+    rangeLabel: 'Time range',
+    ranges: { '7d': '7 days', '30d': '30 days', '90d': '90 days', all: 'All time' },
+    filterLabel: 'Show',
+    filters: {
+      all: 'Everything',
+      claims: 'Claims',
+      watching: 'Watching',
+      campaigns: 'Campaigns',
+      library: 'Library & app'
+    },
+    search: 'Search games, rewards and channels',
+    stats: {
+      drops: 'Drops claimed',
+      watched: 'Time watched',
+      completed: 'Campaigns completed',
+      missed: 'Campaigns missed'
+    },
+    statTip: (what: string): string => `Show only ${what.toLowerCase()}`,
+    dropsNote: (games: number): string =>
+      games === 0 ? 'None in this range' : `From ${plural(games, 'game', 'games')}`,
+    watchedNote: (sessions: number): string =>
+      sessions === 0 ? 'Nothing watched in this range' : plural(sessions, 'session', 'sessions'),
+    completedNote: (ended: number): string =>
+      ended === 0 ? 'None ended in this range' : `Of ${ended} that ended`,
+    missedNote: (partial: number): string =>
+      partial === 0 ? 'Ended with nothing claimed' : `And ${partial} ended part-done`,
+    today: 'Today',
+    yesterday: 'Yesterday',
+    daySummary: (drops: number, minutes: number): string =>
+      [
+        drops > 0 ? plural(drops, 'drop', 'drops') : '',
+        minutes >= 1 ? `${duration(minutes)} watched` : ''
+      ]
+        .filter(Boolean)
+        .join(' · '),
+    watched: (minutes: number): string => `Watched for ${duration(minutes)}`,
+    on: 'on',
+    ended: {
+      completed: (campaign: string): string => `Completed ${campaign}`,
+      partial: (campaign: string): string => `${campaign} ended part-done`,
+      missed: (campaign: string): string => `Missed ${campaign}`,
+      notEarnable: (campaign: string): string => `${campaign} ended`
+    },
+    endedDrops: (claimed: number, total: number): string => `${claimed} of ${total} drops`,
+    notEarnable: 'your account couldn’t earn it',
+    watchedFor: (minutes: number): string => `watched ${duration(minutes)}`,
+    newCampaigns: (n: number): string => (n === 1 ? 'New campaign' : `${n} new campaigns`),
+    newGame: 'New in your Library',
+    started: (campaign: string): string => `${campaign} started`,
+    list: {
+      priority: 'put on Priority',
+      excluded: 'excluded',
+      notSet: 'taken off its list (Not set)'
+    },
+    linked: 'Linked your account for',
+    app: {
+      paused: 'Paused all activity',
+      resumed: 'Resumed mining',
+      updated: (version: string, from: string | undefined): string =>
+        from ? `Updated to version ${version} (from ${from})` : `Updated to version ${version}`
+    },
+    appSub: {
+      paused: 'Nothing was watched or sent to Twitch until it resumed',
+      resumed: 'Watching picked up where the queue stood',
+      updated: 'Drop Collector'
+    },
+    fromTwitch: 'Time from Twitch',
+    fromTwitchTip: 'Claimed outside the app, or before it kept claims: the time is Twitch’s.',
+    games: 'Games',
+    gamesNote: 'By time watched in this range',
+    gameRow: (minutes: number, drops: number): string =>
+      [minutes >= 1 ? duration(minutes) : '', drops > 0 ? plural(drops, 'drop', 'drops') : '']
+        .filter(Boolean)
+        .join(' · '),
+    onlyGame: (game: string): string => `Only ${game}`,
+    allGames: 'All games',
+    showAllGames: (n: number): string => `Show all ${n}`,
+    showFewerGames: 'Show fewer',
+    empty:
+      'Nothing yet. Claims, watching and how campaigns end show up here as Drop Collector runs.',
+    noMatch: 'Nothing matches these filters.',
+    clearFilters: 'Clear filters',
+    showMore: (n: number): string => `Show ${n} more`,
+    starts: (running: number): string =>
+      running > 0
+        ? `The history starts here. ${plural(running, 'campaign was', 'campaigns were')} already running.`
+        : 'The history starts here.',
+    openGame: (game: string): string => `Open ${game} in the Library`,
+    loading: 'Loading the history…',
+    failed: 'The history couldn’t be read.'
+  },
+
+  twitchApi: {
+    heading: 'Twitch API',
+    lead: (file: string): string =>
+      `Every response from Twitch is checked against what the app expects. Anything that doesn’t match shows up here and in ${file} in the logs folder, so a change on Twitch’s side is caught early.`,
+    counts: (errors: number, warnings: number): string => {
+      const parts = [
+        errors > 0 ? plural(errors, 'error', 'errors') : '',
+        warnings > 0 ? plural(warnings, 'warning', 'warnings') : ''
+      ].filter(Boolean)
+      return parts.length ? parts.join(' and ') : 'No problems'
+    },
+    none: 'No problems found. Twitch’s responses match what the app expects.',
+    checking: 'Running…',
+    issuesHeading: 'Issues',
+    demo: 'Simulate a change',
+    demoTip:
+      'Records a made-up mismatch, as if Twitch had changed a response, so you can see the notification, the log and this page at work. Nothing is sent to Twitch.',
+    demoChip: 'Demo',
+    testCalls: 'Test calls',
+    testCallsNote:
+      'The read-only requests the app makes, run on demand. Nothing is claimed, watched or changed on Twitch. A response that doesn’t match is recorded above.',
+    runAll: 'Run all',
+    run: 'Run',
+    runOne: (endpoint: string): string => `Run ${endpoint}`,
+    passed: (ms: number): string => `Passed in ${ms} ms`,
+    failed: (ms: number): string => `Failed after ${ms} ms`,
+    notRun: 'Not run yet',
+    showResponse: 'Response',
+    hideResponse: 'Hide',
+    signInToTest: 'Sign in to run test calls.',
+    checked: (passed: number, total: number): string =>
+      total === 0
+        ? ''
+        : passed === total
+          ? `All ${total} requests passed.`
+          : `${passed} of ${total} requests passed.`,
+    openFolder: 'Open the log folder',
+    pause: 'Pause all activity',
+    resume: 'Resume',
+    pausedNote: 'Paused: the app isn’t talking to Twitch until you resume.',
+    dismiss: 'Dismiss',
+    dismissAll: 'Dismiss all',
+    report: 'Report on GitHub',
+    reportNote:
+      'Opens a new GitHub issue in your browser, filled in with these details. They’re redacted: no tokens, and not your user ID or login. Read it over before you submit.',
+    back: 'Twitch API',
+    severity: { error: 'Error', warning: 'Warning' },
+    source: { gql: 'GQL', pubsub: 'PubSub', identity: 'Sign-in' },
+    kind: {
+      shape: 'Response changed',
+      error: 'Unknown error',
+      http: 'HTTP status',
+      partial: 'Field failed',
+      retried: 'Needed a retry'
+    },
+    times: (n: number): string => plural(n, 'time', 'times'),
+    seen: (count: number, first: string, last: string): string =>
+      count === 1
+        ? `Seen once, ${last}`
+        : `Seen ${plural(count, 'time', 'times')}, ${first} to ${last}`,
+    lastSeen: (when: string): string => `last ${when}`,
+    differences: 'What didn’t match',
+    expected: 'Expected',
+    actual: 'Actual',
+    missing: '(missing)',
+    nothing: '(nothing)',
+    response: 'The response',
+    notFound: 'This issue was dismissed or is no longer kept.',
+    notice: (errors: number, warnings: number): string =>
+      `Twitch API: ${errors > 0 ? plural(errors, 'error', 'errors') : ''}${
+        errors > 0 && warnings > 0 ? ', ' : ''
+      }${warnings > 0 ? plural(warnings, 'warning', 'warnings') : ''}`,
+    noticeDetail: 'Twitch may have changed something the app relies on.',
+    settingsRow: 'Twitch API checks',
+    settingsNote: (summary: string): string => `${summary}. Opens the list of mismatches.`,
+    open: 'Open'
   }
 }

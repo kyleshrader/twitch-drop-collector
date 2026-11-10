@@ -24,7 +24,8 @@ interface SavedQueue {
   layout: string
   sort: string
   paused: boolean
-  split: string
+  linkedFirst: boolean
+  newInCustom: string
   order: string[]
 }
 const savedQueue = async (userDataDir: string): Promise<SavedQueue> =>
@@ -158,9 +159,14 @@ test('the new UI mines, pauses, reorders Up next and shows the library', async (
       .click()
     await expect(upNextDrops).toHaveCount(0)
 
-    // Layouts regroup the same queue.
-    await upNext.getByRole('button', { name: 'Campaigns' }).click()
-    await expect(upNext.getByRole('button', { name: 'Campaigns' })).toHaveAttribute(
+    // Every card says which channels count (a game's shared list, or each campaign's own).
+    await expect(upNext.getByTestId('queue-channels').first()).toContainText(/Any channel|Only on/)
+
+    // Group by game or by campaign: the same queue, regrouped.
+    const groupBy = upNext.getByRole('group', { name: 'Group Up next by' })
+    await expect(groupBy.getByRole('button')).toHaveText(['Game', 'Campaign'])
+    await groupBy.getByRole('button', { name: 'Campaign' }).click()
+    await expect(groupBy.getByRole('button', { name: 'Campaign' })).toHaveAttribute(
       'aria-pressed',
       'true'
     )
@@ -180,9 +186,30 @@ test('the new UI mines, pauses, reorders Up next and shows the library', async (
     await expect.poll(async () => (await savedQueue(userDataDir)).sort).toBe('custom')
     expect((await savedQueue(userDataDir)).order.length).toBeGreaterThan(1)
     await upNext.getByRole('button', { name: /^Reset to / }).click()
-    await expect(upNext.getByRole('button', { name: 'Sort Up next' })).toContainText(
-      'Priority, then time remaining'
+    await expect(upNext.getByRole('button', { name: 'Sort Up next' })).toHaveText('Sort: Priority')
+
+    // The sort menu: each sort says what it does; Custom can't be picked, only started; and
+    // the sorts' two preferences are saved from it.
+    await upNext.getByRole('button', { name: 'Sort Up next' }).click()
+    const queueSort = page.getByRole('dialog', { name: 'Sort Up next' })
+    await expect(queueSort.getByRole('radio', { name: /^Priority/ })).toHaveAttribute(
+      'aria-checked',
+      'true'
     )
+    await expect(queueSort.getByRole('radio', { name: /^Custom/ })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
+    await queueSort.getByRole('checkbox', { name: /^Linked games first/ }).click()
+    await expect.poll(async () => (await savedQueue(userDataDir)).linkedFirst).toBe(false)
+    await queueSort.getByRole('button', { name: 'At the bottom' }).click()
+    await expect.poll(async () => (await savedQueue(userDataDir)).newInCustom).toBe('end')
+    await queueSort.getByRole('radio', { name: /^Ending soonest/ }).click()
+    await expect(queueSort).toHaveCount(0)
+    await expect(upNext.getByRole('button', { name: 'Sort Up next' })).toHaveText(
+      'Sort: Ending soonest'
+    )
+    await expect.poll(async () => (await savedQueue(userDataDir)).sort).toBe('ending')
 
     // At the smallest window size, a menu opened near the bottom stays inside the window.
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.setSize(920, 400))
@@ -333,18 +360,11 @@ test('the new UI mines, pauses, reorders Up next and shows the library', async (
     await expect.poll(dashboards).toBeGreaterThan(refreshesBefore)
     await expect(searchBox).toBeVisible()
 
-    // Settings, from the account menu: the queue rules are saved like any setting.
+    // Settings, from the account menu: no queue rules any more (Twitch settled them).
     await ui.getByRole('button', { name: 'Account' }).click()
     await page.getByRole('button', { name: 'Settings' }).click()
     await expect(ui.getByRole('heading', { name: 'Settings' })).toBeVisible()
-    await ui.getByLabel('Splitting a game').selectOption('never')
-    await expect.poll(async () => (await savedQueue(userDataDir)).split).toBe('never')
-
-    // The rules about Twitch reset to the recommended values (also the defaults).
-    await ui.getByRole('button', { name: 'Reset to recommended' }).click()
-    await expect.poll(async () => (await savedQueue(userDataDir)).split).toBe('byChannels')
-    await expect(ui.getByRole('button', { name: 'Using the recommended rules' })).toBeDisabled()
-    await expect(ui.getByLabel('Campaigns of one game')).toHaveValue('together')
+    await expect(ui.getByRole('heading', { name: 'Queue rules' })).toHaveCount(0)
   } finally {
     await app.close()
   }

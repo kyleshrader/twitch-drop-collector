@@ -1,6 +1,7 @@
 // State that main pushes: loaded once over IPC, then kept current by main → renderer events.
 import { useQuery, type QueryClient } from '@tanstack/react-query'
 import type {
+  ApiIssuesView,
   AuthStateView,
   EventChannel,
   EventPayload,
@@ -13,11 +14,13 @@ import { invoke } from './ipc'
 export const MINER_KEY = ['miner'] as const
 export const AUTH_KEY = ['auth'] as const
 export const UPDATES_KEY = ['updates'] as const
+export const API_ISSUES_KEY = ['apiIssues'] as const
 
 const LIVE: { [E in EventChannel]: readonly string[] } = {
   'miner:state': MINER_KEY,
   'auth:state': AUTH_KEY,
-  'updates:state': UPDATES_KEY
+  'updates:state': UPDATES_KEY,
+  'apiIssues:state': API_ISSUES_KEY
 }
 
 /**
@@ -47,6 +50,10 @@ export const useAuthState = (): AuthStateView | undefined =>
 
 export const useUpdates = (): UpdateView | undefined =>
   useLive('updates:state', () => invoke('updates:getState'))
+
+/** Signs that Twitch changed its API (the Twitch API page). */
+export const useApiIssues = (): ApiIssuesView | undefined =>
+  useLive('apiIssues:state', () => invoke('apiIssues:getState'))
 
 /** Settings aren't pushed by main; the settings screen updates this cache when it saves. */
 export const SETTINGS_KEY = ['settings'] as const

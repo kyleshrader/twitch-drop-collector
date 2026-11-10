@@ -5,5 +5,13 @@ export { createImageIndex, type ImageEntry, type ImageIndex } from './images'
 export { openSqlite, type Database, type Row, type SqlValue } from './database'
 export { MIGRATIONS, NewerDatabaseError, runMigrations, schemaVersion } from './migrations'
 export { createGames, type GameInfo, type Games } from './games'
-export { createSeenCampaigns, type SeenCampaign, type SeenCampaigns } from './seen'
+export {
+  createSeenCampaigns,
+  type CampaignStanding,
+  type SeenCampaign,
+  type SeenCampaigns,
+  type SeenRecord
+} from './seen'
+export { createEventLog, type AppEvent, type EventLog } from './events'
+export { createWatchLog, type WatchLog, type WatchSession, type WatchedChannel } from './watch-log'
 export { openStorage, type Storage } from './storage'

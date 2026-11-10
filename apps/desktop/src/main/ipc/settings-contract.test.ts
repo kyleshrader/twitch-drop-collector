@@ -1,24 +1,14 @@
 // The IPC transport schema mirrors @tdc/config's schema. These assertions fail the typecheck when
 // a field is added to one and not the other; the runtime checks catch rule differences
 // (enums, ranges) that types alone can't see.
-import {
-  DEFAULT_SETTINGS,
-  RECOMMENDED_QUEUE_RULES as CONFIG_RECOMMENDED,
-  Settings,
-  SettingsPatch
-} from '@tdc/config'
-import { RECOMMENDED_QUEUE_RULES, SettingsPatchInput, SettingsView } from '@tdc/ipc-contract'
+import { DEFAULT_SETTINGS, Settings, SettingsPatch } from '@tdc/config'
+import { SettingsPatchInput, SettingsView } from '@tdc/ipc-contract'
 import { describe, expect, expectTypeOf, it } from 'vitest'
 
 describe('settings transport schema', () => {
   it('has the same type as the config schema', () => {
     expectTypeOf<SettingsView>().toEqualTypeOf<Settings>()
     expectTypeOf<SettingsPatchInput>().toEqualTypeOf<SettingsPatch>()
-  })
-
-  it('recommends the same queue rules, which are also the defaults', () => {
-    expect(RECOMMENDED_QUEUE_RULES).toEqual(CONFIG_RECOMMENDED)
-    expect(DEFAULT_SETTINGS.queue).toMatchObject(RECOMMENDED_QUEUE_RULES)
   })
 
   it('accepts and rejects the same values', () => {
@@ -55,7 +45,8 @@ describe('settings transport schema', () => {
       { updates: { skippedVersion: '../2.0.0' } },
       { queue: { order: ['a', 'b'], sort: 'custom' } },
       { queue: { order: [''] } },
-      { queue: { split: 'sometimes' } },
+      // The rules Twitch settled aren't settings any more.
+      { queue: { split: 'byChannels' } },
       { queue: { paused: true, focus: '' } },
       { general: { unknown: true } },
       { other: {} }

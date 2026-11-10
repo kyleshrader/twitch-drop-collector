@@ -2,7 +2,14 @@
 // events and claims drops. A port of upstream's main loop (docs/port-plan.md §3), restructured:
 // the miner's own actions run one at a time through a queue, every decision is a pure rule from
 // ../domain, and the services do the I/O.
-import { gql, pubsubTopics, type GqlClient, type RealtimeSource } from '@tdc/api'
+import {
+  checkShape,
+  gql,
+  pubsubTopics,
+  type ApiMonitor,
+  type GqlClient,
+  type RealtimeSource
+} from '@tdc/api'
 import { AbortError, createEmitter, type Clock, type Logger, type Scheduler } from '@tdc/kernel'
 import type { ChannelService } from '../channels/channel-service'
 import { canEarnCampaign, canEarnDrop, firstEarnableDrop, type EarnContext } from '../domain/rules'
@@ -94,6 +101,8 @@ export function createMiner(deps: {
   logger: Logger
   onClaim?: (notice: ClaimNotice) => void
   timing?: Partial<MinerTiming>
+  /** Told about PubSub messages that suggest Twitch changed them. */
+  monitor?: ApiMonitor
 }): Miner {
   const { inventory, channels, watch, realtime, clock, scheduler, logger } = deps
   const timing = { ...DEFAULT_TIMING, ...deps.timing }
@@ -299,7 +308,13 @@ export function createMiner(deps: {
   }
 
   const onStreamState = (channelId: string, payload: unknown): void => {
-    const parsed = StreamStateEvent.safeParse(payload)
+    const parsed = checkShape(
+      deps.monitor,
+      'pubsub',
+      'video-playback-by-id',
+      StreamStateEvent,
+      payload
+    )
     if (!parsed.success) return
     const { type, viewers } = parsed.data
     if (type === 'viewcount') {
@@ -354,7 +369,10 @@ export function createMiner(deps: {
   }
 
   const onDropEvent = (payload: unknown): void => {
-    const parsed = DropEvent.safeParse(payload)
+    // Only the event types we use are checked: Twitch sends others we have no use for.
+    const type = (payload as { type?: unknown } | null)?.type
+    if (type !== 'drop-progress' && type !== 'drop-claim') return
+    const parsed = checkShape(deps.monitor, 'pubsub', 'user-drop-events', DropEvent, payload)
     if (!parsed.success) return
     const event = parsed.data
     if (event.type === 'drop-claim') {
@@ -379,7 +397,13 @@ export function createMiner(deps: {
   }
 
   const onNotification = (payload: unknown): void => {
-    const parsed = NotificationEvent.safeParse(payload)
+    const parsed = checkShape(
+      deps.monitor,
+      'pubsub',
+      'onsite-notifications',
+      NotificationEvent,
+      payload
+    )
     const notification = parsed.success ? parsed.data.data?.notification : undefined
     if (parsed.data?.type !== 'create-notification' || !notification) return
     if (!REWARD_NOTIFICATION_TYPES.has(notification.type)) return

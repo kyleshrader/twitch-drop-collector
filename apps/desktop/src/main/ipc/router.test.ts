@@ -46,8 +46,18 @@ function setup(overrides: Partial<InvokeHandlers> = {}): {
         view: () => ({ status: 'stopped', wanted: [], channels: [], campaigns: [] }),
         reload: () => {},
         selectChannel: () => {},
-        searchGames: async (query) => [{ id: '1', name: query.toUpperCase() }]
+        searchGames: async (query) => [{ id: '1', name: query.toUpperCase() }],
+        apiCalls: () => [],
+        checkApi: async () => [],
+        history: () => ({ runningAtStart: 0, entries: [] })
       },
+      apiIssues: {
+        view: () => ({ issues: [], errors: 0, warnings: 0, logFile: 'twitch-api.log' }),
+        get: () => undefined,
+        dismiss: () => {},
+        report: () => {}
+      },
+      redact: (value) => value,
       updates: {
         view: () => UNSUPPORTED,
         check: async () => UNSUPPORTED,

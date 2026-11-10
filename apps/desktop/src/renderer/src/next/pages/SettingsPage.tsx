@@ -1,21 +1,21 @@
-// The settings that don't live on a page yet, and the queue rules (docs/new-ui/queue-rules.md).
+// The settings that don't live on a page yet. Up next's own options are in its sort menu.
 import { useMutation } from '@tanstack/react-query'
-import {
-  RECOMMENDED_QUEUE_RULES,
-  type SettingsPatchInput,
-  type SettingsView
-} from '@tdc/ipc-contract'
+import type { SettingsView } from '@tdc/ipc-contract'
 import type { ReactNode } from 'react'
 import { invoke } from '../../ipc'
+import { useApiIssues } from '../../live'
 import { useUiChoice } from '../../ui-choice'
 import { useSettingsPatch } from '../data'
+import { icons } from '../icons'
+import { routeHref } from '../router'
 import { strings } from '../strings'
 import ui from '../ui.module.css'
 import styles from './Pages.module.css'
 
 const t = strings.settings
-const { page, lead, panel, settingRow, settingNote, toggle, select, headingRow } = styles
-const { segmented, btn, btnSmall, ghost, grow } = ui
+const Icon = icons
+const { page, lead, panel, settingRow, settingNote, toggle } = styles
+const { segmented, btn, grow } = ui
 
 function Row(props: { name: string; note: string; children: ReactNode }): ReactNode {
   return (
@@ -42,22 +42,12 @@ function Toggle(props: { label: string; on: boolean; onChange: (on: boolean) => 
   )
 }
 
-type Rule = 'split' | 'dropProgress' | 'campaignProgress' | 'newInCustom'
-/** Rules about what Twitch does: they have a recommended value, from Twitch's own docs. */
-type TwitchRule = keyof typeof RECOMMENDED_QUEUE_RULES
-const TWITCH_RULES: readonly TwitchRule[] = ['dropProgress', 'campaignProgress', 'split']
-
-const recommendedOf = (rule: Rule): string | undefined =>
-  rule === 'newInCustom' ? undefined : RECOMMENDED_QUEUE_RULES[rule]
-
 export function SettingsPage(props: { settings: SettingsView }): ReactNode {
   const { settings } = props
   const { save, failed } = useSettingsPatch()
   const { switchTo, switching } = useUiChoice()
   const openLogs = useMutation({ mutationFn: () => invoke('app:openLogsFolder') })
-  const onRecommended = TWITCH_RULES.every(
-    (rule) => settings.queue[rule] === RECOMMENDED_QUEUE_RULES[rule]
-  )
+  const apiIssues = useApiIssues()
   const general = (
     key: 'closeToTray' | 'launchAtLogin' | 'startMinimized' | 'trayNotifications'
   ): ReactNode => {
@@ -74,7 +64,6 @@ export function SettingsPage(props: { settings: SettingsView }): ReactNode {
   }
   const { name: badgesName, note: badgesNote } = t.toggles.enableBadgesEmotes
   const { name: notSetName, note: notSetNote } = t.toggles.mineNotSet
-  const { name: linkedName, note: linkedNote } = t.ruleNames.linkedFirst
 
   return (
     <div className={page}>
@@ -123,50 +112,6 @@ export function SettingsPage(props: { settings: SettingsView }): ReactNode {
         </Row>
       </div>
 
-      <div className={headingRow}>
-        <h3>{t.rules}</h3>
-        <button
-          type="button"
-          className={`${btn} ${btnSmall} ${ghost}`}
-          disabled={onRecommended}
-          onClick={() => save({ queue: { ...RECOMMENDED_QUEUE_RULES } })}
-        >
-          {onRecommended ? t.onRecommended : t.resetRecommended}
-        </button>
-      </div>
-      <p className={lead}>{t.rulesLead}</p>
-      <div className={panel}>
-        {[...TWITCH_RULES, 'newInCustom' as const].map((rule) => {
-          const { name, note } = t.ruleNames[rule]
-          const options = t.ruleOptions[rule] as Record<string, string>
-          return (
-            <Row key={rule} name={name} note={note}>
-              <select
-                className={select}
-                aria-label={name}
-                value={settings.queue[rule]}
-                onChange={(event) =>
-                  save({ queue: { [rule]: event.target.value } } as SettingsPatchInput)
-                }
-              >
-                {Object.entries(options).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {value === recommendedOf(rule) ? t.recommended(label) : label}
-                  </option>
-                ))}
-              </select>
-            </Row>
-          )
-        })}
-        <Row name={linkedName} note={linkedNote}>
-          <Toggle
-            label={linkedName}
-            on={settings.queue.linkedFirst}
-            onChange={(on) => save({ queue: { linkedFirst: on } })}
-          />
-        </Row>
-      </div>
-
       <h3>{t.interface}</h3>
       <div className={panel}>
         <Row name={strings.backToClassic} note={t.interfaceNote}>
@@ -183,6 +128,17 @@ export function SettingsPage(props: { settings: SettingsView }): ReactNode {
           <button type="button" className={btn} onClick={() => openLogs.mutate()}>
             {t.logs}
           </button>
+        </Row>
+        <Row
+          name={strings.twitchApi.settingsRow}
+          note={strings.twitchApi.settingsNote(
+            strings.twitchApi.counts(apiIssues?.errors ?? 0, apiIssues?.warnings ?? 0)
+          )}
+        >
+          <a className={btn} href={routeHref({ page: 'twitchApi' })}>
+            <Icon.twitchApi />
+            {strings.twitchApi.open}
+          </a>
         </Row>
       </div>
     </div>

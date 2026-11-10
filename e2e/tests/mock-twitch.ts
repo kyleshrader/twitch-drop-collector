@@ -85,6 +85,8 @@ export interface MockTwitch {
   offline: Set<string>
   /** PubSub topics the app currently listens to. */
   topics: Set<string>
+  /** Operations answered with this `data` instead, as if Twitch had changed them. */
+  changed: Map<string, unknown>
   /** Sends a PubSub message on a topic to every connection listening to it. */
   publish(topic: string, message: object): void
   close(): Promise<void>
@@ -104,6 +106,7 @@ export async function startMockTwitch(): Promise<MockTwitch> {
     watched: [],
     offline: new Set(),
     topics: new Set(),
+    changed: new Map(),
     publish: () => {},
     close: async () => {}
   }
@@ -129,6 +132,8 @@ export async function startMockTwitch(): Promise<MockTwitch> {
         }[]
         const answers = ops.map((op) => {
           mock.gqlCalls.push(op.operationName)
+          if (mock.changed.has(op.operationName))
+            return { data: mock.changed.get(op.operationName) }
           return { data: gqlAnswer(op.operationName, op.variables ?? {}, mock) }
         })
         return json(200, Array.isArray(body) ? answers : answers[0]!)

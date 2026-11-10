@@ -1,4 +1,5 @@
-// History of drops this app has claimed, for the inventory screen and to avoid double claims.
+// History of claimed drops: the ones this app claimed, and ones Twitch's inventory says were
+// claimed (with Twitch's award time), so the History page keeps them after the campaign is gone.
 import type { Database, Row } from './database'
 
 export interface ClaimRecord {
@@ -8,6 +9,10 @@ export interface ClaimRecord {
   dropName: string
   rewards: string[]
   claimedAt: Date
+  /** The first reward's picture. */
+  imageUrl?: string
+  /** Who knew the time: this app when it claimed (the default), or Twitch's award time. */
+  source?: 'app' | 'twitch'
 }
 
 export interface ClaimHistory {
@@ -28,7 +33,9 @@ function toRecord(row: Row): ClaimRecord {
     gameName: String(row['game_name']),
     dropName: String(row['drop_name']),
     rewards: Array.isArray(rewards) ? rewards.map(String) : [],
-    claimedAt: new Date(Number(row['claimed_at']))
+    claimedAt: new Date(Number(row['claimed_at'])),
+    ...(row['image_url'] ? { imageUrl: String(row['image_url']) } : {}),
+    ...(row['source'] === 'twitch' ? { source: 'twitch' as const } : {})
   }
 }
 
@@ -37,15 +44,18 @@ export function createClaimHistory(deps: { db: Database }): ClaimHistory {
   return {
     record(claim): boolean {
       const { changes } = db.run(
-        `INSERT INTO claims (drop_id, campaign_id, game_name, drop_name, rewards, claimed_at)
-         VALUES (?, ?, ?, ?, ?, ?)
+        `INSERT INTO claims
+           (drop_id, campaign_id, game_name, drop_name, rewards, claimed_at, image_url, source)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT (drop_id) DO NOTHING`,
         claim.dropId,
         claim.campaignId,
         claim.gameName,
         claim.dropName,
         JSON.stringify(claim.rewards),
-        claim.claimedAt.getTime()
+        claim.claimedAt.getTime(),
+        claim.imageUrl ?? null,
+        claim.source ?? 'app'
       )
       return changes > 0
     },

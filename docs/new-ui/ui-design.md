@@ -12,7 +12,7 @@ Agreed with the user, 2026-11-04. The new UI is built in `apps/desktop/src/rende
 
 ## Structure
 
-- Top navigation, like Steam's Store / Library / Community: **Drops** (home), **Library**, and possibly **History / log**. More may come.
+- Top navigation, like Steam's Store / Library / Community: **Library**, **Drops** (home) and **History** (history.md). More may come.
 - Top right: the account menu, a notifications bell, an app-updates icon, and a "new games" icon.
 - Routing with a small hash-based router: back/forward (mouse back button, Alt+←), deep links from notifications, the tray and popovers, the same page after a window crash reloads it, and pages tests can open directly.
 
@@ -33,7 +33,7 @@ Laid out like Steam's Downloads page, with four sections. Excluded campaigns are
 
 - A queue of **game cards**, each holding its campaigns ordered by time remaining.
 - **Splitting:** dragging a campaign out of a game splits the game there. Dragging up takes that campaign and the ones above it in the game; dragging down takes it and the ones below. While dragging, a piece visually picks up other pieces of the same game it passes, and they only merge when dropped. Every piece also has Move up / Move down in a menu, so the queue works from the keyboard.
-- **Sorting:** a sort menu: _Priority, then time remaining_ (default), _Ending soonest_, _Least time to spare_. Priority comes first, and linked games are favoured. A manual drag switches the menu to **Custom** and keeps that order exactly, with a "Reset to …" button. In Custom order, newly appearing campaigns slot in by time remaining and get a "New" tag, so the user's order is never reshuffled.
+- **Sorting:** a sort menu (each sort explained in a line): _Priority_, then time remaining (default), _Ending soonest_, _Least time to spare_. Priority comes first, and linked games are favoured. A manual drag switches the menu to **Custom** and keeps that order exactly, with a "Reset to …" button. In Custom order, newly appearing campaigns slot in by time remaining and get a "New" tag, so the user's order is never reshuffled.
 - **Not set** games are mined too, after priority ones. Each card can be set to Priority, Not set or Excluded.
 - **Miss warnings:** the queue is simulated in order, and a campaign that won't finish before it ends gets a warning ("Won't finish in time: needs 3 h, ends in 2 h"), saying so when moving it up would save it. It's an estimate that assumes a watchable channel is always available, and it says that.
 - **Collect now** jumps a campaign straight to Current. In Custom order it moves to the top.

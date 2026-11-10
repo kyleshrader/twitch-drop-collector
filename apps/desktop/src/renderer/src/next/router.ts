@@ -6,8 +6,11 @@ export type Route =
   /** `target`: a campaign or drop id to scroll to (from a notification). */
   | { page: 'drops'; target?: string }
   | { page: 'library'; gameId?: string; group?: string }
+  | { page: 'history' }
   | { page: 'settings' }
   | { page: 'updates' }
+  /** Signs that Twitch changed its API; `issueId` opens one issue's expected vs actual. */
+  | { page: 'twitchApi'; issueId?: string }
 
 export function parseRoute(hash: string): Route {
   const [page, id, group] = hash.replace(/^#\/?/, '').split('/')
@@ -16,12 +19,18 @@ export function parseRoute(hash: string): Route {
     if (id === 'group' && group) return { page, group: decodeURIComponent(group) }
     return id ? { page, gameId: decodeURIComponent(id) } : { page }
   }
-  if (page === 'settings' || page === 'updates') return { page }
+  if (page === 'settings' || page === 'updates' || page === 'history') return { page }
+  if (page === 'twitch-api') {
+    return id ? { page: 'twitchApi', issueId: decodeURIComponent(id) } : { page: 'twitchApi' }
+  }
   if (page === 'drops' && id) return { page, target: decodeURIComponent(id) }
   return { page: 'drops' }
 }
 
 export function routeHref(route: Route): string {
+  if (route.page === 'twitchApi') {
+    return route.issueId ? `#/twitch-api/${encodeURIComponent(route.issueId)}` : '#/twitch-api'
+  }
   if (route.page === 'library' && route.gameId) {
     return `#/library/${encodeURIComponent(route.gameId)}`
   }

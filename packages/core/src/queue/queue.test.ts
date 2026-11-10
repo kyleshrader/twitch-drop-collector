@@ -122,11 +122,6 @@ describe('layouts', () => {
     expect(ids(build('games'))).toEqual([['rust-x', 'rust-y', 'rust-x2'], ['rocket']])
   })
 
-  it('channels: one card per game and allow-list', () => {
-    expect(ids(build('channels'))).toEqual([['rust-x', 'rust-x2'], ['rust-y'], ['rocket']])
-    expect(build('channels').pieces.map((p) => p.split)).toEqual([true, true, false])
-  })
-
   it('campaigns: one card per campaign', () => {
     expect(ids(build('campaigns'))).toEqual([['rust-x'], ['rust-y'], ['rust-x2'], ['rocket']])
   })

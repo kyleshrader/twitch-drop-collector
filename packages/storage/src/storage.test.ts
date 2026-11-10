@@ -7,7 +7,10 @@ import { z } from 'zod'
 import { openSqlite } from './database'
 import { MIGRATIONS, NewerDatabaseError, runMigrations, schemaVersion } from './migrations'
 import { createGames } from './games'
+import { createClaimHistory } from './claims'
+import { createEventLog } from './events'
 import { createSeenCampaigns } from './seen'
+import { createWatchLog } from './watch-log'
 import { openStorage } from './storage'
 
 function testLogger(): Logger {
@@ -49,7 +52,15 @@ describe('migrations', () => {
     const tables = db
       .all("SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name")
       .map((row) => row['name'])
-    expect(tables).toEqual(['cache_entries', 'campaigns_seen', 'claims', 'games', 'images'])
+    expect(tables).toEqual([
+      'cache_entries',
+      'campaigns_seen',
+      'claims',
+      'events',
+      'games',
+      'images',
+      'watch_sessions'
+    ])
     db.close()
   })
 
@@ -375,6 +386,100 @@ describe('games', () => {
         ['Rob Run', { name: 'Rob Run', checkedAt: later }]
       ])
     )
+    db.close()
+  })
+})
+
+describe('history', () => {
+  it('keeps a claim picture and where its time came from', () => {
+    const db = openSqlite(':memory:')
+    runMigrations(db)
+    const claims = createClaimHistory({ db })
+    const base = {
+      campaignId: 'c',
+      gameName: 'Rust',
+      dropName: 'Hoodie',
+      rewards: ['Hoodie'],
+      claimedAt: new Date('2026-11-01T10:00:00Z')
+    }
+    claims.record({ ...base, dropId: 'a' })
+    claims.record({ ...base, dropId: 'b', imageUrl: 'https://x/y.png', source: 'twitch' })
+    const [b, a] = claims.recent(5).sort((x, y) => y.dropId.localeCompare(x.dropId))
+    expect(a).toEqual({ ...base, dropId: 'a' })
+    expect(b).toEqual({ ...base, dropId: 'b', imageUrl: 'https://x/y.png', source: 'twitch' })
+    db.close()
+  })
+
+  it('saves how each campaign stood when last seen', () => {
+    const db = openSqlite(':memory:')
+    runMigrations(db)
+    const seen = createSeenCampaigns({ db })
+    const at = new Date('2026-11-01T10:00:00Z')
+    seen.record(
+      [
+        { id: 'a', name: 'A', gameId: 'g', gameName: 'Rust' },
+        { id: 'b', name: 'B', gameId: 'g', gameName: 'Rust' }
+      ],
+      at
+    )
+    const standing = {
+      startsAt: new Date('2026-10-30T00:00:00Z'),
+      endsAt: new Date('2026-11-06T00:00:00Z'),
+      dropsTotal: 3,
+      dropsClaimed: 1,
+      earnable: true
+    }
+    seen.updateStandings([{ id: 'a', ...standing }], at)
+    const [a, b] = seen.all()
+    expect(a).toEqual({
+      id: 'a',
+      name: 'A',
+      gameId: 'g',
+      gameName: 'Rust',
+      firstSeenAt: at,
+      standing: { ...standing, lastSeenAt: at }
+    })
+    expect(b?.standing).toBeUndefined()
+    db.close()
+  })
+
+  it('joins watched minutes into sessions', () => {
+    const db = openSqlite(':memory:')
+    runMigrations(db)
+    const log = createWatchLog({ db })
+    const minute = 60_000
+    const t0 = Date.parse('2026-11-01T10:00:00Z')
+    const rust = { channelLogin: 'x', channelName: 'X', gameName: 'Rust', campaignId: 'c1' }
+    expect(log.firstAt()).toBeUndefined()
+    log.count(rust, new Date(t0 + minute), minute, 3 * minute)
+    log.count(rust, new Date(t0 + 2 * minute), minute, 3 * minute)
+    log.count(rust, new Date(t0 + 3 * minute), minute, 3 * minute)
+    // Another campaign on the same channel starts a session; so does a long gap.
+    log.count({ ...rust, campaignId: 'c2' }, new Date(t0 + 4 * minute), minute, 3 * minute)
+    log.count({ ...rust, campaignId: 'c2' }, new Date(t0 + 30 * minute), minute, 3 * minute)
+    const sessions = log.since(new Date(t0))
+    expect(
+      sessions.map((s) => [s.campaignId, s.startedAt.getTime() - t0, s.endedAt.getTime() - t0])
+    ).toEqual([
+      ['c2', 29 * minute, 30 * minute],
+      ['c2', 3 * minute, 4 * minute],
+      ['c1', 0, 3 * minute]
+    ])
+    expect(log.firstAt()).toEqual(new Date(t0))
+    expect(log.since(new Date(t0 + 10 * minute))).toHaveLength(1)
+    db.close()
+  })
+
+  it('keeps events in order, and finds the latest of a kind', () => {
+    const db = openSqlite(':memory:')
+    runMigrations(db)
+    const events = createEventLog({ db })
+    expect(events.latest('version')).toBeUndefined()
+    events.record('version', { version: '1.0.0' }, new Date('2026-11-01T00:00:00Z'))
+    events.record('list', { game: 'Rust', list: 'priority' }, new Date('2026-11-02T00:00:00Z'))
+    events.record('version', { version: '1.1.0' }, new Date('2026-11-03T00:00:00Z'))
+    expect(events.all().map((e) => e.kind)).toEqual(['version', 'list', 'version'])
+    expect(events.latest('version')?.data).toEqual({ version: '1.1.0' })
     db.close()
   })
 })

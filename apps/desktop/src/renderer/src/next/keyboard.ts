@@ -4,7 +4,7 @@
 // readers announce too); this file finds the control and presses or focuses it:
 //   Ctrl+F     the page's search (the Library's, from a page without one)
 //   F1         the account menu
-//   Alt+1/2    Library / Drops
+//   Alt+1/2/3  Library / Drops / History
 // Back and forward (Alt+←/→, mouse buttons 4/5) are in router.ts; refreshing (Ctrl+R, F5) is
 // handled in main, which keeps the window itself from reloading.
 //

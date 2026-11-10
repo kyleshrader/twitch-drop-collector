@@ -9,6 +9,31 @@ export {
   type InvokeInput,
   type InvokeOutput
 } from './channels'
+export {
+  ApiCallResult,
+  ApiCheckInput,
+  ApiCheckResult,
+  ApiCheckView,
+  ApiIssueSeverity,
+  ApiIssuesView,
+  ApiIssueView,
+  DismissApiIssueInput,
+  ReportApiIssueInput
+} from './api-issues'
+export {
+  HistoryClaimView,
+  HistoryEndedView,
+  HistoryEntryView,
+  HistoryNewView,
+  HistoryView,
+  HistoryWatchView,
+  HistoryAppView,
+  HistoryLinkedView,
+  HistoryListView,
+  HistoryNewGameView,
+  HistoryStartedView,
+  type HistoryKind
+} from './history'
 export { AuthStateView, SignInMethod } from './auth'
 export { GameSearchResult, SearchGamesInput } from './games'
 export { eventChannels, isEventChannel, type EventChannel, type EventPayload } from './events'
@@ -24,7 +49,7 @@ export {
   QueueView,
   SelectChannelInput
 } from './miner'
-export { RECOMMENDED_QUEUE_RULES, SettingsPatchInput, SettingsView } from './settings'
+export { SettingsPatchInput, SettingsView } from './settings'
 export { UpdateStatus, UpdateView } from './updates'
 export {
   IpcError,

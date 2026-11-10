@@ -28,7 +28,8 @@ import {
   createHttpClient,
   createIdentityClient,
   pickUserAgent,
-  systemScheduler
+  systemScheduler,
+  type ApiIssue
 } from '@tdc/api'
 import { createSettingsService } from '@tdc/config'
 import { createAuthService, createConnectivity } from '@tdc/core'
@@ -37,6 +38,14 @@ import { systemClock } from '@tdc/kernel'
 import { NewerDatabaseError, openStorage } from '@tdc/storage'
 import icon from '../../resources/icon.png?asset'
 import { resolveEndpoints } from './adapters/endpoints'
+import {
+  API_LOG_FILE,
+  API_NOTICE_EVERY_MS,
+  countsText,
+  createApiIssueLog
+} from './api-issues/api-issues'
+import { createRedactor } from './api-issues/redact'
+import { createLogAppender } from './api-issues/report'
 import { createJsonFileStore } from './adapters/json-file-store'
 import { createLoginItem } from './adapters/login-item'
 import { browserUserAgent, createLoginWindow, LOGIN_PARTITION } from './adapters/login-window'
@@ -271,6 +280,15 @@ if (!app.requestSingleInstanceLock()) {
       clock: systemClock,
       logger: logger.child('storage')
     })
+    // The version this run is, for the History page's "Updated to …" (recorded when it changes).
+    try {
+      const version = app.getVersion()
+      if (storage.events.latest('version')?.data['version'] !== version) {
+        storage.events.record('version', { version }, new Date())
+      }
+    } catch (error) {
+      logger.warn('Recording the app version failed', { error })
+    }
     const purgeCache = (): void => {
       const purged = storage.cache.purgeExpired()
       if (purged > 0) logger.child('storage').debug('Purged expired cache entries', { purged })
@@ -304,6 +322,29 @@ if (!app.requestSingleInstanceLock()) {
       storage.close()
     })
 
+    // Signs that Twitch changed its API, from every response (packages/api/src/monitor.ts):
+    // saved, written to logs/twitch-api.log with what was expected and what came back, and
+    // shown on the Twitch API page. Redacted first: no tokens, and not the user's ID or login.
+    const identities = new Set<string>()
+    let onApiIssue: (issue: ApiIssue) => void = () => {}
+    const redactApi = createRedactor(() => [...identities])
+    const apiIssues = createApiIssueLog({
+      store: createJsonFileStore({
+        file: join(app.getPath('userData'), 'api-issues.json'),
+        logger: logger.child('api')
+      }),
+      appendLog: createLogAppender(
+        join(logsFolder(), API_LOG_FILE),
+        join(logsFolder(), 'twitch-api.old.log')
+      ),
+      redact: redactApi,
+      clock: systemClock,
+      logger: logger.child('api'),
+      onNew: (issue) => onApiIssue(issue)
+    })
+    void apiIssues.load()
+    app.on('will-quit', () => void apiIssues.flush())
+
     // Twitch, over Electron's net stack. A session presents as the Twitch client it signed in
     // with: the Android app (login window) or the Android TV app (device code). See
     // docs/decisions.md.
@@ -318,7 +359,13 @@ if (!app.requestSingleInstanceLock()) {
     })
     const auth = createAuthService({
       identity: (clientProfile, deviceId) =>
-        createIdentityClient({ http, profile: clientProfile, url: endpoints.id, deviceId }),
+        createIdentityClient({
+          http,
+          profile: clientProfile,
+          url: endpoints.id,
+          deviceId,
+          monitor: apiIssues
+        }),
       store: await createSafeStorageSessionStore({
         safeStorage,
         platform: process.platform,
@@ -349,6 +396,15 @@ if (!app.requestSingleInstanceLock()) {
       logger: logger.child('events')
     })
     auth.onChange((state) => events.publish('auth:state', state))
+    const rememberIdentity = (state: ReturnType<typeof auth.state>): void => {
+      if (state.status === 'signedIn') {
+        identities.add(state.user.id)
+        identities.add(state.user.login)
+      }
+    }
+    rememberIdentity(auth.state())
+    auth.onChange(rememberIdentity)
+    apiIssues.onChange(throttle(() => events.publish('apiIssues:state', apiIssues.view()), 250))
 
     // Online and awake? net.isOnline() is reliable when it says offline; power events cover sleep.
     const connectivity = createConnectivity({
@@ -384,6 +440,21 @@ if (!app.requestSingleInstanceLock()) {
       if (note.onClick) notification.on('click', note.onClick)
       notification.show()
     }
+    // A new API issue: one notification with the counts so far, at most every half hour. Clicking
+    // it opens the logs folder (twitch-api.log); the bell's notice opens the Twitch API page.
+    let lastApiNotice = 0
+    onApiIssue = (issue) => {
+      if (!settings.get().general.trayNotifications) return
+      // A demo always notifies: it's there to show what a real one looks like.
+      if (!issue.demo && Date.now() - lastApiNotice < API_NOTICE_EVERY_MS) return
+      lastApiNotice = Date.now()
+      const { errors, warnings } = apiIssues.view()
+      notify({
+        title: 'Twitch may have changed its API',
+        body: `${countsText(errors, warnings)} so far. Click to open the log folder.`,
+        onClick: () => void shell.openPath(logsFolder())
+      })
+    }
 
     const mining = probeMode
       ? undefined
@@ -395,6 +466,11 @@ if (!app.requestSingleInstanceLock()) {
           endpoints,
           connect: (url) => new WebSocket(url),
           connectivity,
+          monitor: apiIssues,
+          // End-to-end tests count watching every few seconds instead of every minute.
+          ...(process.env['TDC_E2E_WATCH_TICK_MS'] && !app.isPackaged
+            ? { watchTickMs: Number(process.env['TDC_E2E_WATCH_TICK_MS']) }
+            : {}),
           onClaim: (notice) => {
             if (!settings.get().general.trayNotifications) return
             notify({
@@ -493,8 +569,13 @@ if (!app.requestSingleInstanceLock()) {
             view: minerView,
             reload: () => mining?.reload(),
             selectChannel: (channelId) => mining?.selectChannel(channelId),
-            searchGames: async (query) => (mining ? mining.searchGames(query) : [])
+            searchGames: async (query) => (mining ? mining.searchGames(query) : []),
+            apiCalls: () => mining?.apiCalls() ?? [],
+            checkApi: async (only) => (mining ? mining.checkApi(only) : []),
+            history: () => mining?.history() ?? { runningAtStart: 0, entries: [] }
           },
+          apiIssues,
+          redact: redactApi,
           updates: updater
         }),
         isTrustedSender: (url) => isSameOrigin(url, rendererOrigin),

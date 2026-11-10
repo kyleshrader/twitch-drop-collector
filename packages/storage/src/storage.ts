@@ -10,6 +10,8 @@ import { createClaimHistory, type ClaimHistory } from './claims'
 import { createImageIndex, type ImageIndex } from './images'
 import { createGames, type Games } from './games'
 import { createSeenCampaigns, type SeenCampaigns } from './seen'
+import { createWatchLog, type WatchLog } from './watch-log'
+import { createEventLog, type EventLog } from './events'
 import { openSqlite, type Database } from './database'
 import { MIGRATIONS, NewerDatabaseError, runMigrations } from './migrations'
 
@@ -19,6 +21,8 @@ export interface Storage {
   images: ImageIndex
   seen: SeenCampaigns
   games: Games
+  watched: WatchLog
+  events: EventLog
   close(): void
 }
 
@@ -68,6 +72,8 @@ export function openStorage(deps: {
     images: createImageIndex({ db }),
     seen: createSeenCampaigns({ db }),
     games: createGames({ db }),
+    watched: createWatchLog({ db }),
+    events: createEventLog({ db }),
     close: () => db.close()
   }
 }

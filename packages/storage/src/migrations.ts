@@ -57,6 +57,41 @@ export const MIGRATIONS: readonly string[] = [
     box_art_url TEXT,
     checked_at  INTEGER NOT NULL
   ) STRICT;
+  `,
+  // 5: the History page: each claim's picture and where its time came from, how each campaign
+  // stood when last seen (to tell completed from missed once it ends), and what was watched
+  `
+  ALTER TABLE claims ADD COLUMN image_url TEXT;
+  ALTER TABLE claims ADD COLUMN source TEXT NOT NULL DEFAULT 'app';
+  ALTER TABLE campaigns_seen ADD COLUMN starts_at INTEGER;
+  ALTER TABLE campaigns_seen ADD COLUMN ends_at INTEGER;
+  ALTER TABLE campaigns_seen ADD COLUMN drops_total INTEGER;
+  ALTER TABLE campaigns_seen ADD COLUMN drops_claimed INTEGER;
+  ALTER TABLE campaigns_seen ADD COLUMN earnable INTEGER;
+  ALTER TABLE campaigns_seen ADD COLUMN last_seen_at INTEGER;
+  CREATE INDEX campaigns_seen_ends_at ON campaigns_seen (ends_at);
+
+  CREATE TABLE watch_sessions (
+    id            INTEGER PRIMARY KEY,
+    channel_login TEXT    NOT NULL,
+    channel_name  TEXT    NOT NULL,
+    game_name     TEXT    NOT NULL,
+    campaign_id   TEXT,
+    campaign_name TEXT,
+    started_at    INTEGER NOT NULL,
+    ended_at      INTEGER NOT NULL
+  ) STRICT;
+  CREATE INDEX watch_sessions_started_at ON watch_sessions (started_at DESC);
+  `,
+  // 6: things that happened in the app, for the History page (list changes, links, pauses)
+  `
+  CREATE TABLE events (
+    id   INTEGER PRIMARY KEY,
+    kind TEXT    NOT NULL,
+    at   INTEGER NOT NULL,
+    data TEXT    NOT NULL
+  ) STRICT;
+  CREATE INDEX events_at ON events (at);
   `
 ]
 

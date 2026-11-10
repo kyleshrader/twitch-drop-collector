@@ -13,14 +13,32 @@ import {
 } from '../domain/rules'
 import type { Campaign, Drop, Game, MiningPreferences } from '../domain/types'
 
-/** The queue settings the queue reads (all but `paused`). */
-export type QueueOptions = Omit<QueueSettings, 'paused'>
+/**
+ * What Twitch does with watch time, which the estimates and the split rule follow. Twitch's Drops
+ * campaign guide settles it: a campaign's drops progress together, and every campaign live on a
+ * channel gets the watch time, so the only way to hold a campaign back is to watch channels it
+ * doesn't accept; splits follow channel lists (docs/new-ui/queue-rules.md). The other values are
+ * kept for the tests that pin down why these matter.
+ */
+export interface QueueRules {
+  split: 'free' | 'byChannels' | 'never'
+  dropProgress: 'together' | 'oneAtATime'
+  campaignProgress: 'separate' | 'together'
+}
+export const TWITCH_QUEUE_RULES: QueueRules = {
+  split: 'byChannels',
+  dropProgress: 'together',
+  campaignProgress: 'together'
+}
+
+/** The queue settings the queue reads (all but `paused`), with Twitch's rules. */
+export type QueueOptions = Omit<QueueSettings, 'paused'> & QueueRules
 
 /** The queue's options from its settings (pausing is the runtime's business, not the queue's). */
 export function queueOptions(settings: QueueSettings): QueueOptions {
   const { paused, ...options } = settings
   void paused
-  return options
+  return { ...options, ...TWITCH_QUEUE_RULES }
 }
 
 export type ListState = 'priority' | 'notSet' | 'excluded'
@@ -116,8 +134,7 @@ function notMinedReason(
 
 /** What groups campaigns into one card under the layout. */
 function pieceKeyOf(c: Campaign, layout: QueueOptions['layout']): string {
-  if (layout === 'campaigns') return c.id
-  return layout === 'channels' ? `${c.game.id}|${channelKey(c)}` : c.game.id
+  return layout === 'campaigns' ? c.id : c.game.id
 }
 
 /** What must stay together under the split rule (undefined: nothing). */

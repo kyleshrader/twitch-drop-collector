@@ -2,6 +2,7 @@
 // PubSub out for third parties, so the miner depends only on RealtimeSource and a polling
 // implementation can replace this one (docs/port-plan.md §4).
 import { createBackoff, createEmitter, type Logger, type Scheduler } from '@tdc/kernel'
+import { safely, type ApiMonitor } from './monitor'
 
 export interface RealtimeConnectionStatus {
   index: number
@@ -67,7 +68,12 @@ export function createPubSub(deps: {
   pingIntervalMs?: number
   pongTimeoutMs?: number
   random?: () => number
+  /** Told about frames that suggest Twitch changed PubSub. */
+  monitor?: ApiMonitor
 }): RealtimeSource {
+  const monitor = safely(deps.monitor)
+  /** PubSub topic kind, e.g. video-playback-by-id for video-playback-by-id.123. */
+  const kindOf = (topic: string): string => topic.split('.')[0] || '(no topic)'
   const {
     url,
     connect,
@@ -135,6 +141,21 @@ export function createPubSub(deps: {
       message = JSON.parse(String(raw)) as typeof message
     } catch {
       logger.warn('PubSub sent a non-JSON frame', { index: connection.index })
+      monitor?.report({
+        severity: 'warning',
+        source: 'pubsub',
+        endpoint: 'frame',
+        kind: 'shape',
+        summary: 'PubSub sent a frame that is not JSON',
+        checks: [
+          {
+            path: '(root)',
+            message: 'not JSON',
+            expected: 'JSON',
+            actual: String(raw).slice(0, 2000)
+          }
+        ]
+      })
       return
     }
     switch (message.type) {
@@ -146,7 +167,21 @@ export function createPubSub(deps: {
         connection.endSession?.()
         return
       case 'RESPONSE':
-        if (message.error) logger.warn('PubSub rejected a request', { error: message.error })
+        if (message.error) {
+          logger.warn('PubSub rejected a request', { error: message.error })
+          // ERR_BADTOPIC means a topic name we use no longer exists.
+          monitor?.report({
+            severity: message.error === 'ERR_BADTOPIC' ? 'error' : 'warning',
+            source: 'pubsub',
+            endpoint: 'LISTEN',
+            kind: 'error',
+            summary: `PubSub rejected a request: ${message.error}`,
+            checks: [
+              { path: 'error', message: message.error, expected: 'no error', actual: message.error }
+            ],
+            response: message
+          })
+        }
         return
       case 'MESSAGE': {
         const topic = message.data?.topic ?? ''
@@ -155,6 +190,21 @@ export function createPubSub(deps: {
           payload = JSON.parse(message.data?.message ?? '')
         } catch {
           logger.warn('PubSub message payload is not JSON', { topic })
+          monitor?.report({
+            severity: 'warning',
+            source: 'pubsub',
+            endpoint: kindOf(topic),
+            kind: 'shape',
+            summary: 'A PubSub message payload is not JSON',
+            checks: [
+              {
+                path: 'data.message',
+                message: 'not JSON',
+                expected: 'JSON',
+                actual: String(message.data?.message ?? '').slice(0, 2000)
+              }
+            ]
+          })
           return
         }
         for (const handler of [...(handlers.get(topic) ?? [])]) {
@@ -168,6 +218,22 @@ export function createPubSub(deps: {
       }
       default:
         logger.debug('Unknown PubSub frame', { type: message.type })
+        monitor?.report({
+          severity: 'warning',
+          source: 'pubsub',
+          endpoint: 'frame',
+          kind: 'shape',
+          summary: `PubSub sent a frame type we don't know: ${String(message.type)}`,
+          checks: [
+            {
+              path: 'type',
+              message: 'unknown frame type',
+              expected: ['PONG', 'RECONNECT', 'RESPONSE', 'MESSAGE'],
+              actual: message.type
+            }
+          ],
+          response: message
+        })
     }
   }
 

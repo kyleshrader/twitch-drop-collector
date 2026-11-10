@@ -1,6 +1,12 @@
 // The top bar: brand, page links, and on the right app updates, notifications and the account.
 import { useMutation } from '@tanstack/react-query'
-import { imageSrc, type AuthStateView, type MinerView, type UpdateView } from '@tdc/ipc-contract'
+import {
+  imageSrc,
+  type ApiIssuesView,
+  type AuthStateView,
+  type MinerView,
+  type UpdateView
+} from '@tdc/ipc-contract'
 import { useState, type ReactNode } from 'react'
 import { invoke } from '../ipc'
 import { useUiChoice } from '../ui-choice'
@@ -49,10 +55,25 @@ interface Notice {
   to: Route
 }
 
-function noticesOf(miner: MinerView | undefined, now: number): Notice[] {
-  if (!miner) return []
-  const byId = new Map(miner.campaigns.map((c) => [c.id, c]))
+function noticesOf(
+  miner: MinerView | undefined,
+  apiIssues: ApiIssuesView | undefined,
+  now: number
+): Notice[] {
   const notices: Notice[] = []
+  // All API issues as one notice; its key changes with the counts, so new ones show as unread.
+  if (apiIssues && apiIssues.issues.length > 0) {
+    const { errors, warnings } = apiIssues
+    notices.push({
+      key: `api:${errors}:${warnings}`,
+      icon: <Icon.twitchApi style={{ color: errors > 0 ? 'var(--bad)' : 'var(--warn)' }} />,
+      title: strings.twitchApi.notice(errors, warnings),
+      detail: strings.twitchApi.noticeDetail,
+      to: { page: 'twitchApi' }
+    })
+  }
+  if (!miner) return notices
+  const byId = new Map(miner.campaigns.map((c) => [c.id, c]))
   for (const piece of miner.queue?.pieces ?? []) {
     for (const entry of piece.entries) {
       const c = byId.get(entry.campaignId)
@@ -90,8 +111,12 @@ function noticesOf(miner: MinerView | undefined, now: number): Notice[] {
   return notices
 }
 
-function Notifications(props: { miner: MinerView | undefined; now: number }): ReactNode {
-  const notices = noticesOf(props.miner, props.now)
+function Notifications(props: {
+  miner: MinerView | undefined
+  apiIssues: ApiIssuesView | undefined
+  now: number
+}): ReactNode {
+  const notices = noticesOf(props.miner, props.apiIssues, props.now)
   // Read marks last while the app runs; the history data will keep them (ui-design.md).
   const [read, setRead] = useState<ReadonlySet<string>>(new Set())
   const unread = notices.filter((n) => !read.has(n.key)).length
@@ -262,9 +287,10 @@ export function TopBar(props: {
   auth: AuthStateView | undefined
   miner: MinerView | undefined
   updates: UpdateView | undefined
+  apiIssues: ApiIssuesView | undefined
   now: number
 }): ReactNode {
-  const { route, auth, miner, updates, now } = props
+  const { route, auth, miner, updates, apiIssues, now } = props
   const signedIn = auth?.status === 'signedIn' ? auth : undefined
   const link = (to: Route, label: string, shortcut: string, extra?: ReactNode): ReactNode => (
     <a
@@ -299,6 +325,7 @@ export function TopBar(props: {
               </span>
             )
           )}
+          {link({ page: 'history' }, strings.nav.history, 'Alt+3')}
         </nav>
       )}
       <div className={topRight}>
@@ -313,7 +340,9 @@ export function TopBar(props: {
             <span className={pip} />
           </a>
         )}
-        {signedIn && <Notifications miner={miner} now={now} />}
+        {(signedIn || (apiIssues?.issues.length ?? 0) > 0) && (
+          <Notifications miner={miner} apiIssues={apiIssues} now={now} />
+        )}
         {signedIn && <AccountMenu auth={signedIn} avatarUrl={miner?.avatarUrl} />}
       </div>
     </header>
