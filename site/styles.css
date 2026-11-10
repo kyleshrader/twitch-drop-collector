@@ -397,6 +397,124 @@ h1 {
   font-size: 15px;
 }
 
+/* ---- downloads ---- */
+.download {
+  margin-bottom: clamp(56px, 9vw, 110px);
+}
+.version-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 18px;
+  margin: -12px 0 22px;
+  font-size: 15px;
+  color: var(--muted);
+}
+.version-row select {
+  font: inherit;
+  color: var(--text);
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 10px;
+  max-width: 100%;
+}
+.platforms {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (max-width: 960px) {
+  .platforms {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 520px) {
+  .platforms {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.platform {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.platform.detected {
+  border-color: rgba(77, 155, 230, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(77, 155, 230, 0.35),
+    0 18px 40px rgba(77, 155, 230, 0.12);
+}
+.platform-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.platform h3 {
+  margin: 0;
+  font-size: 19px;
+}
+.platform p {
+  flex: 1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+.platform code {
+  font-size: 13px;
+  color: var(--text);
+}
+.platform .button {
+  justify-content: center;
+}
+.platform.detected .button {
+  border: 0;
+  background: var(--gradient);
+}
+.platform .button[aria-disabled='true'] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.platform small {
+  color: var(--faint);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.yours {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(77, 155, 230, 0.16);
+  color: #9cc8f3;
+  font-size: 12.5px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.unsigned {
+  max-width: 820px;
+  margin: 22px auto 0;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(241, 182, 90, 0.08);
+  border: 1px solid rgba(241, 182, 90, 0.25);
+  color: var(--muted);
+  font-size: 14.5px;
+}
+.unsigned strong {
+  color: #f1c27a;
+}
+.note a {
+  white-space: nowrap;
+}
+
 /* ---- how it works ---- */
 .steps {
   display: grid;

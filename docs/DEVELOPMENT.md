@@ -91,7 +91,7 @@ Everything under `media/trailer/out/` is a build product and is git-ignored, inc
 
 ## Releases
 
-Bump `apps/desktop/package.json`, then push a tag `v<version>`. `.github/workflows/release.yml` builds the installers, signs them when the signing secrets are set, and publishes the GitHub release the updater reads. Installers can also be built locally with `yarn workspace @tdc/desktop build:win`, `build:mac` or `build:linux`.
+Bump `apps/desktop/package.json` and the version in the README's download table (its links name the version), then push a tag `v<version>`. The site's download section reads the releases from GitHub, so it needs no change. `.github/workflows/release.yml` builds the installers, signs them when the signing secrets are set, and publishes the GitHub release the updater reads. Installers can also be built locally with `yarn workspace @tdc/desktop build:win`, `build:mac` or `build:linux`.
 
 ## Contributing
 

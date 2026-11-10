@@ -8,7 +8,7 @@
 
 A free desktop app that watches the right streams in the background, earns the drops you care about and claims them for you. You decide what comes first, and you can see everything it did.
 
-[**Download**](https://github.com/kyleshrader/twitch-drop-collector/releases) · [Website](https://kyleshrader.github.io/twitch-drop-collector/) · [Watch the trailer](https://kyleshrader.github.io/twitch-drop-collector/#trailer) · [Report a problem](https://github.com/kyleshrader/twitch-drop-collector/issues)
+[**Download**](#download) · [Website](https://kyleshrader.github.io/twitch-drop-collector/) · [Watch the trailer](https://kyleshrader.github.io/twitch-drop-collector/#trailer) · [Report a problem](https://github.com/kyleshrader/twitch-drop-collector/issues)
 
 [![CI](https://github.com/kyleshrader/twitch-drop-collector/actions/workflows/ci.yml/badge.svg)](https://github.com/kyleshrader/twitch-drop-collector/actions/workflows/ci.yml)
 ![Windows, macOS and Linux](https://img.shields.io/badge/platforms-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-4d9be6)
@@ -59,9 +59,24 @@ A library of every game with drops, with box art, plus any game you want to rank
 
 <img src="site/media/shots/drops-light.png" alt="The Drops page in the light theme" width="820" />
 
+## Download
+
+The latest version is **0.1.0-beta.2** (beta). [What's new](https://github.com/kyleshrader/twitch-drop-collector/releases/tag/v0.1.0-beta.2)
+
+| Platform                               | Download                                                                                                                                              |                                                                   |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **Windows** 10 and 11, 64-bit          | [Installer (.exe)](https://github.com/kyleshrader/twitch-drop-collector/releases/download/v0.1.0-beta.2/twitch-drop-collector-0.1.0-beta.2-setup.exe) | Updates itself                                                    |
+| **macOS**, Apple Silicon (M1 or later) | [Disk image (.dmg)](https://github.com/kyleshrader/twitch-drop-collector/releases/download/v0.1.0-beta.2/twitch-drop-collector-0.1.0-beta.2.dmg)      | Drag to Applications                                              |
+| **Linux** x64, any distribution        | [AppImage](https://github.com/kyleshrader/twitch-drop-collector/releases/download/v0.1.0-beta.2/twitch-drop-collector-0.1.0-beta.2.AppImage)          | Make it executable and run it; updates itself                     |
+| **Debian and Ubuntu** x64              | [Package (.deb)](https://github.com/kyleshrader/twitch-drop-collector/releases/download/v0.1.0-beta.2/twitch-drop-collector_0.1.0-beta.2_amd64.deb)   | `sudo apt install ./twitch-drop-collector_0.1.0-beta.2_amd64.deb` |
+
+Older versions are on the [releases page](https://github.com/kyleshrader/twitch-drop-collector/releases), and the [website](https://kyleshrader.github.io/twitch-drop-collector/#download) picks the right file for your system.
+
+> The beta isn't code-signed yet. On Windows, if SmartScreen says "Windows protected your PC", choose **More info**, then **Run anyway**. On macOS, the first time, right-click the app in Applications and choose **Open**. An unsigned Mac app can't update itself, so download new versions from here.
+
 ## Get started
 
-1. **Download** the installer for Windows, macOS or Linux from the [latest release](https://github.com/kyleshrader/twitch-drop-collector/releases).
+1. **Download** the installer for your system from the table above.
 2. **Sign in with Twitch.** Link your game accounts on Twitch as usual.
 3. **Pick your games** (Priority, Not set or Excluded) and let it run. Check History whenever you're curious.
 

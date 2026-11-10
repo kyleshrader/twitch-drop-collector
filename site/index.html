@@ -25,6 +25,7 @@
       >
       <nav aria-label="Sections">
         <a href="#features">Features</a>
+        <a href="#download">Download</a>
         <a href="#how">How it works</a>
         <a href="#faq">FAQ</a>
         <a class="button small" href="https://github.com/kyleshrader/twitch-drop-collector"
@@ -44,14 +45,15 @@
             everything it did.
           </p>
           <div class="actions">
-            <a
-              class="button primary"
-              href="https://github.com/kyleshrader/twitch-drop-collector/releases"
-              >Download</a
-            >
+            <a class="button primary" href="#download" data-download>Download</a>
             <a class="button" href="#trailer">Watch the trailer</a>
           </div>
-          <p class="note">Currently in beta. No browser tab, no extension, nothing to keep open.</p>
+          <p class="note">
+            <span data-download-note
+              >Currently in beta. No browser tab, no extension, nothing to keep open.</span
+            >
+            <a href="#download">Other platforms and versions</a>
+          </p>
         </div>
         <figure class="trailer" id="trailer">
           <video
@@ -284,13 +286,98 @@
         </div>
       </section>
 
+      <section id="download" class="download">
+        <h2 class="section-title">Download</h2>
+        <div class="version-row">
+          <label for="version">Version</label>
+          <select id="version" data-versions>
+            <option value="v0.1.0-beta.2">0.1.0-beta.2 (beta)</option>
+          </select>
+          <a
+            data-notes
+            href="https://github.com/kyleshrader/twitch-drop-collector/releases/tag/v0.1.0-beta.2"
+            >Release notes</a
+          >
+          <a href="https://github.com/kyleshrader/twitch-drop-collector/releases"
+            >All releases on GitHub</a
+          >
+        </div>
+        <ul class="platforms">
+          <li class="platform" data-kind="win">
+            <div class="platform-head">
+              <h3>Windows</h3>
+              <span class="yours" hidden>Your system</span>
+            </div>
+            <p>Windows 10 and 11, 64-bit. An installer that updates itself.</p>
+            <a
+              class="button"
+              href="https://github.com/kyleshrader/twitch-drop-collector/releases/download/v0.1.0-beta.2/twitch-drop-collector-0.1.0-beta.2-setup.exe"
+              data-file
+              >Download</a
+            >
+            <small data-size>.exe installer</small>
+          </li>
+          <li class="platform" data-kind="mac">
+            <div class="platform-head">
+              <h3>macOS</h3>
+              <span class="yours" hidden>Your system</span>
+            </div>
+            <p>Apple Silicon (M1 or later). Drag it to Applications.</p>
+            <a
+              class="button"
+              href="https://github.com/kyleshrader/twitch-drop-collector/releases/download/v0.1.0-beta.2/twitch-drop-collector-0.1.0-beta.2.dmg"
+              data-file
+              >Download</a
+            >
+            <small data-size>.dmg disk image</small>
+          </li>
+          <li class="platform" data-kind="appimage">
+            <div class="platform-head">
+              <h3>Linux</h3>
+              <span class="yours" hidden>Your system</span>
+            </div>
+            <p>Any distribution, x64. Make it executable and run it; it updates itself.</p>
+            <a
+              class="button"
+              href="https://github.com/kyleshrader/twitch-drop-collector/releases/download/v0.1.0-beta.2/twitch-drop-collector-0.1.0-beta.2.AppImage"
+              data-file
+              >Download</a
+            >
+            <small data-size>.AppImage</small>
+          </li>
+          <li class="platform" data-kind="deb">
+            <div class="platform-head">
+              <h3>Debian and Ubuntu</h3>
+              <span class="yours" hidden>Your system</span>
+            </div>
+            <p>x64. Install with <code>sudo apt install ./&lt;file&gt;.deb</code>.</p>
+            <a
+              class="button"
+              href="https://github.com/kyleshrader/twitch-drop-collector/releases/download/v0.1.0-beta.2/twitch-drop-collector_0.1.0-beta.2_amd64.deb"
+              data-file
+              >Download</a
+            >
+            <small data-size>.deb package</small>
+          </li>
+        </ul>
+        <p class="unsigned">
+          <strong>The beta isn't code-signed yet.</strong> On Windows, if SmartScreen says "Windows
+          protected your PC", choose <em>More info</em>, then <em>Run anyway</em>. On macOS, the
+          first time, right-click the app in Applications and choose <em>Open</em>. An unsigned Mac
+          app can't update itself, so come back here for new versions.
+        </p>
+      </section>
+
       <section id="how" class="how">
         <h2 class="section-title">How it works</h2>
         <ol class="steps">
           <li>
             <span>1</span>
             <h3>Download and install</h3>
-            <p>Get the installer for Windows, macOS or Linux from the latest release.</p>
+            <p>
+              Get the installer for Windows, macOS or Linux from the
+              <a href="#download">download section</a>.
+            </p>
           </li>
           <li>
             <span>2</span>
@@ -356,11 +443,7 @@
         <img src="media/icon.svg" alt="" width="72" height="72" />
         <h2>Stop babysitting streams for drops.</h2>
         <div class="actions">
-          <a
-            class="button primary"
-            href="https://github.com/kyleshrader/twitch-drop-collector/releases"
-            >Download</a
-          >
+          <a class="button primary" href="#download" data-download>Download</a>
           <a class="button" href="https://github.com/kyleshrader/twitch-drop-collector"
             >View on GitHub</a
           >
