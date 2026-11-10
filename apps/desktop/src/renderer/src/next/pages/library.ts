@@ -49,6 +49,8 @@ const latest = (times: readonly (string | undefined)[]): string | undefined =>
 
 /** What a search told us about a game, by name: lists hold names only. */
 export interface KnownGame {
+  /** Twitch's game ID, when saved: it finds the campaigns seen for a game on a list. */
+  id?: string
   boxArtUrl?: string
   slug?: string
 }
@@ -106,7 +108,12 @@ export function gamesOf(
   const withCampaigns = new Set(campaigns.map((c) => c.game))
   const nameOnly = [...new Set(listed)]
     .filter((name) => !withCampaigns.has(name))
-    .map((name) => gameFromName(name, known.get(name)))
+    .map((name) => {
+      const saved = known.get(name)
+      // No campaigns now, but the history may have some, counted by Twitch's game ID.
+      const seen = saved?.id ? (seenByGame[saved.id] ?? 0) : 0
+      return { ...gameFromName(name, saved), seen }
+    })
   return [...byId.entries()]
     .map(([id, list]): LibraryGame => {
       const saved = known.get(list[0]!.game)

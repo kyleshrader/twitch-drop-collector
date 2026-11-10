@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Twitch Drop Collector</title>
+    <meta
+      name="description"
+      content="A free desktop app that watches Twitch for you and claims your drops: a queue you control, a library of every game, and a full history, all on your own computer."
+    />
+    <meta property="og:title" content="Twitch Drop Collector" />
+    <meta
+      property="og:description"
+      content="Your Twitch drops, collected while you get on with your day. Free and open source for Windows, macOS and Linux."
+    />
+    <meta property="og:image" content="media/trailer-poster.jpg" />
+    <meta name="theme-color" content="#0a0d11" />
+    <link rel="icon" href="media/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <a class="brand" href="#top"
+        ><img src="media/icon.svg" alt="" width="28" height="28" />Twitch Drop Collector</a
+      >
+      <nav aria-label="Sections">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+        <a class="button small" href="https://github.com/kyleshrader/twitch-drop-collector"
+          >GitHub</a
+        >
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-text">
+          <p class="eyebrow">Free and open source · Windows, macOS and Linux</p>
+          <h1>Your Twitch drops, collected while you get on with your day.</h1>
+          <p class="lead">
+            Twitch Drop Collector watches the right streams in the background, earns the drops you
+            care about and claims them for you. You decide what comes first, and you can see
+            everything it did.
+          </p>
+          <div class="actions">
+            <a
+              class="button primary"
+              href="https://github.com/kyleshrader/twitch-drop-collector/releases"
+              >Download</a
+            >
+            <a class="button" href="#trailer">Watch the trailer</a>
+          </div>
+          <p class="note">Currently in beta. No browser tab, no extension, nothing to keep open.</p>
+        </div>
+        <figure class="trailer" id="trailer">
+          <video
+            controls
+            playsinline
+            preload="metadata"
+            poster="media/trailer-poster.jpg"
+            aria-label="Trailer: a one-minute tour of the app"
+          >
+            <source src="media/trailer.mp4" type="video/mp4" />
+          </video>
+          <figcaption>
+            A one-minute tour. Music:
+            <a
+              href="https://freemusicarchive.org/music/holiznacc0/spring-at-last-lofi-tape/april-showers/"
+              >April Showers</a
+            >
+            by HoliznaCC0 (CC0, from Free Music Archive).
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="strip" aria-label="At a glance">
+        <div><strong>Hands-off</strong><span>Picks a stream, watches, claims</span></div>
+        <div><strong>Your order</strong><span>A queue you sort and drag</span></div>
+        <div><strong>Every game</strong><span>One library with box art</span></div>
+        <div><strong>Private</strong><span>History stays on your computer</span></div>
+      </section>
+
+      <section id="features" class="features">
+        <h2 class="section-title">What it does</h2>
+
+        <article class="feature">
+          <div class="copy">
+            <span class="tag">Mining</span>
+            <h3>It watches for you</h3>
+            <p>
+              The app finds a live channel with drops enabled for your top campaign, watches it
+              quietly in the background (no video, just enough for Twitch to count it) and claims
+              each reward the moment it unlocks.
+            </p>
+            <ul>
+              <li>Shows the game, the channel, the drop and how long is left</li>
+              <li>Pick a different channel any time, or let it choose</li>
+              <li>Pauses itself when you go offline or the computer sleeps</li>
+              <li>A notification when something is claimed</li>
+            </ul>
+          </div>
+          <img
+            src="media/shots/drops.png"
+            alt="The Drops page: Black Desert being mined on a channel, its drops and time left, and Up next below"
+            loading="lazy"
+            width="1440"
+            height="810"
+          />
+        </article>
+
+        <article class="feature flip">
+          <div class="copy">
+            <span class="tag">Up next</span>
+            <h3>Your queue, your order</h3>
+            <p>
+              Every campaign it can earn sits in one queue. Sort by priority, by what ends soonest
+              or by what's most at risk, or drag cards into your own order. "Collect now" jumps one
+              to the front.
+            </p>
+            <ul>
+              <li>Group by game or by campaign</li>
+              <li>Every card says which channels count</li>
+              <li>
+                Warns when a campaign won't finish in time, and whether moving it up would save it
+              </li>
+              <li>Priority, Not set and Excluded lists for every game</li>
+            </ul>
+          </div>
+          <img
+            src="media/shots/up-next-sort.png"
+            alt="Up next with the sort menu open: Priority, Ending soonest, Least time to spare and Custom, each explained"
+            loading="lazy"
+            width="1440"
+            height="810"
+          />
+        </article>
+
+        <article class="feature">
+          <div class="copy">
+            <span class="tag">Library</span>
+            <h3>Every game in one library</h3>
+            <p>
+              A library of every game with drops, plus any you want to rank or skip, with box art.
+              Search Twitch for games that don't have drops yet. A game's page lists its campaigns
+              and every drop, with progress.
+            </p>
+            <ul>
+              <li>Sort by list, account, name, recently seen or recently claimed</li>
+              <li>Filters for active campaigns, recent claims and unclaimed rewards</li>
+              <li>Shows which games need your account linked, with the link</li>
+            </ul>
+          </div>
+          <img
+            src="media/shots/library.png"
+            alt="The Library: a grid of game box art, grouped under Priority, with a sidebar list"
+            loading="lazy"
+            width="1440"
+            height="810"
+          />
+        </article>
+
+        <article class="feature flip">
+          <div class="copy">
+            <span class="tag">History</span>
+            <h3>See everything it did</h3>
+            <p>
+              A timeline of what it watched, what it claimed, which campaigns turned up and how each
+              one ended: completed, part-done or missed. Totals for the last week, month or all
+              time, and filters for any game, reward or channel.
+            </p>
+            <ul>
+              <li>Drops claimed, time watched, campaigns completed and missed</li>
+              <li>New games, list changes, linked accounts and app updates too</li>
+              <li>Kept on your computer, never uploaded anywhere</li>
+            </ul>
+          </div>
+          <img
+            src="media/shots/history.png"
+            alt="History: totals for drops claimed and time watched, a timeline by day, and games ranked by time watched"
+            loading="lazy"
+            width="1440"
+            height="810"
+          />
+        </article>
+
+        <article class="feature">
+          <div class="copy">
+            <span class="tag">Reliability</span>
+            <h3>Ready when Twitch changes</h3>
+            <p>
+              Every response from Twitch is checked against what the app expects. If Twitch changes
+              something, you get one notification, the details (expected vs actual, with anything
+              personal removed) and a button that opens a ready-to-send bug report.
+            </p>
+            <ul>
+              <li>Its own log file, separate from the app's</li>
+              <li>Pause all activity with one click</li>
+              <li>Test the requests the app uses, one at a time</li>
+            </ul>
+          </div>
+          <img
+            src="media/shots/twitch-api.png"
+            alt="The Twitch API page: one difference, with the expected and actual values side by side"
+            loading="lazy"
+            width="1440"
+            height="810"
+          />
+        </article>
+
+        <article class="feature flip">
+          <div class="copy">
+            <span class="tag">Comfort</span>
+            <h3>Dark, light, or your system's</h3>
+            <p>
+              A calm, Steam-like dark theme by default, a clean light one, or whatever your computer
+              uses. It lives in the tray, can start with your computer and keeps itself up to date.
+            </p>
+            <ul>
+              <li>Full keyboard support, with shortcuts for every page</li>
+              <li>Badge and emote campaigns on or off</li>
+              <li>Never claims for game accounts you haven't linked</li>
+            </ul>
+          </div>
+          <div class="compare" data-compare>
+            <img
+              src="media/shots/drops.png"
+              alt="The Drops page in the dark theme"
+              loading="lazy"
+              width="1440"
+              height="810"
+            />
+            <img
+              class="top"
+              src="media/shots/drops-light.png"
+              alt="The Drops page in the light theme"
+              loading="lazy"
+              width="1440"
+              height="810"
+            />
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              aria-label="Compare the dark and light themes"
+            />
+          </div>
+        </article>
+
+        <div class="cards" aria-label="More features">
+          <div class="card">
+            <h4>Two ways to sign in</h4>
+            <p>
+              Twitch's own login window, or a code on twitch.tv/activate. Your password never
+              touches the app.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Secure by design</h4>
+            <p>
+              Your session is encrypted with your system's keychain. The app talks to Twitch, and to
+              GitHub only to check for updates.
+            </p>
+          </div>
+          <div class="card">
+            <h4>Runs in the tray</h4>
+            <p>Close the window and it keeps mining. Start it with your computer, minimised.</p>
+          </div>
+          <div class="card">
+            <h4>Proxy support</h4>
+            <p>HTTP or SOCKS, for networks that need one.</p>
+          </div>
+          <div class="card">
+            <h4>Automatic updates</h4>
+            <p>Updates download in the background, or check by hand. You pick.</p>
+          </div>
+          <div class="card">
+            <h4>Open source</h4>
+            <p>
+              Built in the open with TypeScript, Electron and React. Read it, build it, improve it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="how" class="how">
+        <h2 class="section-title">How it works</h2>
+        <ol class="steps">
+          <li>
+            <span>1</span>
+            <h3>Download and install</h3>
+            <p>Get the installer for Windows, macOS or Linux from the latest release.</p>
+          </li>
+          <li>
+            <span>2</span>
+            <h3>Sign in with Twitch</h3>
+            <p>
+              Use Twitch's own login page or a device code. Link your game accounts on Twitch as
+              usual.
+            </p>
+          </li>
+          <li>
+            <span>3</span>
+            <h3>Pick your games and let it run</h3>
+            <p>
+              Put games on Priority, sort Up next the way you like, and check History whenever
+              you're curious.
+            </p>
+          </li>
+        </ol>
+      </section>
+
+      <section id="faq" class="faq">
+        <h2 class="section-title">Questions</h2>
+        <details>
+          <summary>Does it need a browser or the Twitch site open?</summary>
+          <p>
+            No. It talks to Twitch directly and "watches" the way Twitch counts watch time, without
+            playing any video. You can close the window too: it keeps going in the tray.
+          </p>
+        </details>
+        <details>
+          <summary>Is my account safe?</summary>
+          <p>
+            You sign in on Twitch's own page (or with a code at twitch.tv/activate), so the app
+            never sees your password. The session it gets is stored encrypted with your system's
+            keychain. Apart from Twitch, the only place it connects to is GitHub, to check for
+            updates.
+          </p>
+        </details>
+        <details>
+          <summary>Which drops can it get?</summary>
+          <p>
+            Any campaign your account can earn: ones for games you've linked on Twitch, and, if you
+            turn them on, badge and emote campaigns that need no linked account. It tells you when a
+            game needs linking and never claims for one that isn't linked.
+          </p>
+        </details>
+        <details>
+          <summary>What does History keep, and where?</summary>
+          <p>
+            What was claimed and when, what was watched and for how long, and how each campaign
+            ended. It's a local database on your computer. Nothing is uploaded.
+          </p>
+        </details>
+        <details>
+          <summary>How much does it cost?</summary>
+          <p>
+            Nothing. It's free and open source. Bug reports and pull requests are welcome on GitHub.
+          </p>
+        </details>
+      </section>
+
+      <section class="cta">
+        <img src="media/icon.svg" alt="" width="72" height="72" />
+        <h2>Stop babysitting streams for drops.</h2>
+        <div class="actions">
+          <a
+            class="button primary"
+            href="https://github.com/kyleshrader/twitch-drop-collector/releases"
+            >Download</a
+          >
+          <a class="button" href="https://github.com/kyleshrader/twitch-drop-collector"
+            >View on GitHub</a
+          >
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        <a href="https://github.com/kyleshrader/twitch-drop-collector">Source</a> ·
+        <a href="https://github.com/kyleshrader/twitch-drop-collector/releases">Releases</a> ·
+        <a href="https://github.com/kyleshrader/twitch-drop-collector/issues">Report a problem</a> ·
+        <a href="https://github.com/kyleshrader/twitch-drop-collector/blob/main/docs/DEVELOPMENT.md"
+          >Developer guide</a
+        >
+      </p>
+      <p class="small">
+        An independent project, not affiliated with or endorsed by Twitch. The screenshots and
+        trailer use the maintainer's own drop history, with the account replaced by a demo one.
+        Trailer music:
+        <a
+          href="https://freemusicarchive.org/music/holiznacc0/spring-at-last-lofi-tape/april-showers/"
+          >April Showers</a
+        >
+        by HoliznaCC0 (CC0, from Free Music Archive).
+      </p>
+    </footer>
+    <script src="site.js" defer></script>
+  </body>
+</html>

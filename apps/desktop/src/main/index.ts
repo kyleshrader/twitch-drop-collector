@@ -281,9 +281,10 @@ if (!app.requestSingleInstanceLock()) {
       logger: logger.child('storage')
     })
     // The version this run is, for the History page's "Updated to …" (recorded when it changes).
+    // Only packaged builds: an unpackaged one reports Electron's own version.
     try {
       const version = app.getVersion()
-      if (storage.events.latest('version')?.data['version'] !== version) {
+      if (app.isPackaged && storage.events.latest('version')?.data['version'] !== version) {
         storage.events.record('version', { version }, new Date())
       }
     } catch (error) {

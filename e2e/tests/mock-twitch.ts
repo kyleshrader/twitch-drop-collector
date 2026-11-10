@@ -85,6 +85,8 @@ export interface MockTwitch {
   offline: Set<string>
   /** PubSub topics the app currently listens to. */
   topics: Set<string>
+  /** The signed-in account's login (the trailer uses a demo name). */
+  login: string
   /** Operations answered with this `data` instead, as if Twitch had changed them. */
   changed: Map<string, unknown>
   /** Sends a PubSub message on a topic to every connection listening to it. */
@@ -107,6 +109,7 @@ export async function startMockTwitch(): Promise<MockTwitch> {
     offline: new Set(),
     topics: new Set(),
     changed: new Map(),
+    login: 'e2euser',
     publish: () => {},
     close: async () => {}
   }
@@ -191,7 +194,7 @@ export async function startMockTwitch(): Promise<MockTwitch> {
         if (!clientId) return json(401, { status: 401, message: 'invalid access token' })
         return json(200, {
           client_id: clientId,
-          login: 'e2euser',
+          login: mock.login,
           user_id: '4242',
           scopes: [],
           expires_in: 0

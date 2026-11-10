@@ -193,4 +193,12 @@ describe('recently seen', () => {
       'Ended long ago'
     ])
   })
+
+  it('counts the campaigns seen for a game on a list that has none now', () => {
+    const games = gamesOf([], { g7: 4 }, ['Palia', 'Rust'], new Map([['Palia', { id: 'g7' }]]))
+    expect(games.map((g) => [g.name, g.seen])).toEqual([
+      ['Palia', 4],
+      ['Rust', 0]
+    ])
+  })
 })
