@@ -2,7 +2,7 @@
 // placed in each element. Allowed cases guard against a config that rejects everything.
 import { ESLint } from 'eslint'
 import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const eslint = new ESLint({ cwd: root })
@@ -13,6 +13,12 @@ async function boundaryErrors(file: string, specifier: string): Promise<string[]
     .filter((m) => m.ruleId === 'boundaries/dependencies')
     .map((m) => m.message)
 }
+
+// The first lint loads the config and its plugins, which took over 5 s on a slow CI runner. Pay
+// for it once here, with room to spare, so each test below keeps the normal time limit.
+beforeAll(async () => {
+  await boundaryErrors('packages/core/src/probe.ts', 'zod')
+}, 60_000)
 
 const KERNEL = 'packages/kernel/src/probe.ts'
 const CORE = 'packages/core/src/probe.ts'
