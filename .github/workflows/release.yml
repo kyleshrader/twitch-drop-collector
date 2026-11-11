@@ -38,6 +38,20 @@ jobs:
             exit 1
           fi
           case "$version" in *-*) echo prerelease=true ;; *) echo prerelease=false ;; esac >> "$GITHUB_OUTPUT"
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The builds run in parallel. When each created the release itself, two could race and
+          # make two drafts for one tag (v0.1.0-beta.2's Windows files landed in a second one). One
+          # draft made here, before them, is the one every build finds and uploads to.
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "The release for $GITHUB_REF_NAME already exists"
+          else
+            flags=(--draft --verify-tag --title "${GITHUB_REF_NAME#v}" --notes "")
+            if [ "${{ steps.check.outputs.prerelease }}" = true ]; then flags+=(--prerelease); fi
+            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" "${flags[@]}"
+          fi
 
   build:
     needs: version
@@ -118,6 +132,18 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: Every platform is in the release
+        run: |
+          # The installers the site and README link to, and the feeds the updater reads.
+          assets=$(gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name')
+          missing=0
+          for pattern in '-setup\.exe$' '\.dmg$' '\.AppImage$' '\.deb$' '^latest\.yml$' '^latest-mac\.yml$' '^latest-linux\.yml$'; do
+            if ! grep -qE -- "$pattern" <<< "$assets"; then
+              echo "::error::The release has no file matching $pattern"
+              missing=1
+            fi
+          done
+          exit $missing
       - name: Publish the draft release
         run: |
           if [ "${{ needs.version.outputs.prerelease }}" = true ]; then
