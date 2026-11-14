@@ -11,7 +11,7 @@ import {
 import { AuthStateView, SignInMethod } from './auth'
 import { GameSearchResult, SearchGamesInput } from './games'
 import { HistoryView } from './history'
-import { MinerView, SelectChannelInput } from './miner'
+import { CampaignView, MinerView, SelectChannelInput } from './miner'
 import { SettingsPatchInput, SettingsView } from './settings'
 import { UpdateView } from './updates'
 
@@ -62,6 +62,8 @@ export const invokeChannels = {
   'apiIssues:calls': { input: z.undefined(), output: z.array(z.string()) },
   /** Records a made-up mismatch, as Twitch changing a response would, to try the page. */
   'apiIssues:demo': { input: z.undefined(), output: ApiIssuesView },
+  /** Campaigns Twitch no longer lists, as last saved (newest first), for the Library. */
+  'library:pastCampaigns': { input: z.undefined(), output: z.array(CampaignView) },
   /** The History page's timeline, from the local database. */
   'history:get': { input: z.undefined(), output: HistoryView },
   'updates:getState': { input: z.undefined(), output: UpdateView },

@@ -10,11 +10,12 @@ import {
   useGameSearch,
   useNow,
   useOpenExternal,
+  usePastCampaigns,
   type ListChoice
 } from '../data'
 import { useSettings } from '../../live'
 import { DropList, ExpandButton } from '../DropList'
-import { shortDate } from '../format'
+import { fullDate, shortDate } from '../format'
 import { icons, type Icon as IconType } from '../icons'
 import { Cover, ListControl, Popover } from '../parts'
 import { routeHref } from '../router'
@@ -145,6 +146,14 @@ function CampaignRows(props: { campaign: CampaignView; now: number }): ReactNode
             <b className={selectable} style={{ fontWeight: 600 }}>
               {c.name}
             </b>
+            {c.archived && (
+              <span
+                className={chip}
+                data-tip={c.lastSeenAt ? t.lastSeen(fullDate(c.lastSeenAt)) : undefined}
+              >
+                {t.noLongerListed}
+              </span>
+            )}
           </span>
         </td>
         <td className={muted}>
@@ -192,7 +201,9 @@ function GamePage(props: { game: LibraryGame | undefined; now: number }): ReactN
           <Cover game={game.name} url={game.boxArtUrl} size={coverMd} />
           <div>
             <h2 className={gameTitle}>{game.name}</h2>
-            <div className={gameSub}>{t.recorded(game.seen, game.campaigns.length)}</div>
+            <div className={gameSub}>
+              {t.recorded(game.seen, game.campaigns.filter((c) => !c.archived).length)}
+            </div>
           </div>
         </div>
       </div>
@@ -255,7 +266,9 @@ function GamePage(props: { game: LibraryGame | undefined; now: number }): ReactN
             </tbody>
           </table>
         </div>
-        {game.seen > game.campaigns.length && <p className={footnote}>{t.historyNote}</p>}
+        {game.seen > game.campaigns.length && (
+          <p className={footnote}>{t.historyNote(game.seen - game.campaigns.length)}</p>
+        )}
       </div>
     </>
   )
@@ -385,7 +398,9 @@ export function LibraryPage(props: {
   const [filters, setFilters] = useState<ReadonlySet<Filter>>(new Set())
   const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(new Set())
   const listed = [...(settings?.mining.priority ?? []), ...(settings?.mining.exclude ?? [])]
-  const all = gamesOf(campaigns, seenByGame, listed, known)
+  // Twitch's current campaigns and the app's copies of the ones it no longer lists.
+  const past = usePastCampaigns()
+  const all = gamesOf(campaigns.concat(past), seenByGame, listed, known)
   const q = query.trim().toLowerCase()
   const games = applyFilters(
     all.filter((g) => !q || g.name.toLowerCase().includes(q)),

@@ -12,6 +12,7 @@ import { createGames, type Games } from './games'
 import { createSeenCampaigns, type SeenCampaigns } from './seen'
 import { createWatchLog, type WatchLog } from './watch-log'
 import { createEventLog, type EventLog } from './events'
+import { createCampaignSnapshots, type CampaignSnapshots } from './snapshots'
 import { openSqlite, type Database } from './database'
 import { MIGRATIONS, NewerDatabaseError, runMigrations } from './migrations'
 
@@ -23,6 +24,7 @@ export interface Storage {
   games: Games
   watched: WatchLog
   events: EventLog
+  snapshots: CampaignSnapshots
   close(): void
 }
 
@@ -74,6 +76,7 @@ export function openStorage(deps: {
     games: createGames({ db }),
     watched: createWatchLog({ db }),
     events: createEventLog({ db }),
+    snapshots: createCampaignSnapshots({ db }),
     close: () => db.close()
   }
 }

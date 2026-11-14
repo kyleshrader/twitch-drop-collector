@@ -9,6 +9,7 @@ import { MIGRATIONS, NewerDatabaseError, runMigrations, schemaVersion } from './
 import { createGames } from './games'
 import { createClaimHistory } from './claims'
 import { createEventLog } from './events'
+import { createCampaignSnapshots } from './snapshots'
 import { createSeenCampaigns } from './seen'
 import { createWatchLog } from './watch-log'
 import { openStorage } from './storage'
@@ -54,6 +55,7 @@ describe('migrations', () => {
       .map((row) => row['name'])
     expect(tables).toEqual([
       'cache_entries',
+      'campaign_snapshots',
       'campaigns_seen',
       'claims',
       'events',
@@ -480,6 +482,29 @@ describe('history', () => {
     events.record('version', { version: '1.1.0' }, new Date('2026-11-03T00:00:00Z'))
     expect(events.all().map((e) => e.kind)).toEqual(['version', 'list', 'version'])
     expect(events.latest('version')?.data).toEqual({ version: '1.1.0' })
+    db.close()
+  })
+})
+
+describe('campaign snapshots', () => {
+  it('keeps the latest copy of each campaign', () => {
+    const db = openSqlite(':memory:')
+    runMigrations(db)
+    const snapshots = createCampaignSnapshots({ db })
+    const first = new Date('2026-11-01T10:00:00Z')
+    const later = new Date('2026-11-02T10:00:00Z')
+    snapshots.save(
+      [
+        { id: 'a', gameId: 'g', data: '{"v":1}' },
+        { id: 'b', gameId: 'g', data: '{"v":1}' }
+      ],
+      first
+    )
+    snapshots.save([{ id: 'a', gameId: 'g', data: '{"v":2}' }], later)
+    expect(snapshots.all()).toEqual([
+      { id: 'a', gameId: 'g', data: '{"v":2}', savedAt: later },
+      { id: 'b', gameId: 'g', data: '{"v":1}', savedAt: first }
+    ])
     db.close()
   })
 })

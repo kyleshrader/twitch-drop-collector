@@ -12,6 +12,7 @@ export {
   type SeenCampaigns,
   type SeenRecord
 } from './seen'
+export { createCampaignSnapshots, type CampaignSnapshot, type CampaignSnapshots } from './snapshots'
 export { createEventLog, type AppEvent, type EventLog } from './events'
 export { createWatchLog, type WatchLog, type WatchSession, type WatchedChannel } from './watch-log'
 export { openStorage, type Storage } from './storage'

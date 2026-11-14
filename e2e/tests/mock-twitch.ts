@@ -85,6 +85,8 @@ export interface MockTwitch {
   offline: Set<string>
   /** PubSub topics the app currently listens to. */
   topics: Set<string>
+  /** Campaign IDs left out of the inventory and the campaign list, as if Twitch stopped listing them. */
+  hidden: Set<string>
   /** The signed-in account's login (the trailer uses a demo name). */
   login: string
   /** Operations answered with this `data` instead, as if Twitch had changed them. */
@@ -110,6 +112,7 @@ export async function startMockTwitch(): Promise<MockTwitch> {
     topics: new Set(),
     changed: new Map(),
     login: 'e2euser',
+    hidden: new Set(),
     publish: () => {},
     close: async () => {}
   }
@@ -311,6 +314,23 @@ export const SEARCHABLE_GAMES = [
   { id: '900002', name: 'Pebble Quest', displayName: 'Pebble Quest', boxArtURL: null }
 ]
 
+/** A response without the hidden campaigns, wherever a list of campaigns holds them. */
+function withoutHidden(value: unknown, hidden: ReadonlySet<string>): unknown {
+  if (hidden.size === 0) return value
+  if (Array.isArray(value)) {
+    return value
+      .filter(
+        (item) =>
+          !(item && typeof item === 'object' && hidden.has((item as { id?: string }).id ?? ''))
+      )
+      .map((item) => withoutHidden(item, hidden))
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, withoutHidden(v, hidden)]))
+  }
+  return value
+}
+
 /** Answers a GQL operation like Twitch did when the fixtures were captured. */
 function gqlAnswer(
   operation: string,
@@ -319,9 +339,9 @@ function gqlAnswer(
 ): unknown {
   switch (operation) {
     case 'Inventory':
-      return fixture('inventory.json')[0]!.data
+      return withoutHidden(fixture('inventory.json')[0]!.data, mock.hidden)
     case 'ViewerDropsDashboard':
-      return fixture('campaigns.json')[0]!.data
+      return withoutHidden(fixture('campaigns.json')[0]!.data, mock.hidden)
     case 'DropCampaignDetails':
       return (
         details.get(String(variables['dropID'])) ?? {

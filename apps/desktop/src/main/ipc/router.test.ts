@@ -49,7 +49,8 @@ function setup(overrides: Partial<InvokeHandlers> = {}): {
         searchGames: async (query) => [{ id: '1', name: query.toUpperCase() }],
         apiCalls: () => [],
         checkApi: async () => [],
-        history: () => ({ runningAtStart: 0, entries: [] })
+        history: () => ({ runningAtStart: 0, entries: [] }),
+        pastCampaigns: () => []
       },
       apiIssues: {
         view: () => ({ issues: [], errors: 0, warnings: 0, logFile: 'twitch-api.log' }),

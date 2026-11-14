@@ -6,6 +6,7 @@ import type {
   ApiIssuesView,
   AppInfo,
   AuthStateView,
+  CampaignView,
   GameSearchResult,
   HistoryView,
   MinerView,
@@ -35,6 +36,7 @@ export function createInvokeHandlers(deps: {
     apiCalls(): string[]
     checkApi(only?: string): Promise<ApiCallOutcome[]>
     history(): HistoryView
+    pastCampaigns(): CampaignView[]
   }
   apiIssues: Pick<ApiIssueLog, 'view' | 'get' | 'dismiss' | 'report'>
   /** Redacts what Test calls show (api-issues/redact.ts). */
@@ -110,6 +112,7 @@ export function createInvokeHandlers(deps: {
       return apiIssues.view()
     },
     'history:get': (): HistoryView => miner.history(),
+    'library:pastCampaigns': (): CampaignView[] => miner.pastCampaigns(),
     'updates:getState': (): UpdateView => updates.view(),
     'updates:check': (): Promise<UpdateView> => updates.check({ manual: true }),
     // Returns once the download starts; progress and the ready state arrive as events.

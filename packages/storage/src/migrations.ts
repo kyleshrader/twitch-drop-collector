@@ -92,6 +92,16 @@ export const MIGRATIONS: readonly string[] = [
     data TEXT    NOT NULL
   ) STRICT;
   CREATE INDEX events_at ON events (at);
+  `,
+  // 7: the last full copy of each campaign, so ones Twitch stops listing can still be shown
+  `
+  CREATE TABLE campaign_snapshots (
+    campaign_id TEXT    NOT NULL PRIMARY KEY,
+    game_id     TEXT    NOT NULL,
+    data        TEXT    NOT NULL,
+    saved_at    INTEGER NOT NULL
+  ) STRICT;
+  CREATE INDEX campaign_snapshots_game ON campaign_snapshots (game_id);
   `
 ]
 

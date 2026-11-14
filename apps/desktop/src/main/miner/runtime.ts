@@ -29,16 +29,19 @@ import {
   type Queue
 } from '@tdc/core'
 import { createRateLimiter, systemClock, type Logger } from '@tdc/kernel'
-import type { GameSearchResult, HistoryView, MinerView } from '@tdc/ipc-contract'
+import type { CampaignView, GameSearchResult, HistoryView, MinerView } from '@tdc/ipc-contract'
 import type { Storage } from '@tdc/storage'
 import { buildHistory } from '../history/history'
 import { createGameInfoService } from './game-info'
-import { queueView, toMinerView, withGameInfo, type ViewHistory } from './views'
+import { pastCampaigns, snapshotOf } from './past-campaigns'
+import { campaignView, queueView, toMinerView, withGameInfo, type ViewHistory } from './views'
 
 /** How many games a search returns. */
 const SEARCH_RESULTS = 12
 /** Watching is counted for the History page a minute at a time. */
 const WATCH_TICK_MS = 60_000
+/** Campaign copies are saved when campaigns or claims change, and at least this often. */
+const SNAPSHOT_EVERY_MS = 10 * 60_000
 /** The History page lists at most this many claims. */
 const MAX_HISTORY_CLAIMS = 5000
 /** How often saved game info is checked for games due a look-up (game-info.ts says when). */
@@ -66,6 +69,8 @@ export interface MiningRuntime {
   checkApi(only?: string): Promise<ApiCallOutcome[]>
   /** The History page's timeline, from the local database. */
   history(): HistoryView
+  /** Campaigns Twitch no longer lists, as last saved, for the Library. */
+  pastCampaigns(): CampaignView[]
   stop(): Promise<void>
 }
 
@@ -163,7 +168,8 @@ export function createMiningRuntime(deps: {
       if (added > 0) logger.debug('New campaigns seen', { added })
     }
     // Progress updates change neither; only re-read the history when campaigns or claims do.
-    if (fresh.length > 0 || claimed !== claimedCount) {
+    const changed = fresh.length > 0 || claimed !== claimedCount
+    if (changed) {
       try {
         recordStandings(list)
       } catch (error) {
@@ -172,6 +178,23 @@ export function createMiningRuntime(deps: {
       history = undefined
     }
     claimedCount = claimed
+    // A full copy of every campaign, so one Twitch stops listing can still be shown. Progress
+    // alone changes it every minute; saving that every ten minutes is enough.
+    if (changed || clock.now().getTime() - snapshotAt >= SNAPSHOT_EVERY_MS) saveSnapshots(list)
+  }
+  let snapshotAt = 0
+  const saveSnapshots = (list: readonly Campaign[]): void => {
+    const now = clock.now()
+    try {
+      const views = withGameInfo(
+        list.map((c) => campaignView(c, now, historyNow())),
+        gameInfo.known()
+      )
+      storage.snapshots.save(views.map(snapshotOf), now)
+      snapshotAt = now.getTime()
+    } catch (error) {
+      logger.warn('Saving campaign copies failed', { error })
+    }
   }
   /** Writes to the History page's event log; never in the way of anything else. */
   const recordEvent = (kind: string, data: Record<string, unknown> = {}): void => {
@@ -552,6 +575,11 @@ export function createMiningRuntime(deps: {
         })
       )
     },
+    pastCampaigns: () =>
+      withGameInfo(
+        pastCampaigns(storage.snapshots.all(), new Set(inventory.campaigns().map((c) => c.id))),
+        gameInfo.known()
+      ),
     history: () =>
       buildHistory({
         claims: storage.claims.recent(MAX_HISTORY_CLAIMS),

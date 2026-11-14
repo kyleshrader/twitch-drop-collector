@@ -2,7 +2,7 @@
 
 Status: **accepted 2026-10-30**. Nothing here is built yet.
 
-Reference: [DevilXD/TwitchDropsMiner](https://github.com/DevilXD/TwitchDropsMiner), branch `dev-build`, commit `99d12fd` (2026-10-28).
+Reference: [DevilXD/TwitchDropsMiner](https://github.com/DevilXD/TwitchDropsMiner), branch `master`, commit [`99d12fd`](https://github.com/DevilXD/TwitchDropsMiner/commit/99d12fd2d815d7737258ed57405c63c0686bd3e1) (2026-10-28). That's also what upstream's `dev-build` pre-release was built from: `dev-build` is a release upstream rebuilds from `master`, not a branch.
 
 **Approach: a rewrite.** New TypeScript in our own architecture, using the behaviour rules in §3 and the protocol details (endpoints, GQL operation names and hashes, PubSub topics, timings, client profiles) exactly as they need to be. No licence bookkeeping is needed for a rewrite like this.
 

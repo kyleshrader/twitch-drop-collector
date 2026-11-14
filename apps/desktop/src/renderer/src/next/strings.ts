@@ -327,7 +327,12 @@ export const strings = {
       partial: 'Partly claimed',
       missed: 'Missed'
     },
-    historyNote: 'Campaigns Twitch no longer lists are counted, but their details aren’t kept yet.',
+    historyNote: (n: number): string =>
+      n === 1
+        ? 'One more campaign was seen before the app kept campaign details, so only its count is known.'
+        : `${n} more campaigns were seen before the app kept campaign details, so only their count is known.`,
+    noLongerListed: 'No longer listed',
+    lastSeen: (when: string): string => `Twitch stopped listing it. Last seen ${when}.`,
     notFound: 'This game isn’t in your campaigns any more.'
   },
 

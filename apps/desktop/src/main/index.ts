@@ -573,7 +573,8 @@ if (!app.requestSingleInstanceLock()) {
             searchGames: async (query) => (mining ? mining.searchGames(query) : []),
             apiCalls: () => mining?.apiCalls() ?? [],
             checkApi: async (only) => (mining ? mining.checkApi(only) : []),
-            history: () => mining?.history() ?? { runningAtStart: 0, entries: [] }
+            history: () => mining?.history() ?? { runningAtStart: 0, entries: [] },
+            pastCampaigns: () => mining?.pastCampaigns() ?? []
           },
           apiIssues,
           redact: redactApi,

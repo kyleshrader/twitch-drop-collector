@@ -56,6 +56,10 @@ export const CampaignView = z.object({
   badgesEmotes: z.boolean(),
   /** When this app first saw the campaign (absent before the app kept a history). */
   firstSeenAt: z.string().optional(),
+  /** Twitch no longer lists it: this is the app's last saved copy (library:pastCampaigns). */
+  archived: z.boolean().optional(),
+  /** When that copy was saved: the last time Twitch listed it. */
+  lastSeenAt: z.string().optional(),
   drops: z.array(DropView)
 })
 export type CampaignView = z.infer<typeof CampaignView>

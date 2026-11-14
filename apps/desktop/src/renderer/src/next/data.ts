@@ -1,7 +1,12 @@
 // The new UI's changes: everything goes through settings:update (main validates and stores it,
 // then pushes the new miner view) or the existing miner and shell calls.
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { GameSearchResult, SettingsPatchInput, SettingsView } from '@tdc/ipc-contract'
+import type {
+  CampaignView,
+  GameSearchResult,
+  SettingsPatchInput,
+  SettingsView
+} from '@tdc/ipc-contract'
 import { useEffect, useState } from 'react'
 import { invoke } from '../ipc'
 import { SETTINGS_KEY, useSettings } from '../live'
@@ -131,6 +136,20 @@ export function useStoredFlag(key: string): [boolean, (on: boolean) => void] {
   }
   return [on, store]
 }
+
+/**
+ * Campaigns Twitch no longer lists, as the app last saved them (newest first): the Library shows
+ * them with the current ones. Read again every minute while it's open.
+ */
+export function usePastCampaigns(): readonly CampaignView[] {
+  const past = useQuery({
+    queryKey: ['pastCampaigns'],
+    queryFn: () => invoke('library:pastCampaigns'),
+    refetchInterval: 60_000
+  })
+  return past.data ?? NO_CAMPAIGNS
+}
+const NO_CAMPAIGNS: readonly CampaignView[] = []
 
 /** Shortest search that asks Twitch; one letter matches too much to be useful. */
 export const MIN_SEARCH = 2
