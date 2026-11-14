@@ -1,5 +1,5 @@
 // The new UI (docs/new-ui/): signing in, the Drops page mining a priority game, Pause and
-// Continue, reordering Up next, the Library and the queue rules, against the mock Twitch.
+// Resume, reordering Up next, the Library and the queue rules, against the mock Twitch.
 import { expect, test } from '@playwright/test'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -43,7 +43,7 @@ test('the new UI mines, pauses, reorders Up next and shows the library', async (
     join(userDataDir, 'settings.json'),
     JSON.stringify({
       version: 1,
-      settings: { general: { ui: 'next' }, mining: { priority: [MINING_GAME.displayName] } }
+      settings: { mining: { priority: [MINING_GAME.displayName] } }
     })
   )
   const { app, window: page } = await launchApp(userDataDir, {
@@ -126,12 +126,12 @@ test('the new UI mines, pauses, reorders Up next and shows the library', async (
     expect(await scrollTop()).toBe(clicked)
     await main.evaluate((m) => (m.scrollTop = 0))
 
-    // Pause stops mining (and says so in the page links); Continue picks it up again.
+    // Pause stops mining (and says so in the page links); Resume picks it up again.
     await current.getByRole('button', { name: 'Pause' }).click()
     await expect(current).toContainText('Mining is paused')
     await expect(ui.getByRole('img', { name: 'Mining is paused' })).toBeVisible()
     await expect.poll(async () => (await savedQueue(userDataDir)).paused).toBe(true)
-    await current.getByRole('button', { name: 'Continue' }).click()
+    await current.getByRole('button', { name: 'Resume' }).click()
     await expect(current.getByRole('heading', { name: MINING_GAME.displayName })).toBeVisible({
       timeout: 15_000
     })
@@ -276,7 +276,7 @@ test('the new UI mines, pauses, reorders Up next and shows the library', async (
     await expect(onTwitch.getByRole('link')).toHaveText([/Pebble Dash$/, /Pebble Quest$/])
     await onTwitch.getByRole('link', { name: 'Pebble Dash' }).click()
     await expect(ui.getByRole('heading', { name: 'Pebble Dash' })).toBeVisible()
-    await expect(ui.getByText(/hasn’t listed a drops campaign/)).toBeVisible()
+    await expect(ui.getByText('No campaigns right now.')).toBeVisible()
     // Its Twitch page: shown, not clicked (it would open the real browser).
     await expect(ui.getByRole('button', { name: 'View on Twitch' })).toBeVisible()
     const pebbleList = ui.getByRole('group', { name: 'List for Pebble Dash' })

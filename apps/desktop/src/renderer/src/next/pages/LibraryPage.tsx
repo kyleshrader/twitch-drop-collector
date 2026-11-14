@@ -11,6 +11,7 @@ import {
   useNow,
   useOpenExternal,
   usePastCampaigns,
+  useSettingsPatch,
   type ListChoice
 } from '../data'
 import { useSettings } from '../../live'
@@ -31,6 +32,7 @@ import {
   gameFromName,
   gamesOf,
   groupGames,
+  movePriority,
   SORTINGS,
   statusOf,
   twitchPageOf,
@@ -82,7 +84,8 @@ const {
   status: statusClass,
   footnote,
   campaignCell,
-  dropsRow
+  dropsRow,
+  rankGroup
 } = styles
 const statusStyles: Record<CampaignStatus, string> = {
   active: styles['active'] ?? '',
@@ -172,6 +175,44 @@ function CampaignRows(props: { campaign: CampaignView; now: number }): ReactNode
   )
 }
 
+/** Where a Priority game sits in the list, with buttons to move it. */
+function PriorityRank(props: { game: string }): ReactNode {
+  const settings = useSettings()
+  const { save } = useSettingsPatch()
+  const priority = settings?.mining.priority ?? []
+  const index = priority.indexOf(props.game)
+  if (index < 0) return null
+  const move = (direction: -1 | 1): void =>
+    save({ mining: { priority: movePriority(priority, props.game, direction) } })
+  return (
+    <span className={rankGroup}>
+      <span className={chip} data-tip={t.rankTip}>
+        {t.rank(index + 1, priority.length)}
+      </span>
+      <button
+        type="button"
+        className={`${iconButton} ${small}`}
+        aria-label={t.rankUp}
+        data-tip={t.rankUp}
+        disabled={index === 0}
+        onClick={() => move(-1)}
+      >
+        <Icon.up />
+      </button>
+      <button
+        type="button"
+        className={`${iconButton} ${small}`}
+        aria-label={t.rankDown}
+        data-tip={t.rankDown}
+        disabled={index === priority.length - 1}
+        onClick={() => move(1)}
+      >
+        <Icon.dn />
+      </button>
+    </span>
+  )
+}
+
 function GamePage(props: { game: LibraryGame | undefined; now: number }): ReactNode {
   const { game, now } = props
   const { listOf, setList } = useGameList()
@@ -214,6 +255,7 @@ function GamePage(props: { game: LibraryGame | undefined; now: number }): ReactN
           value={listOf(game.name)}
           onChange={(v) => setList(game.name, v)}
         />
+        <PriorityRank game={game.name} />
         {game.campaigns.length > 0 && (
           <span className={label} style={{ marginLeft: 12 }}>
             {t.accountLabel}
@@ -450,7 +492,6 @@ export function LibraryPage(props: {
                     </span>
                     {t.collection}
                   </button>
-                  <div className={note}>{t.collectionNote}</div>
                 </>
               )}
             </Popover>

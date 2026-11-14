@@ -691,3 +691,46 @@ span.groupLink {
   margin: 0 0 8px;
   font-size: 12.5px;
 }
+
+/* Text and select fields in Settings rows. */
+.field {
+  height: 32px;
+  min-width: 200px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+.field[aria-invalid='true'] {
+  border-color: var(--bad);
+}
+.fieldError {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--bad);
+}
+/* A device-code sign-in: the code to enter on twitch.tv/activate. */
+.deviceCode {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+.deviceCode strong {
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: 0.18em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A Priority game's place in the list, beside its list control. */
+.rankGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+}

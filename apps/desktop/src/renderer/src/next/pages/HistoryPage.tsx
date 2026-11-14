@@ -247,7 +247,7 @@ function Entry(props: { e: HistoryEntryView; lookup: GameLookup }): ReactNode {
         <div className={entryTitle}>{title}</div>
         {e.kind === 'new' || e.kind === 'newGame'
           ? sub
-          : sub !== null && <div className={entrySub}>{sub}</div>}
+          : sub && <div className={entrySub}>{sub}</div>}
       </div>
       <time className={entryTime} dateTime={e.at} data-tip={fullDate(e.at)}>
         {when}
@@ -349,9 +349,9 @@ export function HistoryPage(props: { miner: MinerView | undefined; now: number }
           ))}
         </div>
       </div>
-      <p className={lead}>
-        {t.lead(data?.startedAt ? DATE_YEAR.format(new Date(data.startedAt)) : undefined)}
-      </p>
+      {data?.startedAt && (
+        <p className={lead}>{t.lead(DATE_YEAR.format(new Date(data.startedAt)))}</p>
+      )}
 
       {history.isLoading && <div className={emptyBox}>{t.loading}</div>}
       {history.isError && (

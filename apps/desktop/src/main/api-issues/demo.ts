@@ -17,7 +17,7 @@ export function demoIssue(): ApiIssue {
     source: 'gql',
     endpoint: gql.UserAvatar.name,
     kind: 'shape',
-    summary: 'Demo: the response doesn’t match what we expect (made up, not from Twitch)',
+    summary: 'Sample issue: the response doesn’t match what the app expects',
     checks,
     response: CHANGED_RESPONSE,
     demo: true

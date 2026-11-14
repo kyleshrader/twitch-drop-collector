@@ -1,6 +1,6 @@
 # New UI design
 
-Agreed with the user, 2026-11-04. The new UI is built in `apps/desktop/src/renderer/src/next/`, beside the classic UI, which stays until the switch-over (see docs/decisions.md, 2026-11-01). Open points are listed at the end. The clickable mockup is [sample-ui-mockup.html](sample-ui-mockup.html); how Up next works, and the rules it can be set to while Twitch's behaviour is unconfirmed, are in [queue-rules.md](queue-rules.md). What is built so far, and what isn't yet, is in docs/decisions.md (2026-11-07).
+Agreed with the user, 2026-11-04. The UI is built in `apps/desktop/src/renderer/src/next/`. It replaced the classic UI on 2026-11-14 (docs/decisions.md). Open points are listed at the end. The clickable mockup is [sample-ui-mockup.html](sample-ui-mockup.html); how Up next works, and the rules it can be set to while Twitch's behaviour is unconfirmed, are in [queue-rules.md](queue-rules.md). What is built so far, and what isn't yet, is in docs/decisions.md (2026-11-07).
 
 ## Look
 

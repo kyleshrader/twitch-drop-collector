@@ -37,10 +37,7 @@ async function openOverwatch(page: Page): Promise<void> {
 
 test('a campaign Twitch stops listing is still shown, from its saved copy', async () => {
   const userDataDir = newUserDataDir()
-  await writeFile(
-    join(userDataDir, 'settings.json'),
-    JSON.stringify({ version: 1, settings: { general: { ui: 'next' } } })
-  )
+  await writeFile(join(userDataDir, 'settings.json'), JSON.stringify({ version: 1, settings: {} }))
   const env = { TDC_TWITCH_ENDPOINTS: JSON.stringify(twitchEndpoints(twitch.url)) }
 
   // First run: Twitch lists the campaign; the app saves its copy as the inventory loads.
@@ -75,8 +72,8 @@ test('a campaign Twitch stops listing is still shown, from its saved copy', asyn
         .getByRole('listitem')
         .first()
     ).toBeVisible()
-    // Its copy is complete, so there's no "only its count is known" footnote.
-    await expect(ui.getByText(/only (its|their) count is known/)).toHaveCount(0)
+    // Its copy is complete, so there's no "no details" footnote.
+    await expect(ui.getByText(/(has|have) no details/)).toHaveCount(0)
   } finally {
     await app.close()
   }

@@ -18,10 +18,7 @@ test.afterEach(async () => {
 
 test('a changed Twitch response is logged, notified and shown with expected vs actual', async () => {
   const userDataDir = newUserDataDir()
-  await writeFile(
-    join(userDataDir, 'settings.json'),
-    JSON.stringify({ version: 1, settings: { general: { ui: 'next' } } })
-  )
+  await writeFile(join(userDataDir, 'settings.json'), JSON.stringify({ version: 1, settings: {} }))
   // Twitch "changed" the avatar query: the picture comes back as a number, next to the user's
   // own ID and login (which must not end up in the log or the report).
   twitch.changed.set('UserAvatar', {
@@ -105,7 +102,7 @@ test('a changed Twitch response is logged, notified and shown with expected vs a
 
     // Pause all activity, then resume.
     await ui.getByRole('button', { name: 'Pause all activity' }).click()
-    await expect(ui.getByText(/isn’t talking to Twitch/)).toBeVisible()
+    await expect(ui.getByText(/All activity is paused/)).toBeVisible()
     await ui.getByRole('button', { name: 'Resume' }).click()
     await expect(ui.getByRole('button', { name: 'Pause all activity' })).toBeVisible()
 
@@ -121,7 +118,7 @@ test('a changed Twitch response is logged, notified and shown with expected vs a
     // Simulate a change: a made-up mismatch goes through the same log, notification and page.
     await ui.getByRole('button', { name: 'Simulate a change' }).click()
     await expect(row).toHaveCount(1)
-    await expect(row).toContainText('Demo')
+    await expect(row).toContainText('Sample')
     await expect
       .poll(() => logOf(userDataDir)().match(/Twitch may have changed its API/g)?.length ?? 0)
       .toBe(2)

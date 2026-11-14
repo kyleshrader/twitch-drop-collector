@@ -19,13 +19,13 @@ Main builds it (`apps/desktop/src/main/history/history.ts`, unit-tested) and sen
 
 - **Claim:** the rewards, the game and campaign, the reward's picture, and "Time from Twitch" when the time is Twitch's.
 - **Watching:** "Watched for 1 h 20 m on _channel_", with the game, the campaign it progressed, and the start and end times.
-- **Campaign ended**, at its end time: _Completed_ (every drop claimed), _ended part-done_ (some), _Missed_ (none, though the account could earn it), or _ended_ when the account couldn't earn it. It shows the drops claimed and how long the app watched for it. Claims recorded after the last look count too. Campaigns last seen before migration 5 have no standing and get no entry.
+- **Campaign ended**, at its end time: _Completed_ (every drop claimed), _ended partly claimed_ (some), _Missed_ (none, though the account could earn it), or _ended_ when the account couldn't earn it. It shows the drops claimed and how long the app watched for it. Claims recorded after the last look count too. Campaigns last seen before migration 5 have no standing and get no entry.
 - **Campaign started:** a campaign first seen while upcoming, at its start time.
 - **New in your Library:** a game whose first campaigns turned up (after the first load), with those campaigns.
 - **List changes:** "_Game_ put on Priority", "excluded", or "taken off its list (Not set)".
 - **Linked your account for _game_.**
 - **The app:** "Paused all activity", "Resumed mining", and "Updated to version 1.2.0 (from 1.1.0)".
-- **New campaigns:** one entry per game for each load that found some. The first load's campaigns were already running when the history started; they're counted ("The history starts here. 12 campaigns were already running."), not listed.
+- **New campaigns:** one entry per game for each load that found some. The first load's campaigns were already running when the history started; they're counted ("History begins · 12 campaigns already running"), not listed.
 
 At most 5000 entries go to the page.
 

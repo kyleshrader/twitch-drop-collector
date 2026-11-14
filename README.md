@@ -90,7 +90,7 @@ The app is in beta. If something doesn't look right, please [open an issue](http
 
 **Is it affiliated with Twitch?** No. It's an independent, open source project, not affiliated with or endorsed by Twitch.
 
-The screenshots and trailer use the maintainer's own drop history, with the account replaced by a demo one. Trailer music: [April Showers](https://freemusicarchive.org/music/holiznacc0/spring-at-last-lofi-tape/april-showers/) by HoliznaCC0 (CC0, from Free Music Archive).
+Trailer music: [April Showers](https://freemusicarchive.org/music/holiznacc0/spring-at-last-lofi-tape/april-showers/) by HoliznaCC0 (CC0, from Free Music Archive).
 
 ## For developers
 

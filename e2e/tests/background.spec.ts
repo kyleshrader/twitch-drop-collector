@@ -58,17 +58,17 @@ test('mining pauses while the computer sleeps and reloads on wake', async () => 
   const { app, window: page } = await launchApp(newUserDataDir(), {
     TDC_TWITCH_ENDPOINTS: JSON.stringify(twitchEndpoints(twitch.url))
   })
-  const status = page.getByTestId('miner-status')
+  const status = page.getByTestId('next-ui').getByRole('region', { name: 'Current' })
   try {
     await page.getByRole('button', { name: 'Sign in with Twitch' }).click()
-    await expect(status).toHaveText('Idle: No campaigns to mine right now', { timeout: 15_000 })
+    await expect(status).toContainText('No campaigns to mine right now', { timeout: 15_000 })
 
     await app.evaluate(({ powerMonitor }) => powerMonitor.emit('suspend'))
-    await expect(status).toHaveText('Paused: The computer is asleep')
+    await expect(status).toContainText('The computer is asleep')
 
     const inventoryLoads = twitch.gqlCalls.filter((op) => op === 'Inventory').length
     await app.evaluate(({ powerMonitor }) => powerMonitor.emit('resume'))
-    await expect(status).toHaveText('Idle: No campaigns to mine right now', { timeout: 15_000 })
+    await expect(status).toContainText('No campaigns to mine right now', { timeout: 15_000 })
     // Waking re-checks the session and reloads everything rather than trusting stale state.
     expect(twitch.gqlCalls.filter((op) => op === 'Inventory').length).toBeGreaterThan(
       inventoryLoads

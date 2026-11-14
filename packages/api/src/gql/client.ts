@@ -73,7 +73,7 @@ function inspect(operation: string, item: GqlItem, report: Report): Verdict {
       report({
         severity: 'warning',
         kind: 'partial',
-        summary: `Twitch couldn't resolve ${error.path.join('.')}; carried on without it`,
+        summary: `Twitch couldn’t resolve ${error.path.join('.')}, so the app carried on without it`,
         checks: [{ path: error.path.join('.'), message, expected: 'a value', actual: error }],
         response: item.errors
       })
@@ -83,7 +83,7 @@ function inspect(operation: string, item: GqlItem, report: Report): Verdict {
     report({
       severity: 'error',
       kind: 'error',
-      summary: `Twitch returned an error we don't know: ${known}`,
+      summary: `Twitch returned an error the app doesn’t know: ${known}`,
       checks: [
         {
           path: error.path?.join('.') ?? 'errors',
@@ -164,7 +164,7 @@ export function createGqlClient(deps: {
         report({
           severity: 'error',
           kind: 'shape',
-          summary: 'The response is not JSON',
+          summary: 'The response isn’t JSON',
           checks: [
             {
               path: '(root)',
@@ -181,7 +181,7 @@ export function createGqlClient(deps: {
         report({
           severity: 'error',
           kind: 'shape',
-          summary: `Expected ${inputs.length} result(s), got ${items.length}`,
+          summary: `Expected ${inputs.length} ${inputs.length === 1 ? 'result' : 'results'}, got ${items.length}`,
           checks: [
             {
               path: '(root)',

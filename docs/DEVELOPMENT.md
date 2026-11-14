@@ -35,7 +35,7 @@ End-to-end windows stay invisible so they don't get in your way. Set `TDC_E2E_SH
 | Path                                 | What                                                                                                                      |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `apps/desktop`                       | The Electron app: `src/main` (network, storage, OS integration), `src/preload` (the typed bridge), `src/renderer` (React) |
-| `apps/desktop/src/renderer/src/next` | The new UI: CSS modules, its own strings, icons only through `next/icons.ts`                                              |
+| `apps/desktop/src/renderer/src/next` | The UI: CSS modules, its strings, icons only through `next/icons.ts`                                                      |
 | `packages/kernel`                    | Logger, clock and other basics; imports nothing from the workspace or the platform                                        |
 | `packages/core`                      | Domain rules, the miner, the Up next queue, services                                                                      |
 | `packages/api`                       | Twitch: HTTP, GQL, PubSub, watching, sign-in, and the API change checks                                                   |
@@ -67,7 +67,7 @@ These are enforced by lint, Yarn constraints and tests wherever they can be:
 - [spec.md](spec.md): the stack and repository spec the project started from.
 - [decisions.md](decisions.md): every library and design decision, with the reason, newest last.
 - [port-plan.md](port-plan.md): the plan for porting TwitchDropsMiner's behaviour.
-- [new-ui/ui-design.md](new-ui/ui-design.md): the new UI's design. Also [queue-rules.md](new-ui/queue-rules.md) (how Up next sorts and splits) and [history.md](new-ui/history.md) (what History records and shows).
+- [new-ui/ui-design.md](new-ui/ui-design.md): the UI's design. Also [queue-rules.md](new-ui/queue-rules.md) (how Up next sorts and splits) and [history.md](new-ui/history.md) (what History records and shows).
 
 ## The trailer, screenshots and site
 

@@ -127,7 +127,7 @@ writeFileSync(
     {
       version: 1,
       settings: {
-        general: { ui: 'next', theme: 'dark', trayNotifications: false },
+        general: { theme: 'dark', trayNotifications: false },
         mining: { priority, exclude, priorityMode: 'endingSoonest' }
       }
     },

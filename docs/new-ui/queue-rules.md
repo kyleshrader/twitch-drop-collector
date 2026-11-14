@@ -71,7 +71,7 @@ The preferences (settings, in the sort menu):
 
 ## How the miner follows the queue
 
-While the new UI is on (`general.ui` is `next`), the miner ranks channels by the queue: a channel's rank is the best queue position among the campaigns watching it would progress. The campaign shown as progressing is likewise the earnable one ranked highest. With the classic UI the miner keeps the classic rules (priority list and `priorityMode`), so nothing changes for it. At the switch-over the classic path goes.
+The miner ranks channels by the queue: a channel's rank is the best queue position among the campaigns watching it would progress. The campaign shown as progressing is likewise the earnable one ranked highest. (Until 2026-11-14 the classic UI kept the older rules, by priority list and `priorityMode`; `core` still has that path when no ranking is given, but the app always gives one.)
 
 ## Miss warnings (an estimate)
 

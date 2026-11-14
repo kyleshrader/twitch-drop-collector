@@ -41,7 +41,7 @@ test('test windows stay invisible unless TDC_E2E_SHOW_WINDOWS=1', async () => {
 
 test('loads the renderer from app:// rather than file://', async () => {
   expect(page.url()).toBe('app://renderer/index.html')
-  await expect(page.getByRole('heading', { name: 'Twitch Drop Collector' })).toBeVisible()
+  await expect(page.getByTestId('next-ui')).toBeVisible()
 })
 
 test('window uses the fixed webPreferences', async () => {

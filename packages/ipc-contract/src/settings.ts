@@ -11,8 +11,7 @@ const General = z.object({
   closeToTray: z.boolean(),
   trayNotifications: z.boolean(),
   theme: z.enum(['system', 'light', 'dark']),
-  crashReports: z.boolean(),
-  ui: z.enum(['classic', 'next'])
+  crashReports: z.boolean()
 })
 
 const Mining = z.object({

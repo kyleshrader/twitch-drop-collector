@@ -37,7 +37,7 @@ describe('settings transport schema', () => {
     const patches: unknown[] = [
       { general: { theme: 'dark' } },
       { general: { theme: 'neon' } },
-      { general: { ui: 'next' } },
+      { general: { ui: 'next' } }, // the UI setting is gone: rejected
       { general: { ui: 'fancy' } },
       { network: { connectionQuality: 0 } },
       { logging: { level: 'trace' } },

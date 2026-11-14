@@ -51,7 +51,7 @@ export function UpdatesPage(props: { updates: UpdateView | undefined }): ReactNo
   return (
     <div className={page}>
       <h2>{t.heading}</h2>
-      <p className={lead}>
+      <p className={lead} data-testid="app-version">
         {t.version(updates.currentVersion)}{' '}
         {updates.lastChecked !== undefined && t.checked(ago(updates.lastChecked))}
       </p>

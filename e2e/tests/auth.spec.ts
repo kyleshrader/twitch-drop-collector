@@ -43,7 +43,15 @@ async function startCodeSignIn(page: Page): Promise<void> {
   await page.reload()
 }
 
+/** The signed-out screen's status (signing in, session expired, and so on). */
 const status = (page: Page): ReturnType<Page['getByTestId']> => page.getByTestId('auth-status')
+/** Signed in: the account menu shows the login. */
+const account = (page: Page): ReturnType<Page['getByRole']> =>
+  page.getByTestId('next-ui').getByRole('button', { name: 'Account', exact: true })
+async function signOut(page: Page): Promise<void> {
+  await account(page).click()
+  await page.getByRole('button', { name: 'Sign out' }).click()
+}
 
 /** Everything the renderer can see or ask main for, as one string. */
 async function everythingTheRendererCanReach(
@@ -75,7 +83,7 @@ test('signs in with the Twitch login window and keeps the token out of the rende
   try {
     await expect(status(page)).toHaveText('Not signed in')
     await startWindowSignIn(page)
-    await expect(status(page)).toHaveText('Signed in as e2euser')
+    await expect(account(page)).toContainText('e2euser')
 
     // The login page was asked for exactly what Twitch's Android app asks for.
     expect(twitch.loginRequests[0]?.searchParams.get('client_id')).toBe(ANDROID_CLIENT_ID)
@@ -99,15 +107,15 @@ test('restores the session after a restart, then signs out completely', async ()
   const userDataDir = newUserDataDir()
   const first = await launch(userDataDir)
   await startWindowSignIn(first.window)
-  await expect(status(first.window)).toHaveText('Signed in as e2euser')
+  await expect(account(first.window)).toContainText('e2euser')
   await first.app.close()
 
   const second = await launch(userDataDir)
   try {
-    await expect(status(second.window)).toHaveText('Signed in as e2euser')
+    await expect(account(second.window)).toContainText('e2euser')
     expect(twitch.loginRequests).toHaveLength(1) // restored, not signed in again
 
-    await second.window.getByRole('button', { name: 'Sign out' }).click()
+    await signOut(second.window)
     await expect(status(second.window)).toHaveText('Not signed in')
     expect(existsSync(join(userDataDir, 'session.bin'))).toBe(false)
     const loginCookies = await second.app.evaluate(async ({ session }) =>
@@ -126,7 +134,7 @@ test('signs in with a device code', async () => {
     await expect(page.getByRole('button', { name: /^Sign in/ })).toHaveCount(1)
     await startCodeSignIn(page)
     await expect(page.getByTestId('device-code')).toHaveText('E2ECODE1')
-    await expect(status(page)).toHaveText('Signed in as e2euser', { timeout: 10_000 })
+    await expect(account(page)).toContainText('e2euser', { timeout: 10_000 })
     expect(await everythingTheRendererCanReach(app, page)).not.toContain(DEVICE_TOKEN)
   } finally {
     await app.close()
@@ -137,7 +145,7 @@ test('asks to sign in again when the saved token has been revoked', async () => 
   const userDataDir = newUserDataDir()
   const first = await launch(userDataDir)
   await startWindowSignIn(first.window)
-  await expect(status(first.window)).toHaveText('Signed in as e2euser')
+  await expect(account(first.window)).toContainText('e2euser')
   await first.app.close()
 
   twitch.validTokens.delete(WINDOW_TOKEN)
@@ -155,7 +163,7 @@ test('the login window shows the page address in its own address bar', async () 
   const { app, window: page } = await launch()
   try {
     await startWindowSignIn(page)
-    await expect(status(page)).toHaveText('Finish signing in in the Twitch window…')
+    await expect(status(page)).toHaveText('Finish signing in in the Twitch window')
 
     // The address bar is our own static page, rendered from a data: URL.
     const addressBar = async (): Promise<string> =>

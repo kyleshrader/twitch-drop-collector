@@ -30,7 +30,7 @@ export function countsText(errors: number, warnings: number): string {
     errors > 0 ? plural(errors, 'error', 'errors') : '',
     warnings > 0 ? plural(warnings, 'warning', 'warnings') : ''
   ].filter(Boolean)
-  return parts.length ? parts.join(' and ') : 'No issues'
+  return parts.length ? parts.join(' and ') : 'No problems'
 }
 
 /** Identity responses are about the user's own session: keep their shape, none of their text. */

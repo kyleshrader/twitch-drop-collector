@@ -1,6 +1,5 @@
-// The new UI (docs/new-ui/ui-design.md), in preview beside the classic UI. It reads the same live
-// state and calls the same IPC; only the view differs. Styles are CSS modules, so nothing here
-// leaks into the classic UI or the other way round.
+// The app's window (docs/new-ui/ui-design.md). It reads live state from main and calls the typed
+// IPC; styles are CSS modules.
 import '@fontsource-variable/inter'
 import type { ReactNode } from 'react'
 import { useApiIssues, useAuthState, useMiner, useSettings, useUpdates } from '../live'

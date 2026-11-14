@@ -9,7 +9,6 @@ import {
 } from '@tdc/ipc-contract'
 import { useState, type ReactNode } from 'react'
 import { invoke } from '../ipc'
-import { useUiChoice } from '../ui-choice'
 import { useOpenExternal } from './data'
 import { minutesUntil } from './format'
 import { icons } from './icons'
@@ -186,7 +185,6 @@ function AccountMenu(props: {
   const { auth, avatarUrl } = props
   const [avatarFailed, setAvatarFailed] = useState(false)
   const openExternal = useOpenExternal()
-  const { switchTo, switching } = useUiChoice()
   const signOut = useMutation({ mutationFn: () => invoke('auth:signOut') })
   return (
     <Popover
@@ -250,15 +248,6 @@ function AccountMenu(props: {
             </span>
           </button>
           <hr className={separator} />
-          <button
-            type="button"
-            className={menuItem}
-            disabled={switching}
-            onClick={() => switchTo('classic')}
-          >
-            <Icon.undo />
-            {strings.backToClassic}
-          </button>
           <button
             type="button"
             className={menuItem}

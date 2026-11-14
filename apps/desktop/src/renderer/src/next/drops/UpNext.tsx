@@ -64,7 +64,6 @@ const {
   campaignActions,
   warning: warningClass,
   dropsPanel,
-  estimate,
   hint,
   row,
   rowExcluded,
@@ -92,7 +91,6 @@ const {
   check,
   popHeading,
   separator,
-  note,
   alert,
   empty,
   coverSm,
@@ -317,8 +315,7 @@ function CampaignRow(props: {
           <Icon.warning />
           <div>
             {t.wontFinish(entry.needMinutes, endsIn)}{' '}
-            {entry.warning.savedAtTop ? t.savedAtTop : t.lostAnyway}{' '}
-            <span className={estimate}>{t.estimate}</span>
+            {entry.warning.savedAtTop ? t.savedAtTop : t.lostAnyway}
           </div>
         </div>
       )}
@@ -679,7 +676,6 @@ function SortMenu(props: {
               ))}
             </div>
           </div>
-          <div className={note}>{t.sortNote}</div>
         </>
       )}
     </Popover>

@@ -20,7 +20,7 @@ test('History lists claims, watching and ended campaigns, and filters them', asy
     join(userDataDir, 'settings.json'),
     JSON.stringify({
       version: 1,
-      settings: { general: { ui: 'next' }, mining: { priority: [MINING_GAME.displayName] } }
+      settings: { mining: { priority: [MINING_GAME.displayName] } }
     })
   )
   const { app, window: page } = await launchApp(userDataDir, {
@@ -39,7 +39,7 @@ test('History lists claims, watching and ended campaigns, and filters them', asy
     // Pausing and resuming, and a list change, are recorded as they happen.
     const current = ui.getByRole('region', { name: 'Current' })
     await current.getByRole('button', { name: 'Pause' }).click()
-    await current.getByRole('button', { name: 'Continue' }).click()
+    await current.getByRole('button', { name: 'Resume' }).click()
     await current.getByRole('button', { name: 'Pause' }).waitFor()
     const settingsFile = join(userDataDir, 'settings.json')
     // As the Library's list control does: through settings:update.

@@ -6,6 +6,7 @@ import {
   breakdown,
   findGame,
   gamesOf,
+  movePriority,
   groupGames,
   nameId,
   statusOf,
@@ -200,5 +201,15 @@ describe('recently seen', () => {
       ['Palia', 4],
       ['Rust', 0]
     ])
+  })
+})
+
+describe('the Priority order', () => {
+  it('moves a game one place, and not past either end', () => {
+    expect(movePriority(['a', 'b', 'c'], 'b', -1)).toEqual(['b', 'a', 'c'])
+    expect(movePriority(['a', 'b', 'c'], 'b', 1)).toEqual(['a', 'c', 'b'])
+    expect(movePriority(['a', 'b', 'c'], 'a', -1)).toEqual(['a', 'b', 'c'])
+    expect(movePriority(['a', 'b', 'c'], 'c', 1)).toEqual(['a', 'b', 'c'])
+    expect(movePriority(['a', 'b'], 'z', 1)).toEqual(['a', 'b'])
   })
 })

@@ -258,3 +258,17 @@ export function groupGames(
     .map((key) => ({ key, games: games.filter((g) => keyOf(g) === key) }))
     .filter((g) => g.games.length > 0)
 }
+
+/** The Priority list with `game` moved one place up (-1) or down (1); unchanged at either end. */
+export function movePriority(
+  priority: readonly string[],
+  game: string,
+  direction: -1 | 1
+): string[] {
+  const list = [...priority]
+  const from = list.indexOf(game)
+  const to = from + direction
+  if (from < 0 || to < 0 || to >= list.length) return list
+  ;[list[from], list[to]] = [list[to]!, list[from]!]
+  return list
+}

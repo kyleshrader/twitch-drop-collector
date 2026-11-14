@@ -138,8 +138,7 @@ export function createMiningRuntime(deps: {
     clock,
     logger: logger.child('watch')
   })
-  // The Up next queue (docs/new-ui/queue-rules.md). It drives mining while the new UI is on;
-  // the classic UI keeps the classic rules until the switch-over.
+  // The Up next queue (docs/new-ui/queue-rules.md): it ranks what the miner watches.
   const queueOf = (current?: Campaign): Queue => {
     return buildQueue({
       campaigns: inventory.campaigns(),
@@ -324,8 +323,8 @@ export function createMiningRuntime(deps: {
   const watchTimer = setInterval(countWatching, watchTick)
   watchTimer.unref?.()
 
-  const queueRank = (): CampaignRank | undefined =>
-    settings.get().general.ui === 'next' ? queueOf().rank : undefined
+  /** Channels are ranked by the Up next queue (docs/new-ui/queue-rules.md). */
+  const queueRank = (): CampaignRank => queueOf().rank
 
   const miner = createMiner({
     inventory,
@@ -397,9 +396,8 @@ export function createMiningRuntime(deps: {
     return undefined
   }
 
-  /** What of the settings ranks channels: the queue, while the new UI is on. */
-  const queueDrives = (s: Settings): string =>
-    s.general.ui === 'next' ? JSON.stringify({ ...s.queue, paused: undefined }) : ''
+  /** What of the settings ranks channels: the queue (all but pausing). */
+  const queueDrives = (s: Settings): string => JSON.stringify({ ...s.queue, paused: undefined })
   const offSettings = settings.subscribe((next, previous) => {
     if (next.queue.paused !== previous.queue.paused) {
       recordEvent(next.queue.paused ? 'paused' : 'resumed')

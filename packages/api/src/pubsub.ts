@@ -146,7 +146,7 @@ export function createPubSub(deps: {
         source: 'pubsub',
         endpoint: 'frame',
         kind: 'shape',
-        summary: 'PubSub sent a frame that is not JSON',
+        summary: 'PubSub sent a frame that isn’t JSON',
         checks: [
           {
             path: '(root)',
@@ -195,7 +195,7 @@ export function createPubSub(deps: {
             source: 'pubsub',
             endpoint: kindOf(topic),
             kind: 'shape',
-            summary: 'A PubSub message payload is not JSON',
+            summary: 'A PubSub message’s payload isn’t JSON',
             checks: [
               {
                 path: 'data.message',
@@ -223,7 +223,7 @@ export function createPubSub(deps: {
           source: 'pubsub',
           endpoint: 'frame',
           kind: 'shape',
-          summary: `PubSub sent a frame type we don't know: ${String(message.type)}`,
+          summary: `PubSub sent a frame type the app doesn’t know: ${String(message.type)}`,
           checks: [
             {
               path: 'type',

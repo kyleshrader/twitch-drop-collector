@@ -182,7 +182,7 @@ describe('API issue log', () => {
   it('says how many errors and warnings there are', () => {
     expect(countsText(2, 1)).toBe('2 errors and 1 warning')
     expect(countsText(0, 3)).toBe('3 warnings')
-    expect(countsText(0, 0)).toBe('No issues')
+    expect(countsText(0, 0)).toBe('No problems')
   })
 })
 

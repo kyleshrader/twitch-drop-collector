@@ -143,7 +143,7 @@ export function checkShape<T>(
       source,
       endpoint,
       kind: 'shape',
-      summary: `The response doesn't match what we expect (${checks.length} ${
+      summary: `The response doesn’t match what the app expects (${checks.length} ${
         checks.length === 1 ? 'difference' : 'differences'
       })`,
       checks,

@@ -8,7 +8,7 @@ import { launchApp } from './app'
 test('the app creates and migrates its database at startup', async () => {
   const { app, window: page, userDataDir } = await launchApp()
   try {
-    await expect(page.getByTestId('app-version')).toContainText('Version')
+    await expect(page.getByTestId('next-ui')).toBeVisible()
     const file = join(userDataDir, 'tdc.db')
     expect(existsSync(file)).toBe(true)
 

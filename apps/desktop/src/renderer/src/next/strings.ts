@@ -1,4 +1,4 @@
-// The new UI's text, kept apart from the classic UI's so the two can differ while both exist.
+// The app's text, in one place.
 import { duration } from './format'
 
 const plural = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`
@@ -6,10 +6,7 @@ const plural = (n: number, one: string, many: string): string => `${n} ${n === 1
 export const strings = {
   title: 'Twitch Drop Collector',
   brand: 'Drop Collector',
-  backToClassic: 'Back to the classic UI',
-  switching: 'Switching…',
-  switchFailed: 'Could not switch. Try again.',
-  saveFailed: 'Could not save that change. Try again.',
+  saveFailed: 'Couldn’t save that change. Try again.',
   loading: 'Loading…',
 
   nav: {
@@ -53,11 +50,13 @@ export const strings = {
 
   signedOut: {
     heading: 'Sign in to start mining',
-    lead: 'Drop Collector watches streams for you and claims the rewards. Sign in with your Twitch account to begin.',
+    lead: 'Earns and claims your Twitch drops in the background.',
     status: 'Not signed in',
     restoring: 'Checking your session…',
     signIn: 'Sign in with Twitch',
-    waiting: 'Waiting for the login window',
+    waiting: 'Finish signing in in the Twitch window',
+    waitingForCode: 'Enter this code on Twitch',
+    openActivate: 'Open twitch.tv/activate',
     cancel: 'Cancel'
   },
 
@@ -66,7 +65,7 @@ export const strings = {
     miningNow: 'Mining now',
     paused: 'Paused',
     pause: 'Pause',
-    resume: 'Continue',
+    resume: 'Resume',
     /** Follows the campaign's name: "AOS Drops Day 9, ends in 3 h". */
     endsSuffix: (endsIn: number): string => `, ends in ${duration(endsIn)}`,
     watching: 'Watching',
@@ -76,7 +75,7 @@ export const strings = {
     changeLabel: 'Change channel',
     channelsFor: (campaign: string): string => `Channels for ${campaign}`,
     letMinerChoose: 'Let the miner choose',
-    channelsNote: 'Greyed channels don’t count for this campaign right now.',
+    channelsNote: 'Grayed-out channels don’t count toward this campaign.',
     noChannels: 'No channels found for this game yet.',
     unwatchable: {
       offline: 'Offline',
@@ -85,15 +84,15 @@ export const strings = {
       nothingToEarn: 'Nothing to earn here'
     },
     claimed: 'Claimed',
-    awaitsLink: 'Finished, link your account to claim',
+    awaitsLink: 'Finished: link your account to claim it',
     minutes: (have: number, need: number): string => `${have} / ${need} min`,
     unlocksAt: (need: number, toGo: number): string =>
       `Unlocks at ${duration(need)} watched, ${duration(toGo)} to go`,
     remaining: 'remaining',
     pausedHeading: 'Mining is paused',
-    pausedLead: 'Nothing is watched until you continue. Your queue stays as it is.',
+    pausedLead: 'Nothing is watched until you resume.',
     idleHeading: 'Not mining right now',
-    idleFallback: 'Waiting for something to mine',
+    idleFallback: 'Nothing to mine right now',
     loadingHeading: 'Loading your campaigns…'
   },
 
@@ -115,45 +114,44 @@ export const strings = {
       custom: 'Custom'
     },
     sortNotes: {
-      priority: 'Priority games in your list’s order, then the least time needed',
-      ending: 'The campaigns that end first go first',
-      spare: 'The campaigns closest to running out of time go first',
-      custom: 'Your own order: drag cards, or use Move up and Move down'
+      priority: 'Priority games first, then least time needed',
+      ending: 'Campaigns ending first',
+      spare: 'Campaigns closest to running out of time',
+      custom: 'Your own order'
     },
-    customFrom: (sort: string): string => `Started from ${sort}. Picking a sort above replaces it.`,
-    customHow: 'Drag a card or use Move up / Move down to start one.',
+    customFrom: (sort: string): string => `Based on ${sort}`,
+    customHow: 'Drag cards to reorder',
     sortOptions: 'Options',
     linkedFirst: 'Linked games first',
-    linkedFirstNote: 'Games that need an account linked go after, in the automatic sorts',
+    linkedFirstNote: 'Games that need linking go last',
     newInCustom: 'New campaigns in a custom order',
     newInCustomOptions: { byTimeRemaining: 'By time remaining', end: 'At the bottom' },
-    sortNote: 'Priority games come before Not set games in every order.',
     reset: (sort: string): string => `Reset to ${sort}`,
     showExcluded: (n: number): string => `Show excluded (${n})`,
     hideExcluded: (n: number): string => `Hide excluded (${n})`,
     excludedHeading: 'Excluded',
-    empty: 'Nothing queued. Campaigns for Priority and Not set games show up here.',
-    priorityOnly: 'Only Priority games are mined. Not set games wait in the queue.',
+    empty: 'Nothing queued.',
+    priorityOnly: 'Only Priority games are being mined.',
     mineNotSet: 'Mine Not set games too',
     drag: 'Drag to reorder',
-    dragCampaign: 'Drag up or down to split the game here',
+    dragCampaign: 'Drag to move this campaign',
     gameActions: (game: string): string => `Actions for ${game}`,
     campaignActions: (campaign: string): string => `Actions for ${campaign}`,
     moveUp: 'Move up',
     moveDown: 'Move down',
-    splitUp: 'Move up, splitting off this and the ones above',
-    splitDown: 'Move down, splitting off this and the ones below',
+    splitUp: 'Move up (splits the game)',
+    splitDown: 'Move down (splits the game)',
     openInLibrary: 'Open in Library',
     collect: 'Collect now',
     collecting: 'Collecting now',
     alsoCurrent: 'Also in Current',
-    alsoCurrentTip: 'Another campaign of this game is in Current',
+    alsoCurrentTip: 'Another campaign of this game is being mined',
     split: 'Split',
-    splitTip: 'This game is in several places in the queue',
+    splitTip: 'This game appears more than once in the queue',
     linked: 'Linked',
-    linkedTip: 'Your Twitch account is linked to this game',
+    linkedTip: 'Game account linked',
     notLinked: 'Not linked',
-    notLinkedTip: 'Rewards need a linked account',
+    notLinkedTip: 'Link your game account on Twitch to earn these',
     newTag: 'New',
     anyChannel: 'Any channel',
     /** "Only on a, b, c and 2 more": the names are links, so the words come in pieces. */
@@ -161,27 +159,25 @@ export const strings = {
     /** How many names "Only on" shows before "and N more". */
     onlyOnShown: 3,
     andMore: (n: number): string => ` and ${n} more`,
-    channelTip: (names: readonly string[]): string => `Only ${names.join(', ')} count`,
-    anyChannelTip: 'Any channel streaming the game with drops on counts',
+    channelTip: (names: readonly string[]): string => names.join(', '),
+    anyChannelTip: 'Any channel with drops enabled',
     drops: (done: number, total: number): string => `${done} of ${total} drops`,
     needs: (minutes: number): string => `Needs ${duration(minutes)}`,
     endsStarts: (endsIn: number, startsIn: number | undefined): string =>
       startsIn === undefined
         ? `Ends in ${duration(endsIn)}`
-        : `Ends in ${duration(endsIn)}, starts in about ${duration(startsIn)}`,
+        : `Ends in ${duration(endsIn)} · starts in ~${duration(startsIn)}`,
     notMined: {
-      notLinked: 'Not mined: link your account first',
-      badgesOff: 'Not mined: badge and emote campaigns are off',
-      priorityOnly: 'Not mined: only Priority games are'
+      notLinked: 'Link your account to mine',
+      badgesOff: 'Badge and emote campaigns are off',
+      priorityOnly: 'Only Priority games are mined'
     },
     linkAccount: 'Link account',
     wontFinish: (need: number, endsIn: number): string =>
-      `Won’t finish in time: needs ${duration(need)}, ends in ${duration(endsIn)}.`,
-    savedAtTop: 'Moving it to the top would save it.',
-    lostAnyway: 'It won’t finish even at the top.',
-    estimate: 'Estimate, assuming a watchable channel is always available.',
-    progressesWith: (names: readonly string[]): string =>
-      `Progresses together with ${names.join(', ')} (per the queue rules)`
+      `Won’t finish in time (needs ${duration(need)}, ends in ${duration(endsIn)}).`,
+    savedAtTop: 'Move it to the top to finish it.',
+    lostAnyway: 'It can’t finish in time.',
+    progressesWith: (names: readonly string[]): string => `Progresses with ${names.join(', ')}`
   },
 
   upcoming: {
@@ -194,15 +190,15 @@ export const strings = {
     show: (campaign: string): string => `Show the drops in ${campaign}`,
     hide: (campaign: string): string => `Hide the drops in ${campaign}`,
     label: (campaign: string): string => `Drops in ${campaign}`,
-    empty: 'This campaign has no drops listed.',
+    empty: 'No drops.',
     minutes: (have: number, need: number): string => `${have} / ${need} min`,
     status: {
       claimed: 'Claimed',
-      awaitsLink: 'Finished, link your account to claim',
+      awaitsLink: 'Finished: link your account to claim it',
       finished: 'Finished',
       inProgress: 'In progress',
       notStarted: 'Not started',
-      ended: 'Window ended'
+      ended: 'Ended'
     },
     startsIn: (minutes: number): string => `Starts in ${duration(minutes)}`,
     window: (from: string, to: string): string => `Only ${from} – ${to}`
@@ -214,22 +210,20 @@ export const strings = {
     hide: 'Hide',
     hideLabel: (drop: string): string => `Hide ${drop}`,
     empty: 'No completed drops to show.',
-    hidden: (n: number): string =>
-      `${plural(n, 'entry', 'entries')} hidden on this device. Nothing was deleted.`,
+    hidden: (n: number): string => `${plural(n, 'entry', 'entries')} hidden.`,
     undo: 'Undo',
     claimed: 'Claimed',
     linkToClaim: 'Link account to claim',
     ends: (date: string): string => `Ends ${date}`,
     ended: (date: string): string => `Ended ${date}`,
     detail: (rewards: string, game: string, campaign: string): string =>
-      `${rewards}, ${game} ${campaign}`
+      `${rewards} · ${game} · ${campaign}`
   },
 
   library: {
     label: 'Library',
     home: 'Home',
     collection: 'Games',
-    collectionNote: 'More collections can go here later.',
     sortLabel: 'Sort and group games',
     sortings: {
       list: 'Priority / Not set / Excluded',
@@ -257,14 +251,13 @@ export const strings = {
     },
     search: 'Search games',
     onTwitch: 'On Twitch',
-    onTwitchNote: 'Games without drops right now. Open one to put it on a list.',
+    onTwitchNote: 'Games without active drops',
     searching: 'Searching Twitch…',
-    searchFailed: 'Couldn’t search Twitch. Try again in a moment.',
+    searchFailed: 'Couldn’t search Twitch.',
     collapseGroup: (name: string): string => `Collapse ${name}`,
     expandGroup: (name: string): string => `Expand ${name}`,
     allGames: 'All games',
-    noCampaigns:
-      'Twitch hasn’t listed a drops campaign for this game. Its list applies whenever it gets one.',
+    noCampaigns: 'No campaigns right now.',
     filterNames: {
       hideExcluded: 'Hide excluded games',
       active: 'Only games with active campaigns',
@@ -307,10 +300,14 @@ export const strings = {
         ? `${plural(seen, 'campaign', 'campaigns')} seen, ${listed} listed by Twitch now`
         : `${plural(seen, 'campaign', 'campaigns')} seen`,
     listLabel: 'List',
+    rank: (n: number, of: number): string => `#${n} of ${of}`,
+    rankTip: 'Position in your Priority list',
+    rankUp: 'Higher priority',
+    rankDown: 'Lower priority',
     accountLabel: 'Twitch account',
     accountLinked: 'Account linked',
     linkOnTwitch: 'Link account on Twitch',
-    noLinkNeeded: 'No account link needed',
+    noLinkNeeded: 'No link needed',
     viewOnTwitch: 'View on Twitch',
     campaignsHeading: 'Campaigns',
     columns: {
@@ -328,45 +325,61 @@ export const strings = {
       missed: 'Missed'
     },
     historyNote: (n: number): string =>
-      n === 1
-        ? 'One more campaign was seen before the app kept campaign details, so only its count is known.'
-        : `${n} more campaigns were seen before the app kept campaign details, so only their count is known.`,
+      n === 1 ? '1 earlier campaign has no details.' : `${n} earlier campaigns have no details.`,
     noLongerListed: 'No longer listed',
-    lastSeen: (when: string): string => `Twitch stopped listing it. Last seen ${when}.`,
-    notFound: 'This game isn’t in your campaigns any more.'
+    lastSeen: (when: string): string => `Last seen ${when}`,
+    notFound: 'Game not found.'
   },
 
   settings: {
     heading: 'Settings',
-    lead: 'Most settings live on the pages they affect. This page holds the rest for now.',
     theme: 'Theme',
-    themeNote: 'Dark is the main theme.',
     themes: { system: 'System', dark: 'Dark', light: 'Light' },
-    general: 'General',
     mining: 'Mining',
+    updates: 'Updates',
+    network: 'Network',
+    diagnostics: 'Diagnostics',
     toggles: {
-      closeToTray: {
-        name: 'Keep running in the tray when closed',
-        note: 'Closing the window keeps mining.'
+      closeToTray: { name: 'Keep running in the tray when closed', note: '' },
+      launchAtLogin: { name: 'Start with your computer', note: '' },
+      startMinimized: { name: 'Start in the tray', note: 'When starting with your computer' },
+      trayNotifications: {
+        name: 'Notifications',
+        note: 'Claimed drops, updates and Twitch API problems'
       },
-      launchAtLogin: {
-        name: 'Start when you sign in to the computer',
-        note: 'Opens with your computer.'
-      },
-      startMinimized: { name: 'Start in the tray', note: 'When it starts with the computer.' },
-      trayNotifications: { name: 'Notifications', note: 'Say when a drop is claimed.' },
+      mineNotSet: { name: 'Mine Not set games', note: 'After Priority games' },
       enableBadgesEmotes: {
         name: 'Mine badge and emote campaigns',
-        note: 'They need no linked account.'
+        note: 'No linked account needed'
       },
-      mineNotSet: {
-        name: 'Mine Not set games',
-        note: 'After Priority games. Off: only Priority games are mined.'
+      availableDropsCheck: {
+        name: 'Confirm drops on each channel',
+        note: 'Checks with Twitch before watching, in case a stream’s drops tag is wrong'
+      },
+      autoUpdate: {
+        name: 'Install updates automatically',
+        note: 'Downloads in the background and installs when you quit'
+      },
+      prereleases: { name: 'Get beta versions', note: '' },
+      crashReports: {
+        name: 'Keep crash reports',
+        note: 'Saved on this computer only. Applies after a restart.'
       }
     },
-    interface: 'Interface',
-    interfaceNote: 'The new UI is in preview. The classic UI is a click away.',
-    logs: 'Open the logs folder'
+    appUpdates: 'App updates',
+    checkNow: 'Check now',
+    proxy: 'Proxy',
+    proxyNote: 'HTTP or SOCKS. Leave empty to connect directly.',
+    proxyPlaceholder: 'socks5://127.0.0.1:1080',
+    proxyInvalid: 'Use an http://, https://, socks:// or socks5:// address.',
+    connection: 'Connection quality',
+    connectionNote: 'Choose a slower setting if requests time out.',
+    connectionLevels: (n: number): string =>
+      n === 1 ? '1 (fast)' : n === 6 ? '6 (slow)' : String(n),
+    logLevel: 'Log detail',
+    logLevels: { error: 'Errors', warn: 'Warnings', info: 'Normal', debug: 'Debug' },
+    logs: 'Logs',
+    openLogs: 'Open folder'
   },
 
   updates: {
@@ -374,14 +387,14 @@ export const strings = {
     version: (v: string): string => `You’re on version ${v}.`,
     checked: (when: string): string => `Last checked ${when}.`,
     upToDate: 'You have the latest version.',
-    unsupported: 'Updates don’t work in this build.',
+    unsupported: 'Updates aren’t available in this build.',
     checking: 'Checking for updates…',
     available: (v: string): string => `Version ${v} is available`,
     downloading: (v: string, percent: number): string =>
       `Downloading version ${v}: ${Math.round(percent)}%`,
     ready: (v: string): string => `Version ${v} is ready to install`,
-    readyNote: 'Mining continues after the restart.',
-    error: (reason: string): string => `Could not check for updates: ${reason}`,
+    readyNote: 'The app restarts to install it.',
+    error: (reason: string): string => `Couldn’t check for updates: ${reason}`,
     check: 'Check for updates',
     download: 'Download',
     install: 'Restart and update',
@@ -390,10 +403,7 @@ export const strings = {
 
   history: {
     heading: 'History',
-    lead: (since: string | undefined): string =>
-      since
-        ? `What Drop Collector has done on this computer since ${since}: what it watched, what it claimed, and how each campaign ended.`
-        : 'What Drop Collector watches and claims, and how each campaign ends, shows up here as it runs.',
+    lead: (since: string | undefined): string => (since ? `Since ${since}` : ''),
     rangeLabel: 'Time range',
     ranges: { '7d': '7 days', '30d': '30 days', '90d': '90 days', all: 'All time' },
     filterLabel: 'Show',
@@ -411,15 +421,15 @@ export const strings = {
       completed: 'Campaigns completed',
       missed: 'Campaigns missed'
     },
-    statTip: (what: string): string => `Show only ${what.toLowerCase()}`,
+    statTip: (what: string): string => `Filter by ${what.toLowerCase()}`,
     dropsNote: (games: number): string =>
       games === 0 ? 'None in this range' : `From ${plural(games, 'game', 'games')}`,
     watchedNote: (sessions: number): string =>
-      sessions === 0 ? 'Nothing watched in this range' : plural(sessions, 'session', 'sessions'),
+      sessions === 0 ? 'None in this range' : plural(sessions, 'session', 'sessions'),
     completedNote: (ended: number): string =>
       ended === 0 ? 'None ended in this range' : `Of ${ended} that ended`,
     missedNote: (partial: number): string =>
-      partial === 0 ? 'Ended with nothing claimed' : `And ${partial} ended part-done`,
+      partial === 0 ? 'Ended with nothing claimed' : `And ${partial} ended partly claimed`,
     today: 'Today',
     yesterday: 'Yesterday',
     daySummary: (drops: number, minutes: number): string =>
@@ -433,12 +443,12 @@ export const strings = {
     on: 'on',
     ended: {
       completed: (campaign: string): string => `Completed ${campaign}`,
-      partial: (campaign: string): string => `${campaign} ended part-done`,
+      partial: (campaign: string): string => `${campaign} ended partly claimed`,
       missed: (campaign: string): string => `Missed ${campaign}`,
       notEarnable: (campaign: string): string => `${campaign} ended`
     },
     endedDrops: (claimed: number, total: number): string => `${claimed} of ${total} drops`,
-    notEarnable: 'your account couldn’t earn it',
+    notEarnable: 'not linked',
     watchedFor: (minutes: number): string => `watched ${duration(minutes)}`,
     newCampaigns: (n: number): string => (n === 1 ? 'New campaign' : `${n} new campaigns`),
     newGame: 'New in your Library',
@@ -446,7 +456,7 @@ export const strings = {
     list: {
       priority: 'put on Priority',
       excluded: 'excluded',
-      notSet: 'taken off its list (Not set)'
+      notSet: 'moved to Not set'
     },
     linked: 'Linked your account for',
     app: {
@@ -456,12 +466,12 @@ export const strings = {
         from ? `Updated to version ${version} (from ${from})` : `Updated to version ${version}`
     },
     appSub: {
-      paused: 'Nothing was watched or sent to Twitch until it resumed',
-      resumed: 'Watching picked up where the queue stood',
-      updated: 'Drop Collector'
+      paused: '',
+      resumed: '',
+      updated: ''
     },
     fromTwitch: 'Time from Twitch',
-    fromTwitchTip: 'Claimed outside the app, or before it kept claims: the time is Twitch’s.',
+    fromTwitchTip: 'Claim time reported by Twitch',
     games: 'Games',
     gamesNote: 'By time watched in this range',
     gameRow: (minutes: number, drops: number): string =>
@@ -472,24 +482,23 @@ export const strings = {
     allGames: 'All games',
     showAllGames: (n: number): string => `Show all ${n}`,
     showFewerGames: 'Show fewer',
-    empty:
-      'Nothing yet. Claims, watching and how campaigns end show up here as Drop Collector runs.',
+    empty: 'No activity yet.',
     noMatch: 'Nothing matches these filters.',
     clearFilters: 'Clear filters',
     showMore: (n: number): string => `Show ${n} more`,
     starts: (running: number): string =>
       running > 0
-        ? `The history starts here. ${plural(running, 'campaign was', 'campaigns were')} already running.`
-        : 'The history starts here.',
+        ? `History begins · ${plural(running, 'campaign', 'campaigns')} already running`
+        : 'History begins',
     openGame: (game: string): string => `Open ${game} in the Library`,
     loading: 'Loading the history…',
-    failed: 'The history couldn’t be read.'
+    failed: 'Couldn’t load the history.'
   },
 
   twitchApi: {
     heading: 'Twitch API',
     lead: (file: string): string =>
-      `Every response from Twitch is checked against what the app expects. Anything that doesn’t match shows up here and in ${file} in the logs folder, so a change on Twitch’s side is caught early.`,
+      `Responses from Twitch that don’t match what the app expects. Also logged to ${file}.`,
     counts: (errors: number, warnings: number): string => {
       const parts = [
         errors > 0 ? plural(errors, 'error', 'errors') : '',
@@ -497,16 +506,14 @@ export const strings = {
       ].filter(Boolean)
       return parts.length ? parts.join(' and ') : 'No problems'
     },
-    none: 'No problems found. Twitch’s responses match what the app expects.',
+    none: 'No problems found.',
     checking: 'Running…',
     issuesHeading: 'Issues',
     demo: 'Simulate a change',
-    demoTip:
-      'Records a made-up mismatch, as if Twitch had changed a response, so you can see the notification, the log and this page at work. Nothing is sent to Twitch.',
-    demoChip: 'Demo',
+    demoTip: 'Adds a sample issue. Nothing is sent to Twitch.',
+    demoChip: 'Sample',
     testCalls: 'Test calls',
-    testCallsNote:
-      'The read-only requests the app makes, run on demand. Nothing is claimed, watched or changed on Twitch. A response that doesn’t match is recorded above.',
+    testCallsNote: 'Read-only requests. Nothing is claimed or changed.',
     runAll: 'Run all',
     run: 'Run',
     runOne: (endpoint: string): string => `Run ${endpoint}`,
@@ -525,12 +532,11 @@ export const strings = {
     openFolder: 'Open the log folder',
     pause: 'Pause all activity',
     resume: 'Resume',
-    pausedNote: 'Paused: the app isn’t talking to Twitch until you resume.',
+    pausedNote: 'All activity is paused.',
     dismiss: 'Dismiss',
     dismissAll: 'Dismiss all',
     report: 'Report on GitHub',
-    reportNote:
-      'Opens a new GitHub issue in your browser, filled in with these details. They’re redacted: no tokens, and not your user ID or login. Read it over before you submit.',
+    reportNote: 'Opens a prefilled issue in your browser. Personal details are removed.',
     back: 'Twitch API',
     severity: { error: 'Error', warning: 'Warning' },
     source: { gql: 'GQL', pubsub: 'PubSub', identity: 'Sign-in' },
@@ -553,14 +559,14 @@ export const strings = {
     missing: '(missing)',
     nothing: '(nothing)',
     response: 'The response',
-    notFound: 'This issue was dismissed or is no longer kept.',
+    notFound: 'Issue not found.',
     notice: (errors: number, warnings: number): string =>
       `Twitch API: ${errors > 0 ? plural(errors, 'error', 'errors') : ''}${
         errors > 0 && warnings > 0 ? ', ' : ''
       }${warnings > 0 ? plural(warnings, 'warning', 'warnings') : ''}`,
     noticeDetail: 'Twitch may have changed something the app relies on.',
     settingsRow: 'Twitch API checks',
-    settingsNote: (summary: string): string => `${summary}. Opens the list of mismatches.`,
+    settingsNote: (summary: string): string => summary,
     open: 'Open'
   }
 }

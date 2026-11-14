@@ -25,7 +25,9 @@ function rawInvoke(channel: string, input?: unknown): Promise<unknown> {
 
 test('the renderer shows data from a real IPC round trip', async () => {
   const version = await app.evaluate(({ app }) => app.getVersion())
-  await expect(page.getByTestId('app-version')).toContainText(`Version ${version}`)
+  // The App updates page shows the version main reports.
+  await page.evaluate(() => (location.hash = '#/updates'))
+  await expect(page.getByTestId('app-version')).toContainText(`version ${version}`)
 })
 
 test('main rejects an invalid payload sent from the renderer', async () => {
@@ -48,7 +50,7 @@ test('a valid request reaches the handler', async () => {
       opened.push(url)
     }
   })
-  await page.getByRole('button', { name: 'Open Twitch drops inventory' }).click()
+  await rawInvoke('shell:openExternal', { url: 'https://www.twitch.tv/drops/inventory' })
   await expect
     .poll(() => app.evaluate(() => (globalThis as { __opened?: string[] }).__opened))
     .toEqual(['https://www.twitch.tv/drops/inventory'])
